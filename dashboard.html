@@ -2133,6 +2133,10 @@ function renderMTD() {
   }
 
   mtdEl.innerHTML =
+    (channel !== 'amazon' ? mkMtdKpi('sessions', 'MTD Sessions', mtd.sessions.toLocaleString(), '', (mtd.sessions>0?(mtd.orders/mtd.sessions*100).toFixed(2)+'% CR | '+fmt(mtd.ad_spend/mtd.sessions)+'/session':'') + ' | '+Math.round(mtd.sessions/n)+'/day',
+      '<span><span class="sub-label">Busy Board</span><span class="sub-val">'+(mtd.bb_sessions||0).toLocaleString()+'</span></span>' +
+      '<span><span class="sub-label">STEM</span><span class="sub-val">'+(mtd.stem_sessions||0).toLocaleString()+'</span></span>' +
+      '<span><span class="sub-label">Soft Toy</span><span class="sub-val">'+(mtd.soft_sessions||0).toLocaleString()+'</span></span>') : '') +
     mkMtdKpi('rev', 'MTD Revenue', fmt(mtd.revenue), '', monthDates.length+' days | '+fmt(mtd.revenue/n)+'/day', mtdBk('rev')) +
     mkMtdKpi('orders', 'MTD Units', mtd.orders.toLocaleString(), '', Math.round(mtd.orders/n)+' units/day | AOV: '+(mtd.orders>0?fmt(mtd.revenue/mtd.orders):'—'), mtdBk('orders', numFmtM)) +
     mkMtdKpi('ads', 'MTD Ad Spend <span style="font-size:8px;color:var(--muted);font-weight:400">(inc GST)</span>', fmt(mtd.ad_spend), '', fmt(mtd.ad_spend/n)+'/day | ROAS: '+mtdRoas, mtdBk('ads')) +
@@ -2156,11 +2160,6 @@ function renderMTD() {
       '<span><span class="sub-label">STEM</span><span class="sub-val">'+mtdStRoas+'</span></span>' +
       '<span><span class="sub-label">Soft Toy</span><span class="sub-val">'+mtdSfRoas+'</span></span>' +
       (channel==='combined'?'<span><span class="sub-label">Amazon</span><span class="sub-val">'+mtdAmzRoas+'</span></span>':'')) +
-    (channel !== 'amazon' ? mkMtdKpi('sessions', 'MTD Sessions', mtd.sessions.toLocaleString(), '', (mtd.sessions>0?(mtd.orders/mtd.sessions*100).toFixed(2)+'% CR | '+fmt(mtd.ad_spend/mtd.sessions)+'/session':'') + ' | '+Math.round(mtd.sessions/n)+'/day',
-      '<span><span class="sub-label">Busy Board</span><span class="sub-val">'+(mtd.bb_sessions||0).toLocaleString()+'</span></span>' +
-      '<span><span class="sub-label">STEM</span><span class="sub-val">'+(mtd.stem_sessions||0).toLocaleString()+'</span></span>' +
-      '<span><span class="sub-label">Soft Toy</span><span class="sub-val">'+(mtd.soft_sessions||0).toLocaleString()+'</span></span>') : '');
-
   // ── Selected Date KPIs ──
   const dayTitle = document.getElementById('mtdDayTitle');
   if (dateStart === dateEnd) {
@@ -2223,6 +2222,11 @@ function renderMTD() {
   const amzCac = s.amz_orders > 0 ? fmt(s.amz_ads / s.amz_orders) : '—';
 
   dayEl.innerHTML =
+    (channel !== 'amazon' ? mkKpi('sessions', 'Sessions', s.sessions.toLocaleString(), '', (s.sessions>0?(s.orders/s.sessions*100).toFixed(2)+'% CR | '+fmt(s.ad_spend/s.sessions)+'/session':''),
+      '<span><span class="sub-label">Busy Board</span><span class="sub-val">'+(s.bb_sessions||0).toLocaleString()+'</span></span>' +
+      '<span><span class="sub-label">STEM</span><span class="sub-val">'+(s.stem_sessions||0).toLocaleString()+'</span></span>' +
+      '<span><span class="sub-label">Soft Toy</span><span class="sub-val">'+(s.soft_sessions||0).toLocaleString()+'</span></span>',
+      growthBadgeMtd(s.sessions, prev.sessions||0)) : '') +
     mkKpi('rev', 'Revenue', fmt(s.revenue), '', channel==='combined'?'D2C: '+fmt(s.d2c_rev)+' | Amz: '+fmt(s.amz_rev):'', bk('rev'), growthBadgeMtd(s.revenue, prev.revenue)) +
     mkKpi('aov', 'AOV', s.orders>0?fmt(s.revenue/s.orders):'—', '', s.orders>0?s.orders+' orders':'',
       '<span><span class="sub-label">Busy Board</span><span class="sub-val">'+(s.bb_orders>0?fmt(s.bb_rev/s.bb_orders):'—')+'</span></span>' +
@@ -2248,12 +2252,6 @@ function renderMTD() {
       '<span><span class="sub-label">Soft (22% RTO)</span><span class="sub-val">-' + fmt(sel.soft_orders*RTO_RATES.soft*RTO_COST) + '</span></span>' +
       '<span><span class="sub-label">Raw Profit</span><span class="sub-val">' + fmt(s.profit) + '</span></span>',
       growthBadgeMtd(selAdjProfit, prevAdjProfit)) +
-    (channel !== 'amazon' ? mkKpi('sessions', 'Sessions', s.sessions.toLocaleString(), '', (s.sessions>0?(s.orders/s.sessions*100).toFixed(2)+'% CR | '+fmt(s.ad_spend/s.sessions)+'/session':''),
-      '<span><span class="sub-label">Busy Board</span><span class="sub-val">'+(s.bb_sessions||0).toLocaleString()+'</span></span>' +
-      '<span><span class="sub-label">STEM</span><span class="sub-val">'+(s.stem_sessions||0).toLocaleString()+'</span></span>' +
-      '<span><span class="sub-label">Soft Toy</span><span class="sub-val">'+(s.soft_sessions||0).toLocaleString()+'</span></span>',
-      growthBadgeMtd(s.sessions, prev.sessions||0)) : '');
-
   // (old hidden chart removed)
 
   // ── Category Analytics Charts ──
