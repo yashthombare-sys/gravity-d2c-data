@@ -1818,12 +1818,12 @@
     "2026-03-16": {
       "revenue": 101350.39,
       "orders": 131,
-      "ad_spend": 0.0,
+      "ad_spend": 18597.98,
       "commissions": 25775.8,
       "product_expense": 40791.0,
       "total_expense": 66566.8,
       "profit": 34783.59
     }
   },
-  "last_synced": "2026-03-17T11:25:28"
+  "last_synced": "2026-03-17T12:15:25"
 }
