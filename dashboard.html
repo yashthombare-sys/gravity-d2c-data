@@ -2133,7 +2133,7 @@ function renderMTD() {
   }
 
   mtdEl.innerHTML =
-    (channel !== 'amazon' ? mkMtdKpi('sessions', 'MTD Sessions', mtd.sessions.toLocaleString(), '', (mtd.sessions>0?(mtd.orders/mtd.sessions*100).toFixed(2)+'% CR | '+fmt(mtd.ad_spend/mtd.sessions)+'/session':'') + ' | '+Math.round(mtd.sessions/n)+'/day',
+    (channel !== 'amazon' ? mkMtdKpi('sessions', 'MTD Sessions', mtd.sessions.toLocaleString(), '', (mtd.sessions>0?(mtd.orders/mtd.sessions*100).toFixed(2)+'% CR | '+fmt(mtd.ad_spend/mtd.sessions)+'/session | '+Math.round(mtd.sessions/n)+'/day':''),
       '<span><span class="sub-label">Busy Board</span><span class="sub-val">'+(mtd.bb_sessions||0).toLocaleString()+'</span></span>' +
       '<span><span class="sub-label">STEM</span><span class="sub-val">'+(mtd.stem_sessions||0).toLocaleString()+'</span></span>' +
       '<span><span class="sub-label">Soft Toy</span><span class="sub-val">'+(mtd.soft_sessions||0).toLocaleString()+'</span></span>') : '') +
