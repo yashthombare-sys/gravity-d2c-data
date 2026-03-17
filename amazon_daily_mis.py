@@ -7,6 +7,7 @@ Usage:
     python3 amazon_daily_mis.py                    # Current month (Mar 1 to yesterday)
     python3 amazon_daily_mis.py 2026-03            # Specific month (1st to yesterday or end of month)
     python3 amazon_daily_mis.py --yesterday        # Only yesterday (for daily cron at 6 AM)
+    python3 amazon_daily_mis.py --last4             # Past 4 days (for daily cron — re-syncs recent data)
 """
 import sys, os, json, time
 
@@ -763,7 +764,79 @@ def main():
     today = datetime.now()
     yesterday = today - timedelta(days=1)
 
-    if "--yesterday" in args:
+    if "--last4" in args:
+        # Cron mode: fetch past 4 days (re-syncs recent data for accuracy)
+        end_date = yesterday
+        start_date = today - timedelta(days=4)
+
+        print(f"Cron mode: fetching last 4 days ({start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')})", flush=True)
+        print("=" * 60, flush=True)
+
+        access_token = get_access_token()
+        date_from = start_date.strftime("%Y-%m-%d")
+        date_to = end_date.strftime("%Y-%m-%d")
+
+        # Fetch orders
+        print(f"  Fetching orders...", flush=True)
+        orders = fetch_all_orders(date_from, date_to, access_token)
+        non_cancelled = [o for o in orders if o.get("OrderStatus") not in ("Canceled", "Cancelled")]
+        print(f"  {len(orders)} orders ({len(non_cancelled)} non-cancelled)", flush=True)
+
+        # Fetch order items
+        print(f"  Fetching order items...", flush=True)
+        order_ids = [o["AmazonOrderId"] for o in non_cancelled]
+        items_by_order, access_token = fetch_order_items_batch(order_ids, access_token)
+
+        daily_orders = aggregate_orders_by_day(orders, items_by_order)
+
+        # Fetch fees
+        print(f"  Fetching fees...", flush=True)
+        daily_fees = fetch_all_fees(date_from, date_to, access_token)
+
+        # Fetch traffic
+        print(f"  Fetching traffic...", flush=True)
+        access_token = get_access_token()
+        daily_traffic = fetch_traffic_report(date_from, date_to, access_token)
+
+        # Group by month and push
+        from collections import defaultdict as dd
+        months = dd(list)
+        current = start_date
+        while current <= end_date:
+            ds = current.strftime("%Y-%m-%d")
+            month_label = current.strftime("%B %Y")
+
+            order_data = daily_orders.get(ds, {"revenue": 0, "orders": 0, "cogs": 0})
+            fee_data = daily_fees.get(ds, {"commission": 0, "fba_fee": 0, "closing_fee": 0, "total": 0})
+            traffic_data = daily_traffic.get(ds, {"sessions": 0, "conversion_pct": 0})
+
+            if fee_data["total"] == 0 and order_data["revenue"] > 0:
+                estimated = round(order_data["revenue"] * 0.15, 2)
+                fee_data = {"commission": estimated, "fba_fee": 0, "closing_fee": 0, "total": estimated}
+
+            months[month_label].append({
+                "date": ds,
+                "revenue": order_data["revenue"],
+                "orders": order_data["orders"],
+                "cogs": order_data["cogs"],
+                "fees_commission": fee_data["commission"],
+                "fees_fba": fee_data["fba_fee"],
+                "fees_closing": fee_data["closing_fee"],
+                "fees_total": fee_data["total"],
+                "ad_spend": 0,
+                "sessions": traffic_data.get("sessions", 0),
+                "conversion_pct": traffic_data.get("conversion_pct", 0),
+            })
+
+            print(f"  {ds}: ₹{order_data['revenue']:>10,.2f} rev | {order_data['orders']:>4} orders", flush=True)
+            current += timedelta(days=1)
+
+        for month_label, day_data in months.items():
+            url = push_to_sheet(day_data, month_label)
+
+        print(f"\nDone! Sheet: {url}", flush=True)
+
+    elif "--yesterday" in args:
         # Cron mode: fetch only yesterday
         date_str = yesterday.strftime("%Y-%m-%d")
         month_label = yesterday.strftime("%B %Y")
