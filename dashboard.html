@@ -527,8 +527,8 @@
     <div class="section-title">Daily Breakdown</div>
     <div class="table-wrap">
       <table><thead><tr>
-        <th>Date</th><th>D2C Rev</th><th>D2C Orders</th><th>D2C Ads</th>
-        <th>Amz Rev</th><th>Amz Orders</th><th>Amz Ads</th>
+        <th>Date</th><th>D2C Rev</th><th>D2C Units</th><th>D2C Ads</th>
+        <th>Amz Rev</th><th>Amz Units</th><th>Amz Ads</th>
         <th>Total Rev</th><th>Total Profit</th><th>Profit %</th>
       </tr></thead><tbody id="mtdTableBody"></tbody></table>
     </div>
@@ -2134,7 +2134,7 @@ function renderMTD() {
 
   mtdEl.innerHTML =
     mkMtdKpi('rev', 'MTD Revenue', fmt(mtd.revenue), '', monthDates.length+' days | '+fmt(mtd.revenue/n)+'/day', mtdBk('rev')) +
-    mkMtdKpi('orders', 'MTD Orders', mtd.orders.toLocaleString(), '', Math.round(mtd.orders/n)+' orders/day | AOV: '+(mtd.orders>0?fmt(mtd.revenue/mtd.orders):'—'), mtdBk('orders', numFmtM)) +
+    mkMtdKpi('orders', 'MTD Units', mtd.orders.toLocaleString(), '', Math.round(mtd.orders/n)+' units/day | AOV: '+(mtd.orders>0?fmt(mtd.revenue/mtd.orders):'—'), mtdBk('orders', numFmtM)) +
     mkMtdKpi('ads', 'MTD Ad Spend <span style="font-size:8px;color:var(--muted);font-weight:400">(inc GST)</span>', fmt(mtd.ad_spend), '', fmt(mtd.ad_spend/n)+'/day | ROAS: '+mtdRoas, mtdBk('ads')) +
     (function(){
       const mtdRtoLoss = (mtd.bb_orders*0.10 + mtd.stem_orders*0.18 + mtd.soft_orders*0.22) * 100;
