@@ -3,3 +3,10 @@
 shiproket-mis-70c28ae6e7fb.json
 __pycache__/
 amazon-daily-sync/
+
+# Large raw data files (>50MB)
+oct_orders_raw.json
+nov_orders_raw.json
+dec_orders_raw.json
+jan_orders_raw.json
+feb_orders_raw.json
