@@ -1,0 +1,102 @@
+{
+  "Busy Book Blue": {
+    "revenue": 633.33,
+    "total_orders": 1,
+    "delivered": 1,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 300,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V1": {
+    "revenue": 46233.23,
+    "total_orders": 65,
+    "delivered": 65,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 225,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V1-V2 Combo": {
+    "revenue": 4385.74,
+    "total_orders": 3,
+    "delivered": 3,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 524,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V1-V4 Combo": {
+    "revenue": 14619.14,
+    "total_orders": 15,
+    "delivered": 15,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 404,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V2": {
+    "revenue": 14227.97,
+    "total_orders": 15,
+    "delivered": 15,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 275,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V2-V4 Combo": {
+    "revenue": 14099.32,
+    "total_orders": 14,
+    "delivered": 14,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 488,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V3": {
+    "revenue": 10087.19,
+    "total_orders": 10,
+    "delivered": 10,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 662,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V4": {
+    "revenue": 7175.26,
+    "total_orders": 17,
+    "delivered": 17,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 170,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V7 Police Cruiser": {
+    "revenue": 3248.68,
+    "total_orders": 4,
+    "delivered": 4,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 600,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V9": {
+    "revenue": 34464.38,
+    "total_orders": 26,
+    "delivered": 26,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 778,
+    "fc_margin": 0,
+    "ad_spend": 0
+  }
+}

@@ -1,0 +1,233 @@
+{
+  "Busy Book Pink": {
+    "total_orders": 50,
+    "shipped": 50,
+    "delivered": 49,
+    "rto": 1,
+    "in_transit": 0,
+    "cancelled": 0,
+    "lost": 0,
+    "revenue": 42554.049999999996,
+    "freight": 10358.460000000008
+  },
+  "V1": {
+    "total_orders": 592,
+    "shipped": 584,
+    "delivered": 543,
+    "rto": 40,
+    "in_transit": 0,
+    "cancelled": 8,
+    "lost": 1,
+    "revenue": 556884.0699999995,
+    "freight": 44493.949999999604
+  },
+  "V9": {
+    "total_orders": 763,
+    "shipped": 747,
+    "delivered": 672,
+    "rto": 73,
+    "in_transit": 0,
+    "cancelled": 16,
+    "lost": 2,
+    "revenue": 1283745.890000001,
+    "freight": 109623.25999999866
+  },
+  "V4": {
+    "total_orders": 427,
+    "shipped": 424,
+    "delivered": 409,
+    "rto": 15,
+    "in_transit": 0,
+    "cancelled": 3,
+    "lost": 0,
+    "revenue": 193039.64000000013,
+    "freight": 31879.489999999965
+  },
+  "V3": {
+    "total_orders": 19,
+    "shipped": 18,
+    "delivered": 17,
+    "rto": 1,
+    "in_transit": 0,
+    "cancelled": 1,
+    "lost": 0,
+    "revenue": 27532.039999999997,
+    "freight": 2793.68
+  },
+  "V10": {
+    "total_orders": 3,
+    "shipped": 3,
+    "delivered": 3,
+    "rto": 0,
+    "in_transit": 0,
+    "cancelled": 0,
+    "lost": 0,
+    "revenue": 6109.09,
+    "freight": 384.74
+  },
+  "V2": {
+    "total_orders": 423,
+    "shipped": 417,
+    "delivered": 387,
+    "rto": 28,
+    "in_transit": 0,
+    "cancelled": 6,
+    "lost": 2,
+    "revenue": 461347.9999999998,
+    "freight": 34542.71999999993
+  },
+  "V9 P of 2": {
+    "total_orders": 16,
+    "shipped": 16,
+    "delivered": 16,
+    "rto": 0,
+    "in_transit": 0,
+    "cancelled": 0,
+    "lost": 0,
+    "revenue": 57279.12,
+    "freight": 3271.24
+  },
+  "V6": {
+    "total_orders": 534,
+    "shipped": 504,
+    "delivered": 451,
+    "rto": 50,
+    "in_transit": 1,
+    "cancelled": 30,
+    "lost": 2,
+    "revenue": 532895.3799999995,
+    "freight": 40938.21999999974
+  },
+  "Busy Book Blue": {
+    "total_orders": 50,
+    "shipped": 49,
+    "delivered": 49,
+    "rto": 0,
+    "in_transit": 0,
+    "cancelled": 1,
+    "lost": 0,
+    "revenue": 44234.25999999997,
+    "freight": 6194.340000000003
+  },
+  "V7 Police Cruiser": {
+    "total_orders": 110,
+    "shipped": 109,
+    "delivered": 105,
+    "rto": 3,
+    "in_transit": 0,
+    "cancelled": 1,
+    "lost": 1,
+    "revenue": 123971.80000000005,
+    "freight": 11613.550000000016
+  },
+  "V6-V2 Combo": {
+    "total_orders": 65,
+    "shipped": 65,
+    "delivered": 64,
+    "rto": 1,
+    "in_transit": 0,
+    "cancelled": 0,
+    "lost": 0,
+    "revenue": 134699.68,
+    "freight": 10373.680000000008
+  },
+  "Car": {
+    "total_orders": 1,
+    "shipped": 1,
+    "delivered": 1,
+    "rto": 0,
+    "in_transit": 0,
+    "cancelled": 0,
+    "lost": 0,
+    "revenue": 1249.0,
+    "freight": 81.42
+  },
+  "V1- P of 2": {
+    "total_orders": 6,
+    "shipped": 6,
+    "delivered": 6,
+    "rto": 0,
+    "in_transit": 0,
+    "cancelled": 0,
+    "lost": 0,
+    "revenue": 11752.08,
+    "freight": 372.88
+  },
+  "V2- P of 2": {
+    "total_orders": 7,
+    "shipped": 6,
+    "delivered": 6,
+    "rto": 0,
+    "in_transit": 0,
+    "cancelled": 1,
+    "lost": 0,
+    "revenue": 13125.64,
+    "freight": 712.1099999999999
+  },
+  "V4- P of 2": {
+    "total_orders": 52,
+    "shipped": 52,
+    "delivered": 51,
+    "rto": 1,
+    "in_transit": 0,
+    "cancelled": 0,
+    "lost": 0,
+    "revenue": 41284.33,
+    "freight": 6323.570000000002
+  },
+  "V8": {
+    "total_orders": 14,
+    "shipped": 13,
+    "delivered": 13,
+    "rto": 0,
+    "in_transit": 0,
+    "cancelled": 1,
+    "lost": 0,
+    "revenue": 22671.54,
+    "freight": 3024.0899999999997
+  },
+  "V6- P of 2": {
+    "total_orders": 10,
+    "shipped": 10,
+    "delivered": 10,
+    "rto": 0,
+    "in_transit": 0,
+    "cancelled": 0,
+    "lost": 0,
+    "revenue": 22186.0,
+    "freight": 1250.94
+  },
+  "V2-V4 Combo": {
+    "total_orders": 1,
+    "shipped": 1,
+    "delivered": 1,
+    "rto": 0,
+    "in_transit": 0,
+    "cancelled": 0,
+    "lost": 0,
+    "revenue": 1699.0,
+    "freight": 92.04
+  },
+  "V5": {
+    "total_orders": 91,
+    "shipped": 75,
+    "delivered": 71,
+    "rto": 4,
+    "in_transit": 0,
+    "cancelled": 16,
+    "lost": 0,
+    "revenue": 66020.26,
+    "freight": 6001.9600000000055
+  },
+  "V4- P of 3": {
+    "total_orders": 1,
+    "shipped": 1,
+    "delivered": 1,
+    "rto": 0,
+    "in_transit": 0,
+    "cancelled": 0,
+    "lost": 0,
+    "revenue": 1197.0,
+    "freight": 46.02
+  }
+}

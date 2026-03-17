@@ -1,0 +1,112 @@
+{
+  "V1": {
+    "revenue": 39883.0,
+    "total_orders": 68,
+    "delivered": 68,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 225,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V1-V2 Combo": {
+    "revenue": 2340.0,
+    "total_orders": 2,
+    "delivered": 2,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 524,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V1-V4 Combo": {
+    "revenue": 14040.0,
+    "total_orders": 17,
+    "delivered": 17,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 404,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V1-V6 Combo": {
+    "revenue": 9911.0,
+    "total_orders": 8,
+    "delivered": 8,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 500,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V10": {
+    "revenue": 14124.0,
+    "total_orders": 13,
+    "delivered": 13,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 1009,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V2": {
+    "revenue": 45609.0,
+    "total_orders": 66,
+    "delivered": 66,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 275,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V2-V4 Combo": {
+    "revenue": 17922.0,
+    "total_orders": 21,
+    "delivered": 21,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 488,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V3": {
+    "revenue": 1927.0,
+    "total_orders": 2,
+    "delivered": 2,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 662,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V4": {
+    "revenue": 8203.0,
+    "total_orders": 26,
+    "delivered": 26,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 170,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V6": {
+    "revenue": 21474.0,
+    "total_orders": 30,
+    "delivered": 30,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 275,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V9": {
+    "revenue": 22797.0,
+    "total_orders": 23,
+    "delivered": 23,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 778,
+    "fc_margin": 0,
+    "ad_spend": 0
+  }
+}

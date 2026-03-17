@@ -1,0 +1,14 @@
+{
+  "V2": {
+    "revenue": 227303,
+    "total_expense": 111272.42,
+    "total_orders": 227,
+    "shipped": 227,
+    "delivered": 227,
+    "rto": 0,
+    "in_transit": 0,
+    "cancelled": 0,
+    "lost": 0,
+    "product_expense": 79450
+  }
+}

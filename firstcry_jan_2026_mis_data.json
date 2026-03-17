@@ -1,0 +1,172 @@
+{
+  "Busy Book Blue": {
+    "revenue": 9910.26,
+    "total_orders": 18,
+    "delivered": 18,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 300,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "Busy Book Pink": {
+    "revenue": 3303.42,
+    "total_orders": 6,
+    "delivered": 6,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 300,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V1": {
+    "revenue": 67763.28,
+    "total_orders": 121,
+    "delivered": 121,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 225,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V1- P of 2": {
+    "revenue": 1017.78,
+    "total_orders": 1,
+    "delivered": 1,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 531,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V1-V2 Combo": {
+    "revenue": 18411.92,
+    "total_orders": 18,
+    "delivered": 18,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 524,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V1-V6 Combo": {
+    "revenue": 2230.04,
+    "total_orders": 2,
+    "delivered": 2,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 500,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V10": {
+    "revenue": 3107.49,
+    "total_orders": 3,
+    "delivered": 3,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 1009,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V2": {
+    "revenue": 38518.16,
+    "total_orders": 64,
+    "delivered": 64,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 275,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V2-V4 Combo": {
+    "revenue": 7695.0,
+    "total_orders": 9,
+    "delivered": 9,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 488,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V2-V9 Combo": {
+    "revenue": 12213.76,
+    "total_orders": 8,
+    "delivered": 8,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 1053,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V3": {
+    "revenue": 18580.26,
+    "total_orders": 21,
+    "delivered": 21,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 662,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V4": {
+    "revenue": 8804.8,
+    "total_orders": 32,
+    "delivered": 32,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 170,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V4- P of 3": {
+    "revenue": 770.8,
+    "total_orders": 1,
+    "delivered": 1,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 510,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V4-V6 Combo": {
+    "revenue": 7599.2,
+    "total_orders": 10,
+    "delivered": 10,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 445,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V6": {
+    "revenue": 26127.33,
+    "total_orders": 45,
+    "delivered": 45,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 275,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V9": {
+    "revenue": 112509.71,
+    "total_orders": 112,
+    "delivered": 112,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 778,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V9-V10 Combo": {
+    "revenue": 14226.34,
+    "total_orders": 7,
+    "delivered": 7,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 1787,
+    "fc_margin": 0,
+    "ad_spend": 0
+  }
+}

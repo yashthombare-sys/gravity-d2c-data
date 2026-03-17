@@ -1,0 +1,122 @@
+{
+  "V1": {
+    "revenue": 25912.0,
+    "total_orders": 46,
+    "delivered": 46,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 225,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V1-V2 Combo": {
+    "revenue": 26980.0,
+    "total_orders": 28,
+    "delivered": 28,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 524,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V1-V4 Combo": {
+    "revenue": 1651.0,
+    "total_orders": 2,
+    "delivered": 2,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 404,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V1-V6 Combo": {
+    "revenue": 3716.0,
+    "total_orders": 3,
+    "delivered": 3,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 500,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V10": {
+    "revenue": 1073.0,
+    "total_orders": 1,
+    "delivered": 1,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 1009,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V2": {
+    "revenue": 16957.0,
+    "total_orders": 28,
+    "delivered": 28,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 275,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V2-V4 Combo": {
+    "revenue": 1706.0,
+    "total_orders": 2,
+    "delivered": 2,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 488,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V3": {
+    "revenue": 4818.0,
+    "total_orders": 5,
+    "delivered": 5,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 662,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V4": {
+    "revenue": 2998.0,
+    "total_orders": 9,
+    "delivered": 9,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 170,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V6": {
+    "revenue": 4239.0,
+    "total_orders": 7,
+    "delivered": 7,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 275,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V6-V2 Combo": {
+    "revenue": 3716.0,
+    "total_orders": 3,
+    "delivered": 3,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 612,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V9": {
+    "revenue": 17841.0,
+    "total_orders": 18,
+    "delivered": 18,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 778,
+    "fc_margin": 0,
+    "ad_spend": 0
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "V1": {
+    "total_orders": 131,
+    "shipped": 131,
+    "delivered": 126,
+    "rto": 5,
+    "in_transit": 0,
+    "cancelled": 0,
+    "lost": 0,
+    "revenue": 152718.0,
+    "freight": 12838
+  },
+  "V2": {
+    "total_orders": 66,
+    "shipped": 60,
+    "delivered": 55,
+    "rto": 5,
+    "in_transit": 0,
+    "cancelled": 6,
+    "lost": 0,
+    "revenue": 87379.0,
+    "freight": 5880
+  },
+  "V4": {
+    "total_orders": 70,
+    "shipped": 68,
+    "delivered": 67,
+    "rto": 1,
+    "in_transit": 0,
+    "cancelled": 2,
+    "lost": 0,
+    "revenue": 42031.0,
+    "freight": 6664
+  },
+  "V5": {
+    "total_orders": 53,
+    "shipped": 53,
+    "delivered": 48,
+    "rto": 5,
+    "in_transit": 0,
+    "cancelled": 0,
+    "lost": 0,
+    "revenue": 57249.0,
+    "freight": 5194
+  },
+  "V6": {
+    "total_orders": 313,
+    "shipped": 308,
+    "delivered": 282,
+    "rto": 26,
+    "in_transit": 0,
+    "cancelled": 5,
+    "lost": 0,
+    "revenue": 392752.0,
+    "freight": 30184
+  },
+  "V7": {
+    "total_orders": 117,
+    "shipped": 114,
+    "delivered": 105,
+    "rto": 9,
+    "in_transit": 0,
+    "cancelled": 3,
+    "lost": 0,
+    "revenue": 194448,
+    "freight": 11172
+  }
+}

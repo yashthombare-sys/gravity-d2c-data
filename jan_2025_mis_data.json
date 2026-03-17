@@ -1,0 +1,156 @@
+{
+  "V1": {
+    "total_orders": 189,
+    "shipped": 188,
+    "delivered": 175,
+    "rto": 13,
+    "in_transit": 0,
+    "cancelled": 1,
+    "lost": 0,
+    "revenue": 191397.0,
+    "freight": 19740
+  },
+  "V2": {
+    "total_orders": 990,
+    "shipped": 956,
+    "delivered": 875,
+    "rto": 81,
+    "in_transit": 0,
+    "cancelled": 34,
+    "lost": 0,
+    "revenue": 1103308.0,
+    "freight": 95600
+  },
+  "V3": {
+    "total_orders": 14,
+    "shipped": 14,
+    "delivered": 13,
+    "rto": 1,
+    "in_transit": 0,
+    "cancelled": 0,
+    "lost": 0,
+    "revenue": 25786.0,
+    "freight": 1400
+  },
+  "V4": {
+    "total_orders": 192,
+    "shipped": 188,
+    "delivered": 180,
+    "rto": 8,
+    "in_transit": 0,
+    "cancelled": 4,
+    "lost": 0,
+    "revenue": 94646.0,
+    "freight": 18800
+  },
+  "V5": {
+    "total_orders": 85,
+    "shipped": 81,
+    "delivered": 73,
+    "rto": 8,
+    "in_transit": 0,
+    "cancelled": 4,
+    "lost": 0,
+    "revenue": 86821.0,
+    "freight": 8100
+  },
+  "V6": {
+    "total_orders": 394,
+    "shipped": 388,
+    "delivered": 357,
+    "rto": 31,
+    "in_transit": 0,
+    "cancelled": 6,
+    "lost": 0,
+    "revenue": 449955.0,
+    "freight": 38800
+  },
+  "V7": {
+    "total_orders": 205,
+    "shipped": 195,
+    "delivered": 188,
+    "rto": 7,
+    "in_transit": 0,
+    "cancelled": 10,
+    "lost": 0,
+    "revenue": 268857.0,
+    "freight": 19500
+  },
+  "V9": {
+    "total_orders": 8,
+    "shipped": 8,
+    "delivered": 7,
+    "rto": 1,
+    "in_transit": 0,
+    "cancelled": 0,
+    "lost": 0,
+    "revenue": 13693.0,
+    "freight": 800
+  },
+  "V4-V5 Combo": {
+    "total_orders": 116,
+    "shipped": 111,
+    "delivered": 102,
+    "rto": 9,
+    "in_transit": 0,
+    "cancelled": 5,
+    "lost": 0,
+    "revenue": 117798.0,
+    "freight": 11100
+  },
+  "V7-V4 Combo": {
+    "total_orders": 23,
+    "shipped": 21,
+    "delivered": 19,
+    "rto": 2,
+    "in_transit": 0,
+    "cancelled": 2,
+    "lost": 0,
+    "revenue": 35581.0,
+    "freight": 2100
+  },
+  "V1-V4 Combo": {
+    "total_orders": 19,
+    "shipped": 19,
+    "delivered": 19,
+    "rto": 0,
+    "in_transit": 0,
+    "cancelled": 0,
+    "lost": 0,
+    "revenue": 25281.0,
+    "freight": 1900
+  },
+  "V2-V4 Combo": {
+    "total_orders": 10,
+    "shipped": 10,
+    "delivered": 9,
+    "rto": 1,
+    "in_transit": 0,
+    "cancelled": 0,
+    "lost": 0,
+    "revenue": 13291.0,
+    "freight": 1000
+  },
+  "V6-V2 Combo": {
+    "total_orders": 45,
+    "shipped": 45,
+    "delivered": 45,
+    "rto": 0,
+    "in_transit": 0,
+    "cancelled": 0,
+    "lost": 0,
+    "revenue": 81704.0,
+    "freight": 4500
+  },
+  "V6-V4 Combo": {
+    "total_orders": 23,
+    "shipped": 22,
+    "delivered": 20,
+    "rto": 2,
+    "in_transit": 0,
+    "cancelled": 1,
+    "lost": 0,
+    "revenue": 31308.0,
+    "freight": 2200
+  }
+}

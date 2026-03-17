@@ -1,0 +1,142 @@
+{
+  "V1": {
+    "revenue": 53346.02,
+    "total_orders": 75,
+    "delivered": 75,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 225,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V1-V2 Combo": {
+    "revenue": 4385.74,
+    "total_orders": 3,
+    "delivered": 3,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 524,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V1-V4 Combo": {
+    "revenue": 31187.49,
+    "total_orders": 32,
+    "delivered": 32,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 404,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V1-V6 Combo": {
+    "revenue": 14619.13,
+    "total_orders": 10,
+    "delivered": 10,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 500,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V2": {
+    "revenue": 36044.18,
+    "total_orders": 38,
+    "delivered": 38,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 275,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V2-V4 Combo": {
+    "revenue": 34241.21,
+    "total_orders": 34,
+    "delivered": 34,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 488,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V3": {
+    "revenue": 1120.8,
+    "total_orders": 1,
+    "delivered": 1,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 662,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V4": {
+    "revenue": 13928.44,
+    "total_orders": 33,
+    "delivered": 33,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 170,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V5": {
+    "revenue": 8207.13,
+    "total_orders": 12,
+    "delivered": 12,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 225,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V6": {
+    "revenue": 5812.67,
+    "total_orders": 7,
+    "delivered": 7,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 275,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V6-V2 Combo": {
+    "revenue": 27776.36,
+    "total_orders": 19,
+    "delivered": 19,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 612,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V7 Police Cruiser": {
+    "revenue": 7309.53,
+    "total_orders": 9,
+    "delivered": 9,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 600,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V8": {
+    "revenue": 2651.1,
+    "total_orders": 2,
+    "delivered": 2,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 700,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V9": {
+    "revenue": 2651.1,
+    "total_orders": 2,
+    "delivered": 2,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 778,
+    "fc_margin": 0,
+    "ad_spend": 0
+  }
+}

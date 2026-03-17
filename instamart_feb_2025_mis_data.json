@@ -1,0 +1,38 @@
+{
+  "V1": {
+    "total_orders": 114,
+    "shipped": 114,
+    "delivered": 114,
+    "rto": 0,
+    "in_transit": 0,
+    "cancelled": 0,
+    "lost": 0,
+    "revenue": 82878,
+    "freight": 0,
+    "ad_spend": 0.0
+  },
+  "V4": {
+    "total_orders": 20,
+    "shipped": 20,
+    "delivered": 20,
+    "rto": 0,
+    "in_transit": 0,
+    "cancelled": 0,
+    "lost": 0,
+    "revenue": 7700,
+    "freight": 0,
+    "ad_spend": 0.0
+  },
+  "V2": {
+    "total_orders": 81,
+    "shipped": 81,
+    "delivered": 81,
+    "rto": 0,
+    "in_transit": 0,
+    "cancelled": 0,
+    "lost": 0,
+    "revenue": 64881,
+    "freight": 0,
+    "ad_spend": 0.0
+  }
+}

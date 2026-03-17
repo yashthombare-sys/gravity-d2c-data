@@ -1,0 +1,728 @@
+{
+  "reportSpecification": {
+    "reportType": "GET_SALES_AND_TRAFFIC_REPORT",
+    "reportOptions": {
+      "dateGranularity": "DAY",
+      "asinGranularity": "SKU"
+    },
+    "dataStartTime": "2026-03-14",
+    "dataEndTime": "2026-03-14",
+    "marketplaceIds": [
+      "A21TJRUUN4KGV"
+    ]
+  },
+  "salesAndTrafficByDate": [
+    {
+      "date": "2026-03-14",
+      "salesByDate": {
+        "orderedProductSales": {
+          "amount": 88240.66,
+          "currencyCode": "INR"
+        },
+        "orderedProductSalesB2B": {
+          "amount": 998.99,
+          "currencyCode": "INR"
+        },
+        "unitsOrdered": 95,
+        "unitsOrderedB2B": 1,
+        "totalOrderItems": 95,
+        "totalOrderItemsB2B": 1,
+        "averageSalesPerOrderItem": {
+          "amount": 928.85,
+          "currencyCode": "INR"
+        },
+        "averageSalesPerOrderItemB2B": {
+          "amount": 998.99,
+          "currencyCode": "INR"
+        },
+        "averageUnitsPerOrderItem": 1.0,
+        "averageUnitsPerOrderItemB2B": 1.0,
+        "averageSellingPrice": {
+          "amount": 928.85,
+          "currencyCode": "INR"
+        },
+        "averageSellingPriceB2B": {
+          "amount": 998.99,
+          "currencyCode": "INR"
+        },
+        "unitsRefunded": 10,
+        "refundRate": 10.53,
+        "claimsGranted": 0,
+        "claimsAmount": {
+          "amount": 0.0,
+          "currencyCode": "INR"
+        },
+        "shippedProductSales": {
+          "amount": 83546.68,
+          "currencyCode": "INR"
+        },
+        "unitsShipped": 103,
+        "ordersShipped": 103
+      },
+      "trafficByDate": {
+        "browserPageViews": 225,
+        "browserPageViewsB2B": 3,
+        "mobileAppPageViews": 2591,
+        "mobileAppPageViewsB2B": 39,
+        "pageViews": 2816,
+        "pageViewsB2B": 42,
+        "browserSessions": 185,
+        "browserSessionsB2B": 3,
+        "mobileAppSessions": 1849,
+        "mobileAppSessionsB2B": 34,
+        "sessions": 2034,
+        "sessionsB2B": 37,
+        "buyBoxPercentage": 98.95,
+        "buyBoxPercentageB2B": 100.0,
+        "orderItemSessionPercentage": 4.67,
+        "orderItemSessionPercentageB2B": 2.7,
+        "unitSessionPercentage": 4.67,
+        "unitSessionPercentageB2B": 2.7,
+        "averageOfferCount": 39,
+        "averageParentItems": 26,
+        "feedbackReceived": 0,
+        "negativeFeedbackReceived": 0,
+        "receivedNegativeFeedbackRate": 0.0
+      }
+    }
+  ],
+  "salesAndTrafficByAsin": [
+    {
+      "parentAsin": "B0GLQGV7FD",
+      "childAsin": "B0GLQGV7FD",
+      "sku": "Ganesha_Clapcuddles",
+      "salesByAsin": {
+        "unitsOrdered": 1,
+        "unitsOrderedB2B": 0,
+        "orderedProductSales": {
+          "amount": 899.0,
+          "currencyCode": "INR"
+        },
+        "orderedProductSalesB2B": {
+          "amount": 0.0,
+          "currencyCode": "INR"
+        },
+        "totalOrderItems": 1,
+        "totalOrderItemsB2B": 0
+      },
+      "trafficByAsin": {
+        "browserSessions": 3,
+        "browserSessionsB2B": 0,
+        "mobileAppSessions": 24,
+        "mobileAppSessionsB2B": 0,
+        "sessions": 27,
+        "sessionsB2B": 0,
+        "browserSessionPercentage": 1.22,
+        "browserSessionPercentageB2B": 0.0,
+        "mobileAppSessionPercentage": 1.04,
+        "mobileAppSessionPercentageB2B": 0.0,
+        "sessionPercentage": 1.06,
+        "sessionPercentageB2B": 0.0,
+        "browserPageViews": 4,
+        "browserPageViewsB2B": 0,
+        "mobileAppPageViews": 33,
+        "mobileAppPageViewsB2B": 0,
+        "pageViews": 37,
+        "pageViewsB2B": 0,
+        "browserPageViewsPercentage": 1.32,
+        "browserPageViewsPercentageB2B": 0.0,
+        "mobileAppPageViewsPercentage": 1.01,
+        "mobileAppPageViewsPercentageB2B": 0.0,
+        "pageViewsPercentage": 1.03,
+        "pageViewsPercentageB2B": 0.0,
+        "buyBoxPercentage": 100.0,
+        "buyBoxPercentageB2B": 0.0,
+        "unitSessionPercentage": 3.7,
+        "unitSessionPercentageB2B": 0.0
+      }
+    },
+    {
+      "parentAsin": "B0CHPFKFSR",
+      "childAsin": "B0CHPFKFSR",
+      "sku": "PortablebusyboardV6 SF",
+      "salesByAsin": {
+        "unitsOrdered": 1,
+        "unitsOrderedB2B": 0,
+        "orderedProductSales": {
+          "amount": 1442.37,
+          "currencyCode": "INR"
+        },
+        "orderedProductSalesB2B": {
+          "amount": 0.0,
+          "currencyCode": "INR"
+        },
+        "totalOrderItems": 1,
+        "totalOrderItemsB2B": 0
+      },
+      "trafficByAsin": {
+        "browserSessions": 37,
+        "browserSessionsB2B": 0,
+        "mobileAppSessions": 341,
+        "mobileAppSessionsB2B": 11,
+        "sessions": 378,
+        "sessionsB2B": 11,
+        "browserSessionPercentage": 15.1,
+        "browserSessionPercentageB2B": 0.0,
+        "mobileAppSessionPercentage": 14.8,
+        "mobileAppSessionPercentageB2B": 23.4,
+        "sessionPercentage": 14.83,
+        "sessionPercentageB2B": 22.0,
+        "browserPageViews": 42,
+        "browserPageViewsB2B": 0,
+        "mobileAppPageViews": 499,
+        "mobileAppPageViewsB2B": 15,
+        "pageViews": 541,
+        "pageViewsB2B": 15,
+        "browserPageViewsPercentage": 13.82,
+        "browserPageViewsPercentageB2B": 0.0,
+        "mobileAppPageViewsPercentage": 15.21,
+        "mobileAppPageViewsPercentageB2B": 26.79,
+        "pageViewsPercentage": 15.09,
+        "pageViewsPercentageB2B": 25.42,
+        "buyBoxPercentage": 99.78,
+        "buyBoxPercentageB2B": 100.0,
+        "unitSessionPercentage": 0.26,
+        "unitSessionPercentageB2B": 0.0
+      }
+    },
+    {
+      "parentAsin": "B0CHPFKFSR",
+      "childAsin": "B0CHPFKFSR",
+      "sku": "PortablebusyboardV6",
+      "salesByAsin": {
+        "unitsOrdered": 30,
+        "unitsOrderedB2B": 1,
+        "orderedProductSales": {
+          "amount": 26972.73,
+          "currencyCode": "INR"
+        },
+        "orderedProductSalesB2B": {
+          "amount": 998.99,
+          "currencyCode": "INR"
+        },
+        "totalOrderItems": 30,
+        "totalOrderItemsB2B": 1
+      },
+      "trafficByAsin": {
+        "browserSessions": 37,
+        "browserSessionsB2B": 0,
+        "mobileAppSessions": 341,
+        "mobileAppSessionsB2B": 11,
+        "sessions": 378,
+        "sessionsB2B": 11,
+        "browserSessionPercentage": 15.1,
+        "browserSessionPercentageB2B": 0.0,
+        "mobileAppSessionPercentage": 14.8,
+        "mobileAppSessionPercentageB2B": 23.4,
+        "sessionPercentage": 14.83,
+        "sessionPercentageB2B": 22.0,
+        "browserPageViews": 42,
+        "browserPageViewsB2B": 0,
+        "mobileAppPageViews": 499,
+        "mobileAppPageViewsB2B": 15,
+        "pageViews": 541,
+        "pageViewsB2B": 15,
+        "browserPageViewsPercentage": 13.82,
+        "browserPageViewsPercentageB2B": 0.0,
+        "mobileAppPageViewsPercentage": 15.21,
+        "mobileAppPageViewsPercentageB2B": 26.79,
+        "pageViewsPercentage": 15.09,
+        "pageViewsPercentageB2B": 25.42,
+        "buyBoxPercentage": 99.78,
+        "buyBoxPercentageB2B": 100.0,
+        "unitSessionPercentage": 7.94,
+        "unitSessionPercentageB2B": 9.09
+      }
+    },
+    {
+      "parentAsin": "B0F6YMNTXW",
+      "childAsin": "B0F6YMNTXW",
+      "sku": "busybook_pink",
+      "salesByAsin": {
+        "unitsOrdered": 3,
+        "unitsOrderedB2B": 0,
+        "orderedProductSales": {
+          "amount": 2247.0,
+          "currencyCode": "INR"
+        },
+        "orderedProductSalesB2B": {
+          "amount": 0.0,
+          "currencyCode": "INR"
+        },
+        "totalOrderItems": 3,
+        "totalOrderItemsB2B": 0
+      },
+      "trafficByAsin": {
+        "browserSessions": 14,
+        "browserSessionsB2B": 0,
+        "mobileAppSessions": 95,
+        "mobileAppSessionsB2B": 2,
+        "sessions": 109,
+        "sessionsB2B": 2,
+        "browserSessionPercentage": 5.71,
+        "browserSessionPercentageB2B": 0.0,
+        "mobileAppSessionPercentage": 4.12,
+        "mobileAppSessionPercentageB2B": 4.26,
+        "sessionPercentage": 4.28,
+        "sessionPercentageB2B": 4.0,
+        "browserPageViews": 14,
+        "browserPageViewsB2B": 0,
+        "mobileAppPageViews": 115,
+        "mobileAppPageViewsB2B": 2,
+        "pageViews": 129,
+        "pageViewsB2B": 2,
+        "browserPageViewsPercentage": 4.61,
+        "browserPageViewsPercentageB2B": 0.0,
+        "mobileAppPageViewsPercentage": 3.51,
+        "mobileAppPageViewsPercentageB2B": 3.57,
+        "pageViewsPercentage": 3.6,
+        "pageViewsPercentageB2B": 3.39,
+        "buyBoxPercentage": 100.0,
+        "buyBoxPercentageB2B": 100.0,
+        "unitSessionPercentage": 2.75,
+        "unitSessionPercentageB2B": 0.0
+      }
+    },
+    {
+      "parentAsin": "B0FBX5SQHY",
+      "childAsin": "B0FBX5SQHY",
+      "sku": "bb_v10_SF",
+      "salesByAsin": {
+        "unitsOrdered": 1,
+        "unitsOrderedB2B": 0,
+        "orderedProductSales": {
+          "amount": 2449.0,
+          "currencyCode": "INR"
+        },
+        "orderedProductSalesB2B": {
+          "amount": 0.0,
+          "currencyCode": "INR"
+        },
+        "totalOrderItems": 1,
+        "totalOrderItemsB2B": 0
+      },
+      "trafficByAsin": {
+        "browserSessions": 5,
+        "browserSessionsB2B": 0,
+        "mobileAppSessions": 26,
+        "mobileAppSessionsB2B": 0,
+        "sessions": 31,
+        "sessionsB2B": 0,
+        "browserSessionPercentage": 2.04,
+        "browserSessionPercentageB2B": 0.0,
+        "mobileAppSessionPercentage": 1.13,
+        "mobileAppSessionPercentageB2B": 0.0,
+        "sessionPercentage": 1.22,
+        "sessionPercentageB2B": 0.0,
+        "browserPageViews": 6,
+        "browserPageViewsB2B": 0,
+        "mobileAppPageViews": 28,
+        "mobileAppPageViewsB2B": 0,
+        "pageViews": 34,
+        "pageViewsB2B": 0,
+        "browserPageViewsPercentage": 1.97,
+        "browserPageViewsPercentageB2B": 0.0,
+        "mobileAppPageViewsPercentage": 0.85,
+        "mobileAppPageViewsPercentageB2B": 0.0,
+        "pageViewsPercentage": 0.95,
+        "pageViewsPercentageB2B": 0.0,
+        "buyBoxPercentage": 100.0,
+        "buyBoxPercentageB2B": 0.0,
+        "unitSessionPercentage": 3.23,
+        "unitSessionPercentageB2B": 0.0
+      }
+    },
+    {
+      "parentAsin": "B0C7JBRXVZ",
+      "childAsin": "B0C7JBRXVZ",
+      "sku": "PortablebusyboardV1.5",
+      "salesByAsin": {
+        "unitsOrdered": 19,
+        "unitsOrderedB2B": 0,
+        "orderedProductSales": {
+          "amount": 17081.0,
+          "currencyCode": "INR"
+        },
+        "orderedProductSalesB2B": {
+          "amount": 0.0,
+          "currencyCode": "INR"
+        },
+        "totalOrderItems": 19,
+        "totalOrderItemsB2B": 0
+      },
+      "trafficByAsin": {
+        "browserSessions": 39,
+        "browserSessionsB2B": 1,
+        "mobileAppSessions": 458,
+        "mobileAppSessionsB2B": 7,
+        "sessions": 497,
+        "sessionsB2B": 8,
+        "browserSessionPercentage": 15.92,
+        "browserSessionPercentageB2B": 33.33,
+        "mobileAppSessionPercentage": 19.88,
+        "mobileAppSessionPercentageB2B": 14.89,
+        "sessionPercentage": 19.5,
+        "sessionPercentageB2B": 16.0,
+        "browserPageViews": 48,
+        "browserPageViewsB2B": 1,
+        "mobileAppPageViews": 616,
+        "mobileAppPageViewsB2B": 7,
+        "pageViews": 664,
+        "pageViewsB2B": 8,
+        "browserPageViewsPercentage": 15.79,
+        "browserPageViewsPercentageB2B": 33.33,
+        "mobileAppPageViewsPercentage": 18.78,
+        "mobileAppPageViewsPercentageB2B": 12.5,
+        "pageViewsPercentage": 18.53,
+        "pageViewsPercentageB2B": 13.56,
+        "buyBoxPercentage": 99.65,
+        "buyBoxPercentageB2B": 100.0,
+        "unitSessionPercentage": 3.82,
+        "unitSessionPercentageB2B": 0.0
+      }
+    },
+    {
+      "parentAsin": "B0DZXTRM2J",
+      "childAsin": "B0DZXTRM2J",
+      "sku": "PortableBusyBoard_V09",
+      "salesByAsin": {
+        "unitsOrdered": 4,
+        "unitsOrderedB2B": 0,
+        "orderedProductSales": {
+          "amount": 5697.0,
+          "currencyCode": "INR"
+        },
+        "orderedProductSalesB2B": {
+          "amount": 0.0,
+          "currencyCode": "INR"
+        },
+        "totalOrderItems": 4,
+        "totalOrderItemsB2B": 0
+      },
+      "trafficByAsin": {
+        "browserSessions": 26,
+        "browserSessionsB2B": 0,
+        "mobileAppSessions": 199,
+        "mobileAppSessionsB2B": 3,
+        "sessions": 225,
+        "sessionsB2B": 3,
+        "browserSessionPercentage": 10.61,
+        "browserSessionPercentageB2B": 0.0,
+        "mobileAppSessionPercentage": 8.64,
+        "mobileAppSessionPercentageB2B": 6.38,
+        "sessionPercentage": 8.83,
+        "sessionPercentageB2B": 6.0,
+        "browserPageViews": 41,
+        "browserPageViewsB2B": 0,
+        "mobileAppPageViews": 302,
+        "mobileAppPageViewsB2B": 3,
+        "pageViews": 343,
+        "pageViewsB2B": 3,
+        "browserPageViewsPercentage": 13.49,
+        "browserPageViewsPercentageB2B": 0.0,
+        "mobileAppPageViewsPercentage": 9.21,
+        "mobileAppPageViewsPercentageB2B": 5.36,
+        "pageViewsPercentage": 9.57,
+        "pageViewsPercentageB2B": 5.08,
+        "buyBoxPercentage": 99.65,
+        "buyBoxPercentageB2B": 100.0,
+        "unitSessionPercentage": 1.78,
+        "unitSessionPercentageB2B": 0.0
+      }
+    },
+    {
+      "parentAsin": "B0DZXTRM2J",
+      "childAsin": "B0DZXTRM2J",
+      "sku": "new_PortableBusyBoard V9",
+      "salesByAsin": {
+        "unitsOrdered": 3,
+        "unitsOrderedB2B": 0,
+        "orderedProductSales": {
+          "amount": 5987.85,
+          "currencyCode": "INR"
+        },
+        "orderedProductSalesB2B": {
+          "amount": 0.0,
+          "currencyCode": "INR"
+        },
+        "totalOrderItems": 3,
+        "totalOrderItemsB2B": 0
+      },
+      "trafficByAsin": {
+        "browserSessions": 26,
+        "browserSessionsB2B": 0,
+        "mobileAppSessions": 199,
+        "mobileAppSessionsB2B": 3,
+        "sessions": 225,
+        "sessionsB2B": 3,
+        "browserSessionPercentage": 10.61,
+        "browserSessionPercentageB2B": 0.0,
+        "mobileAppSessionPercentage": 8.64,
+        "mobileAppSessionPercentageB2B": 6.38,
+        "sessionPercentage": 8.83,
+        "sessionPercentageB2B": 6.0,
+        "browserPageViews": 41,
+        "browserPageViewsB2B": 0,
+        "mobileAppPageViews": 302,
+        "mobileAppPageViewsB2B": 3,
+        "pageViews": 343,
+        "pageViewsB2B": 3,
+        "browserPageViewsPercentage": 13.49,
+        "browserPageViewsPercentageB2B": 0.0,
+        "mobileAppPageViewsPercentage": 9.21,
+        "mobileAppPageViewsPercentageB2B": 5.36,
+        "pageViewsPercentage": 9.57,
+        "pageViewsPercentageB2B": 5.08,
+        "buyBoxPercentage": 99.65,
+        "buyBoxPercentageB2B": 100.0,
+        "unitSessionPercentage": 1.33,
+        "unitSessionPercentageB2B": 0.0
+      }
+    },
+    {
+      "parentAsin": "B0C1NTQKTK",
+      "childAsin": "B0C1NTQKTK",
+      "sku": "PortableBusyBoardV2",
+      "salesByAsin": {
+        "unitsOrdered": 20,
+        "unitsOrderedB2B": 0,
+        "orderedProductSales": {
+          "amount": 19979.8,
+          "currencyCode": "INR"
+        },
+        "orderedProductSalesB2B": {
+          "amount": 0.0,
+          "currencyCode": "INR"
+        },
+        "totalOrderItems": 20,
+        "totalOrderItemsB2B": 0
+      },
+      "trafficByAsin": {
+        "browserSessions": 34,
+        "browserSessionsB2B": 0,
+        "mobileAppSessions": 314,
+        "mobileAppSessionsB2B": 5,
+        "sessions": 348,
+        "sessionsB2B": 5,
+        "browserSessionPercentage": 13.88,
+        "browserSessionPercentageB2B": 0.0,
+        "mobileAppSessionPercentage": 13.63,
+        "mobileAppSessionPercentageB2B": 10.64,
+        "sessionPercentage": 13.65,
+        "sessionPercentageB2B": 10.0,
+        "browserPageViews": 39,
+        "browserPageViewsB2B": 0,
+        "mobileAppPageViews": 458,
+        "mobileAppPageViewsB2B": 5,
+        "pageViews": 497,
+        "pageViewsB2B": 5,
+        "browserPageViewsPercentage": 12.83,
+        "browserPageViewsPercentageB2B": 0.0,
+        "mobileAppPageViewsPercentage": 13.96,
+        "mobileAppPageViewsPercentageB2B": 8.93,
+        "pageViewsPercentage": 13.87,
+        "pageViewsPercentageB2B": 8.47,
+        "buyBoxPercentage": 98.29,
+        "buyBoxPercentageB2B": 100.0,
+        "unitSessionPercentage": 5.75,
+        "unitSessionPercentageB2B": 0.0
+      }
+    },
+    {
+      "parentAsin": "B0FD7FRM4V",
+      "childAsin": "B0FD7FRM4V",
+      "sku": "bb_v03",
+      "salesByAsin": {
+        "unitsOrdered": 1,
+        "unitsOrderedB2B": 0,
+        "orderedProductSales": {
+          "amount": 0.0,
+          "currencyCode": "INR"
+        },
+        "orderedProductSalesB2B": {
+          "amount": 0.0,
+          "currencyCode": "INR"
+        },
+        "totalOrderItems": 1,
+        "totalOrderItemsB2B": 0
+      },
+      "trafficByAsin": {
+        "browserSessions": 3,
+        "browserSessionsB2B": 0,
+        "mobileAppSessions": 29,
+        "mobileAppSessionsB2B": 0,
+        "sessions": 32,
+        "sessionsB2B": 0,
+        "browserSessionPercentage": 1.22,
+        "browserSessionPercentageB2B": 0.0,
+        "mobileAppSessionPercentage": 1.26,
+        "mobileAppSessionPercentageB2B": 0.0,
+        "sessionPercentage": 1.26,
+        "sessionPercentageB2B": 0.0,
+        "browserPageViews": 3,
+        "browserPageViewsB2B": 0,
+        "mobileAppPageViews": 45,
+        "mobileAppPageViewsB2B": 0,
+        "pageViews": 48,
+        "pageViewsB2B": 0,
+        "browserPageViewsPercentage": 0.99,
+        "browserPageViewsPercentageB2B": 0.0,
+        "mobileAppPageViewsPercentage": 1.37,
+        "mobileAppPageViewsPercentageB2B": 0.0,
+        "pageViewsPercentage": 1.34,
+        "pageViewsPercentageB2B": 0.0,
+        "buyBoxPercentage": 100.0,
+        "buyBoxPercentageB2B": 0.0,
+        "unitSessionPercentage": 3.13,
+        "unitSessionPercentageB2B": 0.0
+      }
+    },
+    {
+      "parentAsin": "B0F63FMWNS",
+      "childAsin": "B0F63FMWNS",
+      "sku": "busybook_blue",
+      "salesByAsin": {
+        "unitsOrdered": 3,
+        "unitsOrderedB2B": 0,
+        "orderedProductSales": {
+          "amount": 2247.0,
+          "currencyCode": "INR"
+        },
+        "orderedProductSalesB2B": {
+          "amount": 0.0,
+          "currencyCode": "INR"
+        },
+        "totalOrderItems": 3,
+        "totalOrderItemsB2B": 0
+      },
+      "trafficByAsin": {
+        "browserSessions": 12,
+        "browserSessionsB2B": 1,
+        "mobileAppSessions": 135,
+        "mobileAppSessionsB2B": 3,
+        "sessions": 147,
+        "sessionsB2B": 4,
+        "browserSessionPercentage": 4.9,
+        "browserSessionPercentageB2B": 33.33,
+        "mobileAppSessionPercentage": 5.86,
+        "mobileAppSessionPercentageB2B": 6.38,
+        "sessionPercentage": 5.77,
+        "sessionPercentageB2B": 8.0,
+        "browserPageViews": 14,
+        "browserPageViewsB2B": 1,
+        "mobileAppPageViews": 177,
+        "mobileAppPageViewsB2B": 3,
+        "pageViews": 191,
+        "pageViewsB2B": 4,
+        "browserPageViewsPercentage": 4.61,
+        "browserPageViewsPercentageB2B": 33.33,
+        "mobileAppPageViewsPercentage": 5.4,
+        "mobileAppPageViewsPercentageB2B": 5.36,
+        "pageViewsPercentage": 5.33,
+        "pageViewsPercentageB2B": 6.78,
+        "buyBoxPercentage": 97.55,
+        "buyBoxPercentageB2B": 100.0,
+        "unitSessionPercentage": 2.04,
+        "unitSessionPercentageB2B": 0.0
+      }
+    },
+    {
+      "parentAsin": "B0CJ9ZLLN5",
+      "childAsin": "B0CJ9ZLLN5",
+      "sku": "PortablebusyboardV7",
+      "salesByAsin": {
+        "unitsOrdered": 9,
+        "unitsOrderedB2B": 0,
+        "orderedProductSales": {
+          "amount": 3887.91,
+          "currencyCode": "INR"
+        },
+        "orderedProductSalesB2B": {
+          "amount": 0.0,
+          "currencyCode": "INR"
+        },
+        "totalOrderItems": 9,
+        "totalOrderItemsB2B": 0
+      },
+      "trafficByAsin": {
+        "browserSessions": 9,
+        "browserSessionsB2B": 1,
+        "mobileAppSessions": 140,
+        "mobileAppSessionsB2B": 2,
+        "sessions": 149,
+        "sessionsB2B": 3,
+        "browserSessionPercentage": 3.67,
+        "browserSessionPercentageB2B": 33.33,
+        "mobileAppSessionPercentage": 6.08,
+        "mobileAppSessionPercentageB2B": 4.26,
+        "sessionPercentage": 5.85,
+        "sessionPercentageB2B": 6.0,
+        "browserPageViews": 10,
+        "browserPageViewsB2B": 1,
+        "mobileAppPageViews": 203,
+        "mobileAppPageViewsB2B": 3,
+        "pageViews": 213,
+        "pageViewsB2B": 4,
+        "browserPageViewsPercentage": 3.29,
+        "browserPageViewsPercentageB2B": 33.33,
+        "mobileAppPageViewsPercentage": 6.19,
+        "mobileAppPageViewsPercentageB2B": 5.36,
+        "pageViewsPercentage": 5.94,
+        "pageViewsPercentageB2B": 6.78,
+        "buyBoxPercentage": 100.0,
+        "buyBoxPercentageB2B": 100.0,
+        "unitSessionPercentage": 6.04,
+        "unitSessionPercentageB2B": 0.0
+      }
+    },
+    {
+      "parentAsin": "B0DBLVZR9C",
+      "childAsin": "B0DBLVZR9C",
+      "sku": "ComboV1_V4",
+      "salesByAsin": {
+        "unitsOrdered": 1,
+        "unitsOrderedB2B": 0,
+        "orderedProductSales": {
+          "amount": 1349.0,
+          "currencyCode": "INR"
+        },
+        "orderedProductSalesB2B": {
+          "amount": 0.0,
+          "currencyCode": "INR"
+        },
+        "totalOrderItems": 1,
+        "totalOrderItemsB2B": 0
+      },
+      "trafficByAsin": {
+        "browserSessions": 0,
+        "browserSessionsB2B": 0,
+        "mobileAppSessions": 3,
+        "mobileAppSessionsB2B": 0,
+        "sessions": 3,
+        "sessionsB2B": 0,
+        "browserSessionPercentage": 0.0,
+        "browserSessionPercentageB2B": 0.0,
+        "mobileAppSessionPercentage": 0.13,
+        "mobileAppSessionPercentageB2B": 0.0,
+        "sessionPercentage": 0.12,
+        "sessionPercentageB2B": 0.0,
+        "browserPageViews": 0,
+        "browserPageViewsB2B": 0,
+        "mobileAppPageViews": 3,
+        "mobileAppPageViewsB2B": 0,
+        "pageViews": 3,
+        "pageViewsB2B": 0,
+        "browserPageViewsPercentage": 0.0,
+        "browserPageViewsPercentageB2B": 0.0,
+        "mobileAppPageViewsPercentage": 0.09,
+        "mobileAppPageViewsPercentageB2B": 0.0,
+        "pageViewsPercentage": 0.08,
+        "pageViewsPercentageB2B": 0.0,
+        "buyBoxPercentage": 100.0,
+        "buyBoxPercentageB2B": 0.0,
+        "unitSessionPercentage": 33.33,
+        "unitSessionPercentageB2B": 0.0
+      }
+    }
+  ]
+}

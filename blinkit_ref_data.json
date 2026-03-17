@@ -1,0 +1,742 @@
+{
+  "Apr 2025": {
+    "month": "Apr 2025",
+    "products": [
+      {
+        "product": "V1",
+        "total_revenue": 97149,
+        "total_expense": 71750.1,
+        "total_pl": 25398.9,
+        "profit_pct": 26.14427323,
+        "p_per_pcs": 180.1340426,
+        "product_exp": 38070,
+        "total_orders": 141.0,
+        "blinkit_exp": 0.0,
+        "ads": 30860.1,
+        "logistics": 2820
+      },
+      {
+        "product": "V4",
+        "total_revenue": 31951,
+        "total_expense": 26805.9,
+        "total_pl": 5145.1,
+        "profit_pct": 16.10309536,
+        "p_per_pcs": 57.81011236,
+        "product_exp": 19580,
+        "total_orders": 89.0,
+        "blinkit_exp": 0.0,
+        "ads": 5445.9,
+        "logistics": 1780
+      },
+      {
+        "product": "V2",
+        "total_revenue": 57013,
+        "total_expense": 27010,
+        "total_pl": 30003,
+        "profit_pct": 52.62483995,
+        "p_per_pcs": 411,
+        "product_exp": 25550,
+        "total_orders": 73.0,
+        "blinkit_exp": 0.0,
+        "ads": 0,
+        "logistics": 1460
+      },
+      {
+        "product": "V6",
+        "total_revenue": 55638,
+        "total_expense": 24420,
+        "total_pl": 31218,
+        "profit_pct": 56.10913405,
+        "p_per_pcs": 473,
+        "product_exp": 23100,
+        "total_orders": 66.0,
+        "blinkit_exp": 0.0,
+        "ads": 0,
+        "logistics": 1320
+      }
+    ],
+    "totals": {
+      "total_revenue": 241751,
+      "total_expense": 149986,
+      "total_pl": 91765,
+      "product_exp": 106300,
+      "total_orders": 369,
+      "ads": 36306,
+      "logistics": 7380
+    },
+    "summary": {
+      "total_revenue": 241751,
+      "cogs": 106300,
+      "logistics": 7380,
+      "ad_spent_total": 36306,
+      "net_pl": 91765,
+      "pl_pct": 37.95847794
+    }
+  },
+  "May 2025": {
+    "month": "May 2025",
+    "products": [
+      {
+        "product": "V1",
+        "total_revenue": 81991,
+        "total_expense": 65409.05,
+        "total_pl": 16581.95,
+        "profit_pct": 20.22410996,
+        "p_per_pcs": 139.3441176,
+        "product_exp": 32130,
+        "total_orders": 119.0,
+        "blinkit_exp": 2277,
+        "ads": 28622.05,
+        "logistics": 2380
+      },
+      {
+        "product": "V4",
+        "total_revenue": 33028,
+        "total_expense": 27970.95,
+        "total_pl": 5057.05,
+        "profit_pct": 15.31140245,
+        "p_per_pcs": 54.96793478,
+        "product_exp": 20240,
+        "total_orders": 92.0,
+        "blinkit_exp": 840,
+        "ads": 5050.95,
+        "logistics": 1840
+      },
+      {
+        "product": "V2",
+        "total_revenue": 39831,
+        "total_expense": 19975,
+        "total_pl": 19856,
+        "profit_pct": 49.85061886,
+        "p_per_pcs": 389.3333333,
+        "product_exp": 17850,
+        "total_orders": 51.0,
+        "blinkit_exp": 1105,
+        "ads": 0,
+        "logistics": 1020
+      },
+      {
+        "product": "V6",
+        "total_revenue": 53109,
+        "total_expense": 24390,
+        "total_pl": 28719,
+        "profit_pct": 54.07558041,
+        "p_per_pcs": 455.8571429,
+        "product_exp": 22050,
+        "total_orders": 63.0,
+        "blinkit_exp": 1080.0,
+        "ads": 0,
+        "logistics": 1260
+      }
+    ],
+    "totals": {
+      "total_revenue": 207959,
+      "total_expense": 137745,
+      "total_pl": 70214,
+      "product_exp": 92270,
+      "total_orders": 325,
+      "ads": 33673,
+      "logistics": 6500
+    },
+    "summary": {
+      "total_revenue": 207959,
+      "cogs": 92270,
+      "logistics": 6500,
+      "ad_spent_total": 38975,
+      "net_pl": 70214,
+      "pl_pct": 33.76338605
+    }
+  },
+  "Jun 2025": {
+    "month": "Jun 2025",
+    "products": [
+      {
+        "product": "V1",
+        "total_revenue": 73723,
+        "total_expense": 31030,
+        "total_pl": 42693,
+        "profit_pct": 57.91001451,
+        "p_per_pcs": 399,
+        "product_exp": 28890,
+        "total_orders": 107.0,
+        "blinkit_exp": 0.0,
+        "ads": 0.0,
+        "logistics": 2140
+      },
+      {
+        "product": "V4",
+        "total_revenue": 32669,
+        "total_expense": 21840,
+        "total_pl": 10829,
+        "profit_pct": 33.14763231,
+        "p_per_pcs": 119,
+        "product_exp": 20020,
+        "total_orders": 91.0,
+        "blinkit_exp": 0.0,
+        "ads": 0.0,
+        "logistics": 1820
+      },
+      {
+        "product": "V2",
+        "total_revenue": 56232,
+        "total_expense": 26640,
+        "total_pl": 29592,
+        "profit_pct": 52.62483995,
+        "p_per_pcs": 411,
+        "product_exp": 25200,
+        "total_orders": 72.0,
+        "blinkit_exp": 0.0,
+        "ads": 0,
+        "logistics": 1440
+      },
+      {
+        "product": "V6",
+        "total_revenue": 29505,
+        "total_expense": 12950,
+        "total_pl": 16555,
+        "profit_pct": 56.10913405,
+        "p_per_pcs": 473,
+        "product_exp": 12250,
+        "total_orders": 35.0,
+        "blinkit_exp": 0.0,
+        "ads": 0,
+        "logistics": 700
+      }
+    ],
+    "totals": {
+      "total_revenue": 192129,
+      "total_expense": 92460,
+      "total_pl": 99669,
+      "product_exp": 86360,
+      "total_orders": 305,
+      "ads": 0,
+      "logistics": 6100
+    },
+    "summary": {
+      "total_revenue": 192129,
+      "cogs": 86360,
+      "logistics": 6100,
+      "ad_spent_total": 59209,
+      "net_pl": 40460,
+      "pl_pct": 21.05876781
+    }
+  },
+  "Jul 2025": {
+    "month": "Jul 2025",
+    "products": [
+      {
+        "product": "V1",
+        "total_revenue": 112996,
+        "total_expense": 41820,
+        "total_pl": 71176,
+        "profit_pct": 62.98984035,
+        "p_per_pcs": 434,
+        "product_exp": 38540,
+        "total_orders": 164.0,
+        "blinkit_exp": 0.0,
+        "ads": 0.0,
+        "logistics": 3280
+      },
+      {
+        "product": "V4",
+        "total_revenue": 61030,
+        "total_expense": 37230,
+        "total_pl": 23800,
+        "profit_pct": 38.99721448,
+        "p_per_pcs": 140,
+        "product_exp": 33830,
+        "total_orders": 170.0,
+        "blinkit_exp": 0.0,
+        "ads": 0.0,
+        "logistics": 3400
+      },
+      {
+        "product": "V2",
+        "total_revenue": 106216,
+        "total_expense": 46104,
+        "total_pl": 60112,
+        "profit_pct": 56.59411012,
+        "p_per_pcs": 442,
+        "product_exp": 43384,
+        "total_orders": 136.0,
+        "blinkit_exp": 0.0,
+        "ads": 0,
+        "logistics": 2720
+      },
+      {
+        "product": "V6",
+        "total_revenue": 85143,
+        "total_expense": 34643,
+        "total_pl": 50500,
+        "profit_pct": 59.31198102,
+        "p_per_pcs": 500,
+        "product_exp": 32623,
+        "total_orders": 101.0,
+        "blinkit_exp": 0.0,
+        "ads": 0,
+        "logistics": 2020
+      }
+    ],
+    "totals": {
+      "total_revenue": 365385,
+      "total_expense": 159797,
+      "total_pl": 205588,
+      "product_exp": 148377,
+      "total_orders": 571,
+      "ads": 0,
+      "logistics": 11420
+    },
+    "summary": {
+      "total_revenue": 365385,
+      "cogs": 148377,
+      "logistics": 11420,
+      "ad_spent_total": 134501,
+      "net_pl": 71087,
+      "pl_pct": 19.45536899
+    }
+  },
+  "Aug 2025": {
+    "month": "Aug 2025",
+    "products": [
+      {
+        "product": "V1",
+        "total_revenue": 188786,
+        "total_expense": 69870,
+        "total_pl": 118916,
+        "profit_pct": 62.98984035,
+        "p_per_pcs": 434,
+        "product_exp": 64390,
+        "total_orders": 274.0,
+        "blinkit_exp": 0.0,
+        "ads": 0.0,
+        "logistics": 5480
+      },
+      {
+        "product": "V4",
+        "total_revenue": 88314,
+        "total_expense": 53874,
+        "total_pl": 34440,
+        "profit_pct": 38.99721448,
+        "p_per_pcs": 140,
+        "product_exp": 48954,
+        "total_orders": 246.0,
+        "blinkit_exp": 0.0,
+        "ads": 0.0,
+        "logistics": 4920
+      },
+      {
+        "product": "V2",
+        "total_revenue": 153076,
+        "total_expense": 66444,
+        "total_pl": 86632,
+        "profit_pct": 56.59411012,
+        "p_per_pcs": 442,
+        "product_exp": 62524,
+        "total_orders": 196.0,
+        "blinkit_exp": 0.0,
+        "ads": 0,
+        "logistics": 3920
+      },
+      {
+        "product": "V6",
+        "total_revenue": 185460,
+        "total_expense": 75460,
+        "total_pl": 110000,
+        "profit_pct": 59.31198102,
+        "p_per_pcs": 500,
+        "product_exp": 71060,
+        "total_orders": 220.0,
+        "blinkit_exp": 0.0,
+        "ads": 0,
+        "logistics": 4400
+      }
+    ],
+    "totals": {
+      "total_revenue": 615636,
+      "total_expense": 265648,
+      "total_pl": 349988,
+      "product_exp": 246928,
+      "total_orders": 936,
+      "ads": 144647.0,
+      "logistics": 18720
+    },
+    "summary": {
+      "total_revenue": 615636,
+      "cogs": 246928,
+      "logistics": 18720,
+      "ad_spent_total": 144647,
+      "net_pl": 205341,
+      "pl_pct": 33.35428727
+    }
+  },
+  "Sep 2025": {
+    "month": "Sep 2025",
+    "products": [
+      {
+        "product": "V1",
+        "total_revenue": 158470,
+        "total_expense": 55200,
+        "total_pl": 103270,
+        "profit_pct": 65.16690856,
+        "p_per_pcs": 449,
+        "product_exp": 50600,
+        "total_orders": 230.0,
+        "blinkit_exp": 0.0,
+        "ads": 0.0,
+        "logistics": 4600
+      },
+      {
+        "product": "V4",
+        "total_revenue": 80057,
+        "total_expense": 45492,
+        "total_pl": 34565,
+        "profit_pct": 43.17548747,
+        "p_per_pcs": 155,
+        "product_exp": 41032,
+        "total_orders": 223.0,
+        "blinkit_exp": 0.0,
+        "ads": 0.0,
+        "logistics": 4460
+      },
+      {
+        "product": "V2",
+        "total_revenue": 119493,
+        "total_expense": 49572,
+        "total_pl": 69921,
+        "profit_pct": 58.51472471,
+        "p_per_pcs": 457,
+        "product_exp": 46512,
+        "total_orders": 153.0,
+        "blinkit_exp": 0.0,
+        "ads": 0,
+        "logistics": 3060
+      },
+      {
+        "product": "V6",
+        "total_revenue": 153426,
+        "total_expense": 59696,
+        "total_pl": 93730,
+        "profit_pct": 61.09134045,
+        "p_per_pcs": 515,
+        "product_exp": 56056,
+        "total_orders": 182.0,
+        "blinkit_exp": 0.0,
+        "ads": 0,
+        "logistics": 3640
+      }
+    ],
+    "totals": {
+      "total_revenue": 511446,
+      "total_expense": 209960,
+      "total_pl": 301486,
+      "product_exp": 194200,
+      "total_orders": 788,
+      "ads": 162565,
+      "logistics": 15760
+    },
+    "summary": {
+      "total_revenue": 511446,
+      "cogs": 194200,
+      "logistics": 15760,
+      "ad_spent_total": 162565,
+      "net_pl": 138921,
+      "pl_pct": 27.16239838
+    }
+  },
+  "Oct 2025": {
+    "month": "Oct 2025",
+    "products": [
+      {
+        "product": "V1",
+        "total_revenue": 129532,
+        "total_expense": 45120,
+        "total_pl": 84412,
+        "profit_pct": 65.16690856,
+        "p_per_pcs": 449,
+        "product_exp": 41360,
+        "total_orders": 188.0,
+        "blinkit_exp": 0.0,
+        "ads": 0.0,
+        "logistics": 3760
+      },
+      {
+        "product": "V4",
+        "total_revenue": 65697,
+        "total_expense": 37332,
+        "total_pl": 28365,
+        "profit_pct": 43.17548747,
+        "p_per_pcs": 155,
+        "product_exp": 33672,
+        "total_orders": 183.0,
+        "blinkit_exp": 0.0,
+        "ads": 0.0,
+        "logistics": 3660
+      },
+      {
+        "product": "V2",
+        "total_revenue": 101530,
+        "total_expense": 42120,
+        "total_pl": 59410,
+        "profit_pct": 58.51472471,
+        "p_per_pcs": 457,
+        "product_exp": 39520,
+        "total_orders": 130.0,
+        "blinkit_exp": 0.0,
+        "ads": 0,
+        "logistics": 2600
+      },
+      {
+        "product": "V6",
+        "total_revenue": 127293,
+        "total_expense": 49528,
+        "total_pl": 77765,
+        "profit_pct": 61.09134045,
+        "p_per_pcs": 515,
+        "product_exp": 46508,
+        "total_orders": 151.0,
+        "blinkit_exp": 0.0,
+        "ads": 0,
+        "logistics": 3020
+      }
+    ],
+    "totals": {
+      "total_revenue": 424052,
+      "total_expense": 174100,
+      "total_pl": 249952,
+      "product_exp": 161060,
+      "total_orders": 652,
+      "ads": 161733,
+      "logistics": 13040
+    },
+    "summary": {
+      "total_revenue": 424052,
+      "cogs": 161060,
+      "logistics": 13040,
+      "ad_spent_total": 161733,
+      "net_pl": 88219,
+      "pl_pct": 20.80381651
+    }
+  },
+  "Nov 2025": {
+    "month": "Nov 2025",
+    "products": [
+      {
+        "product": "V1",
+        "total_revenue": 49608.0,
+        "total_expense": 17280,
+        "total_pl": 32328,
+        "profit_pct": 65.16690856,
+        "p_per_pcs": 449,
+        "product_exp": 15840,
+        "total_orders": 72.0,
+        "blinkit_exp": 0.0,
+        "ads": 0.0,
+        "logistics": 1440
+      },
+      {
+        "product": "V4",
+        "total_revenue": 50297.0,
+        "total_expense": 11424,
+        "total_pl": 38873,
+        "profit_pct": 77.28691572,
+        "p_per_pcs": 694.1607143,
+        "product_exp": 10304,
+        "total_orders": 56.0,
+        "blinkit_exp": 0.0,
+        "ads": 0.0,
+        "logistics": 1120
+      },
+      {
+        "product": "V2",
+        "total_revenue": 38584.0,
+        "total_expense": 23652,
+        "total_pl": 14932,
+        "profit_pct": 38.69997927,
+        "p_per_pcs": 204.5479452,
+        "product_exp": 22192,
+        "total_orders": 73.0,
+        "blinkit_exp": 0.0,
+        "ads": 0,
+        "logistics": 1460
+      },
+      {
+        "product": "V6",
+        "total_revenue": 70967.0,
+        "total_expense": 33784,
+        "total_pl": 37183,
+        "profit_pct": 52.39477504,
+        "p_per_pcs": 361,
+        "product_exp": 31724,
+        "total_orders": 103.0,
+        "blinkit_exp": 0.0,
+        "ads": 0,
+        "logistics": 2060
+      }
+    ],
+    "totals": {
+      "total_revenue": 209456,
+      "total_expense": 86140,
+      "total_pl": 123316,
+      "product_exp": 80060,
+      "total_orders": 304,
+      "ads": 93688.0,
+      "logistics": 6080
+    },
+    "summary": {
+      "total_revenue": 209456,
+      "cogs": 80060,
+      "logistics": 6080,
+      "ad_spent_total": 93688,
+      "net_pl": 29628,
+      "pl_pct": 14.14521427
+    }
+  },
+  "Dec 2025": {
+    "month": "Dec 2025",
+    "products": [
+      {
+        "product": "V1",
+        "total_revenue": 82680,
+        "total_expense": 26400,
+        "total_pl": 56280,
+        "profit_pct": 68.06966618,
+        "p_per_pcs": 469,
+        "product_exp": 24000,
+        "total_orders": 120.0,
+        "blinkit_exp": 0.0,
+        "ads": 0.0,
+        "logistics": 2400
+      },
+      {
+        "product": "V4",
+        "total_revenue": 34823,
+        "total_expense": 19788,
+        "total_pl": 15035,
+        "profit_pct": 43.17548747,
+        "p_per_pcs": 155,
+        "product_exp": 17848,
+        "total_orders": 97.0,
+        "blinkit_exp": 0.0,
+        "ads": 0.0,
+        "logistics": 1940
+      },
+      {
+        "product": "V2",
+        "total_revenue": 40612,
+        "total_expense": 16848,
+        "total_pl": 23764,
+        "profit_pct": 58.51472471,
+        "p_per_pcs": 457,
+        "product_exp": 15808,
+        "total_orders": 52.0,
+        "blinkit_exp": 0.0,
+        "ads": 0,
+        "logistics": 1040
+      },
+      {
+        "product": "V6",
+        "total_revenue": 61539,
+        "total_expense": 23944,
+        "total_pl": 37595,
+        "profit_pct": 61.09134045,
+        "p_per_pcs": 515,
+        "product_exp": 22484,
+        "total_orders": 73.0,
+        "blinkit_exp": 0.0,
+        "ads": 0,
+        "logistics": 1460
+      }
+    ],
+    "totals": {
+      "total_revenue": 219654,
+      "total_expense": 86980,
+      "total_pl": 132674,
+      "product_exp": 80140,
+      "total_orders": 342,
+      "ads": 27906.0,
+      "logistics": 6840
+    },
+    "summary": {
+      "total_revenue": 219654,
+      "cogs": 80140,
+      "logistics": 6840,
+      "ad_spent_total": 27906,
+      "net_pl": 104768,
+      "pl_pct": 47.69683229
+    }
+  },
+  "Jan 2026": {
+    "month": "Jan 2026",
+    "products": [
+      {
+        "product": "V1",
+        "total_revenue": 90259,
+        "total_expense": 28820,
+        "total_pl": 61439,
+        "profit_pct": 68.06966618,
+        "p_per_pcs": 469,
+        "product_exp": 26200,
+        "total_orders": 131.0,
+        "blinkit_exp": 0.0,
+        "ads": 0.0,
+        "logistics": 2620
+      },
+      {
+        "product": "V4",
+        "total_revenue": 33028,
+        "total_expense": 18768,
+        "total_pl": 14260,
+        "profit_pct": 43.17548747,
+        "p_per_pcs": 155,
+        "product_exp": 16928,
+        "total_orders": 92.0,
+        "blinkit_exp": 0.0,
+        "ads": 0.0,
+        "logistics": 1840
+      },
+      {
+        "product": "V2",
+        "total_revenue": 49984,
+        "total_expense": 20736,
+        "total_pl": 29248,
+        "profit_pct": 58.51472471,
+        "p_per_pcs": 457,
+        "product_exp": 19456,
+        "total_orders": 64.0,
+        "blinkit_exp": 0.0,
+        "ads": 0,
+        "logistics": 1280
+      },
+      {
+        "product": "V6",
+        "total_revenue": 53952,
+        "total_expense": 20992,
+        "total_pl": 32960,
+        "profit_pct": 61.09134045,
+        "p_per_pcs": 515,
+        "product_exp": 19712,
+        "total_orders": 64.0,
+        "blinkit_exp": 0.0,
+        "ads": 0,
+        "logistics": 1280
+      }
+    ],
+    "totals": {
+      "total_revenue": 227223,
+      "total_expense": 0,
+      "total_pl": 137907,
+      "product_exp": 82296,
+      "total_orders": 351,
+      "ads": 37929.0,
+      "logistics": 7020
+    },
+    "summary": {
+      "total_revenue": 227223,
+      "cogs": 82296,
+      "logistics": 7020,
+      "ad_spent_total": 37929,
+      "net_pl": 99978,
+      "pl_pct": 43.99994719
+    }
+  }
+}

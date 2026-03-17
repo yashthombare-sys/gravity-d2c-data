@@ -1,0 +1,112 @@
+{
+  "V1": {
+    "revenue": 78240.84,
+    "total_orders": 110,
+    "delivered": 110,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 225,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V1-V2 Combo": {
+    "revenue": 5847.65,
+    "total_orders": 4,
+    "delivered": 4,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 524,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V1-V4 Combo": {
+    "revenue": 24365.23,
+    "total_orders": 25,
+    "delivered": 25,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 404,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V1-V6 Combo": {
+    "revenue": 5847.65,
+    "total_orders": 4,
+    "delivered": 4,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 500,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V2": {
+    "revenue": 55014.0,
+    "total_orders": 58,
+    "delivered": 58,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 275,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V2-V4 Combo": {
+    "revenue": 16113.51,
+    "total_orders": 16,
+    "delivered": 16,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 488,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V4": {
+    "revenue": 14350.52,
+    "total_orders": 34,
+    "delivered": 34,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 170,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V5": {
+    "revenue": 6839.28,
+    "total_orders": 10,
+    "delivered": 10,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 225,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V6": {
+    "revenue": 27026.34,
+    "total_orders": 32,
+    "delivered": 32,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 275,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V6-V2 Combo": {
+    "revenue": 14619.13,
+    "total_orders": 10,
+    "delivered": 10,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 612,
+    "fc_margin": 0,
+    "ad_spend": 0
+  },
+  "V7 Police Cruiser": {
+    "revenue": 4873.03,
+    "total_orders": 6,
+    "delivered": 6,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 600,
+    "fc_margin": 0,
+    "ad_spend": 0
+  }
+}

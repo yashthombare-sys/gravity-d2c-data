@@ -1,0 +1,189 @@
+{
+  "V6": {
+    "total_orders": 807,
+    "shipped": 781,
+    "delivered": 709,
+    "rto": 72,
+    "in_transit": 0,
+    "cancelled": 26,
+    "lost": 0,
+    "revenue": 815233.3700000031,
+    "freight": 55549.089999999276
+  },
+  "V5": {
+    "total_orders": 82,
+    "shipped": 76,
+    "delivered": 73,
+    "rto": 3,
+    "in_transit": 0,
+    "cancelled": 6,
+    "lost": 0,
+    "revenue": 76068.70000000004,
+    "freight": 5374.360000000005
+  },
+  "V1": {
+    "total_orders": 577,
+    "shipped": 558,
+    "delivered": 528,
+    "rto": 30,
+    "in_transit": 0,
+    "cancelled": 19,
+    "lost": 0,
+    "revenue": 551336.4599999983,
+    "freight": 38830.82999999983
+  },
+  "V9": {
+    "total_orders": 1282,
+    "shipped": 1220,
+    "delivered": 1140,
+    "rto": 80,
+    "in_transit": 0,
+    "cancelled": 62,
+    "lost": 0,
+    "revenue": 2450306.3200000054,
+    "freight": 110159.84000000084
+  },
+  "V4": {
+    "total_orders": 317,
+    "shipped": 303,
+    "delivered": 286,
+    "rto": 17,
+    "in_transit": 0,
+    "cancelled": 14,
+    "lost": 0,
+    "revenue": 143738.61000000013,
+    "freight": 21707.54000000005
+  },
+  "V2": {
+    "total_orders": 736,
+    "shipped": 714,
+    "delivered": 674,
+    "rto": 39,
+    "in_transit": 0,
+    "cancelled": 22,
+    "lost": 1,
+    "revenue": 844342.850000002,
+    "freight": 53495.909999999385
+  },
+  "V6-V2 Combo": {
+    "total_orders": 69,
+    "shipped": 64,
+    "delivered": 63,
+    "rto": 1,
+    "in_transit": 0,
+    "cancelled": 5,
+    "lost": 0,
+    "revenue": 137984.60000000003,
+    "freight": 10625.940000000006
+  },
+  "V7 Police Cruiser": {
+    "total_orders": 107,
+    "shipped": 102,
+    "delivered": 95,
+    "rto": 7,
+    "in_transit": 0,
+    "cancelled": 5,
+    "lost": 0,
+    "revenue": 111703.4000000001,
+    "freight": 9143.510000000011
+  },
+  "V3": {
+    "total_orders": 121,
+    "shipped": 113,
+    "delivered": 111,
+    "rto": 2,
+    "in_transit": 0,
+    "cancelled": 8,
+    "lost": 0,
+    "revenue": 193572.36000000002,
+    "freight": 13107.350000000024
+  },
+  "V6- P of 2": {
+    "total_orders": 20,
+    "shipped": 19,
+    "delivered": 19,
+    "rto": 0,
+    "in_transit": 0,
+    "cancelled": 1,
+    "lost": 0,
+    "revenue": 40608.350000000006,
+    "freight": 1994.2999999999995
+  },
+  "V4- P of 2": {
+    "total_orders": 63,
+    "shipped": 59,
+    "delivered": 57,
+    "rto": 1,
+    "in_transit": 0,
+    "cancelled": 4,
+    "lost": 1,
+    "revenue": 48169.79999999999,
+    "freight": 6945.410000000001
+  },
+  "V9 P of 2": {
+    "total_orders": 44,
+    "shipped": 41,
+    "delivered": 38,
+    "rto": 3,
+    "in_transit": 0,
+    "cancelled": 3,
+    "lost": 0,
+    "revenue": 144246.77000000002,
+    "freight": 6991.339999999998
+  },
+  "V2- P of 2": {
+    "total_orders": 19,
+    "shipped": 19,
+    "delivered": 18,
+    "rto": 1,
+    "in_transit": 0,
+    "cancelled": 0,
+    "lost": 0,
+    "revenue": 39751.6,
+    "freight": 2163.5299999999997
+  },
+  "V1- P of 2": {
+    "total_orders": 13,
+    "shipped": 12,
+    "delivered": 12,
+    "rto": 0,
+    "in_transit": 0,
+    "cancelled": 1,
+    "lost": 0,
+    "revenue": 23288.349999999995,
+    "freight": 833.1799999999998
+  },
+  "V1-V4 Combo": {
+    "total_orders": 1,
+    "shipped": 1,
+    "delivered": 1,
+    "rto": 0,
+    "in_transit": 0,
+    "cancelled": 0,
+    "lost": 0,
+    "revenue": 1399.0,
+    "freight": 46.02
+  },
+  "V8": {
+    "total_orders": 100,
+    "shipped": 86,
+    "delivered": 80,
+    "rto": 6,
+    "in_transit": 0,
+    "cancelled": 14,
+    "lost": 0,
+    "revenue": 149032.69000000003,
+    "freight": 11391.890000000005
+  },
+  "V1-V2 Combo": {
+    "total_orders": 2,
+    "shipped": 2,
+    "delivered": 2,
+    "rto": 0,
+    "in_transit": 0,
+    "cancelled": 0,
+    "lost": 0,
+    "revenue": 3998.0,
+    "freight": 92.04
+  }
+}

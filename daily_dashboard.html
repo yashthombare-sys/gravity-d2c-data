@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClapStore Toys — Daily P&L</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #FCBB13;
+    --primary-dark: #d9a00e;
+    --teal: #108474;
+    --bg: #0a0d12;
+    --card: #141820;
+    --green: #22c55e;
+    --red: #ef4444;
+    --text: #e8ecf1;
+    --muted: #8a94a6;
+    --border: #1f2937;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var(--text); }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg,#0d1117,#161c24,#0d1117);
+    padding:16px 32px; border-bottom:2px solid var(--primary);
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .header-left { display:flex; align-items:center; gap:12px; }
+  .header-logo { width:40px; height:40px; border-radius:10px; }
+  .header h1 { font-size:20px; font-weight:800; }
+  .header .sub { color:var(--muted); font-size:11px; }
+  .nav-btn {
+    padding:6px 14px; border-radius:6px; border:1px solid var(--border);
+    color:var(--muted); text-decoration:none; font-size:10px; font-weight:700;
+    letter-spacing:0.3px; transition:all 0.15s;
+  }
+  .nav-btn:hover { border-color:var(--primary); color:var(--primary); }
+
+  .container { max-width:900px; margin:0 auto; padding:24px 20px; }
+
+  /* Month selector */
+  .month-row { display:flex; gap:6px; margin-bottom:16px; flex-wrap:wrap; }
+  .month-btn {
+    padding:6px 14px; border-radius:6px; border:1px solid var(--border);
+    background:transparent; color:var(--muted); font-size:11px; font-weight:600;
+    cursor:pointer; transition:all 0.15s; font-family:inherit;
+  }
+  .month-btn.active { background:var(--primary); color:#000; border-color:var(--primary); }
+  .month-btn:hover:not(.active) { border-color:var(--primary); color:var(--text); }
+
+  /* Calendar grid */
+  .cal-grid {
+    display:grid; grid-template-columns:repeat(7,1fr); gap:6px;
+    margin-bottom:24px;
+  }
+  .day-btn {
+    aspect-ratio:1; border-radius:10px; border:1px solid var(--border);
+    background:var(--card); color:var(--muted); font-size:14px; font-weight:700;
+    cursor:pointer; transition:all 0.15s; font-family:inherit;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+  }
+  .day-btn .day-rev { font-size:8px; font-weight:500; color:var(--muted); }
+  .day-btn.has-data { color:var(--text); border-color:rgba(252,187,19,0.2); }
+  .day-btn.has-data .day-rev { color:var(--primary); }
+  .day-btn.active { background:var(--primary); color:#000; border-color:var(--primary); }
+  .day-btn.active .day-rev { color:#000; }
+  .day-btn:hover:not(.active) { border-color:var(--primary); transform:translateY(-1px); }
+  .day-btn.empty { visibility:hidden; }
+
+  /* P&L Card */
+  .pnl-card {
+    background:var(--card); border-radius:14px; border:1px solid var(--border);
+    padding:24px; margin-bottom:16px;
+  }
+  .pnl-title {
+    font-size:13px; font-weight:700; color:var(--muted); text-transform:uppercase;
+    letter-spacing:0.8px; margin-bottom:16px; display:flex; align-items:center; gap:8px;
+  }
+  .pnl-title::before { content:''; width:4px; height:16px; background:var(--primary); border-radius:2px; }
+  .pnl-title .badge {
+    font-size:9px; padding:2px 8px; border-radius:4px; font-weight:700;
+    background:rgba(252,187,19,0.12); color:var(--primary);
+  }
+
+  /* Metric rows */
+  .metric-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .metric {
+    display:flex; justify-content:space-between; align-items:baseline;
+    padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.04);
+  }
+  .metric-label { font-size:12px; color:var(--muted); font-weight:500; }
+  .metric-value { font-size:16px; font-weight:800; }
+  .metric-value.sm { font-size:13px; font-weight:700; }
+
+  /* Highlight metrics */
+  .highlight-row {
+    display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:16px;
+  }
+  .highlight {
+    text-align:center; padding:14px 8px; border-radius:10px;
+    background:rgba(255,255,255,0.02); border:1px solid var(--border);
+  }
+  .highlight-label { font-size:9px; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; font-weight:600; margin-bottom:4px; }
+  .highlight-val { font-size:20px; font-weight:800; }
+  .highlight-sub { font-size:9px; color:var(--muted); margin-top:2px; }
+
+  .positive { color:var(--green); }
+  .negative { color:var(--red); }
+
+  /* Separator */
+  .sep { height:1px; background:var(--border); margin:12px 0; }
+
+  /* No data */
+  .no-data { text-align:center; padding:40px; color:var(--muted); font-size:13px; }
+
+  @media (max-width:600px) {
+    .container { padding:16px 12px; }
+    .cal-grid { grid-template-columns:repeat(7,1fr); gap:4px; }
+    .day-btn { font-size:12px; }
+    .highlight-row { grid-template-columns:repeat(2,1fr); }
+    .metric-grid { grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <img class="header-logo" src="https://clapstoretoys.com/cdn/shop/files/Convert_to_JPG_project_100x100_crop_center.jpg?v=1728916696" alt="ClapStore">
+    <div>
+      <h1>ClapStore Toys</h1>
+      <div class="sub">Daily P&L</div>
+    </div>
+  </div>
+  <a href="dashboard.html" class="nav-btn">MONTHLY VIEW</a>
+</div>
+
+<div class="container">
+  <!-- Month selector -->
+  <div class="month-row" id="monthRow"></div>
+
+  <!-- Calendar -->
+  <div class="cal-grid" id="calGrid"></div>
+
+  <!-- P&L Content -->
+  <div id="pnlContent"></div>
+</div>
+
+<script>
+// ── DAILY_DATA_START ──
+const DAILY_D2C={"Oct 2025":[],"Nov 2025":[],"Dec 2025":[],"Jan 2026":[],"Feb 2026":[{date:"1",orders:103,revenue:112321.0,cogs:50318.0,ads:54696.3,profit:-14388.0,profit_pct:-13.0,mkt_pct:49.0,cogs_log_pct:44.8,category:"busyboard"},{date:"2",orders:155,revenue:180005.0,cogs:82608.0,ads:83736.0,profit:-13272.0,profit_pct:-7.4,mkt_pct:46.5,cogs_log_pct:45.9,category:"busyboard"},{date:"3",orders:149,revenue:175488.0,cogs:81566.0,ads:68020.6,profit:2301.0,profit_pct:1.3,mkt_pct:38.8,cogs_log_pct:46.5,category:"busyboard"},{date:"4",orders:156,revenue:182143.0,cogs:83262.0,ads:63248.3,profit:13968.0,profit_pct:7.7,mkt_pct:34.7,cogs_log_pct:45.7,category:"busyboard"},{date:"5",orders:138,revenue:156313.0,cogs:73639.0,ads:57859.5,profit:3723.0,profit_pct:2.4,mkt_pct:37.0,cogs_log_pct:47.1,category:"busyboard"},{date:"6",orders:129,revenue:147981.0,cogs:68292.0,ads:51421.6,profit:3095.0,profit_pct:2.1,mkt_pct:34.8,cogs_log_pct:46.1,category:"busyboard"},{date:"7",orders:108,revenue:123165.0,cogs:56642.0,ads:51858.5,profit:-18582.0,profit_pct:-15.1,mkt_pct:42.1,cogs_log_pct:46.0,category:"busyboard"},{date:"8",orders:101,revenue:108990.0,cogs:49335.0,ads:45232.3,profit:-9576.0,profit_pct:-8.8,mkt_pct:41.5,cogs_log_pct:45.3,category:"busyboard"},{date:"9",orders:91,revenue:106103.0,cogs:52223.0,ads:28835.2,profit:10908.0,profit_pct:10.3,mkt_pct:27.2,cogs_log_pct:49.2,category:"busyboard"},{date:"10",orders:111,revenue:123976.0,cogs:55983.0,ads:49575.1,profit:587.0,profit_pct:0.5,mkt_pct:40.0,cogs_log_pct:45.2,category:"busyboard"},{date:"11",orders:126,revenue:136337.0,cogs:62792.0,ads:51691.4,profit:3303.0,profit_pct:2.4,mkt_pct:37.9,cogs_log_pct:46.1,category:"busyboard"},{date:"12",orders:115,revenue:130596.0,cogs:58417.0,ads:64483.5,profit:-11803.0,profit_pct:-9.0,mkt_pct:49.4,cogs_log_pct:44.7,category:"busyboard"},{date:"13",orders:144,revenue:159419.0,cogs:71851.0,ads:85507.1,profit:-21976.0,profit_pct:-13.8,mkt_pct:53.6,cogs_log_pct:45.1,category:"busyboard"},{date:"14",orders:114,revenue:125027.0,cogs:56365.0,ads:71586.8,profit:-23677.0,profit_pct:-18.9,mkt_pct:57.3,cogs_log_pct:45.1,category:"busyboard"},{date:"15",orders:144,revenue:159191.0,cogs:71851.0,ads:84879.8,profit:-16921.0,profit_pct:-10.6,mkt_pct:53.3,cogs_log_pct:45.1,category:"busyboard"},{date:"16",orders:200,revenue:224025.0,cogs:103963.0,ads:92834.0,profit:8190.0,profit_pct:3.7,mkt_pct:41.4,cogs_log_pct:46.4,category:"busyboard"},{date:"17",orders:214,revenue:246685.0,cogs:110583.0,ads:99677.0,profit:10299.0,profit_pct:4.2,mkt_pct:40.4,cogs_log_pct:44.8,category:"busyboard"},{date:"18",orders:255,revenue:280674.0,cogs:126951.0,ads:111878.7,profit:11523.0,profit_pct:4.1,mkt_pct:39.9,cogs_log_pct:45.2,category:"busyboard"},{date:"19",orders:236,revenue:275690.0,cogs:126732.0,ads:127218.7,profit:-12326.0,profit_pct:-4.5,mkt_pct:46.1,cogs_log_pct:46.0,category:"busyboard"},{date:"20",orders:234,revenue:273735.0,cogs:128132.0,ads:109391.0,profit:3494.0,profit_pct:1.3,mkt_pct:40.0,cogs_log_pct:46.8,category:"busyboard"},{date:"21",orders:248,revenue:284435.0,cogs:127154.0,ads:115032.1,profit:7608.0,profit_pct:2.7,mkt_pct:40.4,cogs_log_pct:44.7,category:"busyboard"},{date:"22",orders:273,revenue:307224.0,cogs:139069.0,ads:123791.9,profit:4012.0,profit_pct:1.3,mkt_pct:40.3,cogs_log_pct:45.3,category:"busyboard"},{date:"23",orders:231,revenue:267963.0,cogs:121548.0,ads:11185.5,profit:-10764.0,profit_pct:-4.0,mkt_pct:4.2,cogs_log_pct:45.4,category:"busyboard"},{date:"24",orders:269,revenue:317564.0,cogs:143142.0,ads:134678.8,profit:13230.0,profit_pct:4.2,mkt_pct:42.4,cogs_log_pct:45.1,category:"busyboard"},{date:"25",orders:300,revenue:352231.0,cogs:159323.0,ads:120164.2,profit:39028.0,profit_pct:11.1,mkt_pct:34.1,cogs_log_pct:45.2,category:"busyboard"},{date:"26",orders:253,revenue:288901.0,cogs:128798.0,ads:133100.7,profit:3044.0,profit_pct:1.1,mkt_pct:46.1,cogs_log_pct:44.6,category:"busyboard"},{date:"27",orders:284,revenue:322497.0,cogs:147145.0,ads:140687.3,profit:9341.0,profit_pct:2.9,mkt_pct:43.6,cogs_log_pct:45.6,category:"busyboard"},{date:"28",orders:255,revenue:294797.0,cogs:134009.0,ads:150817.0,profit:-17176.0,profit_pct:-5.8,mkt_pct:51.2,cogs_log_pct:45.5,category:"busyboard"},{date:"1",orders:580,revenue:760320.0,cogs:374752.0,ads:27377.1,profit:353263.0,profit_pct:46.0,mkt_pct:4.0,cogs_log_pct:49.3,category:"softtoy"},{date:"2",orders:52,revenue:72849.0,cogs:39872.0,ads:26037.3,profit:2253.0,profit_pct:3.0,mkt_pct:36.0,cogs_log_pct:54.7,category:"softtoy"},{date:"3",orders:114,revenue:161786.0,cogs:92120.0,ads:22446.8,profit:43179.0,profit_pct:27.0,mkt_pct:14.0,cogs_log_pct:56.9,category:"softtoy"},{date:"4",orders:40,revenue:56360.0,cogs:32928.0,ads:24699.0,profit:-5713.0,profit_pct:-10.0,mkt_pct:44.0,cogs_log_pct:58.4,category:"softtoy"},{date:"5",orders:27,revenue:37873.0,cogs:22484.0,ads:20679.0,profit:-9012.0,profit_pct:-24.0,mkt_pct:55.0,cogs_log_pct:59.4,category:"softtoy"},{date:"6",orders:28,revenue:40972.0,cogs:25046.0,ads:21011.8,profit:-8868.0,profit_pct:-22.0,mkt_pct:51.0,cogs_log_pct:61.1,category:"softtoy"},{date:"7",orders:38,revenue:56662.0,cogs:26908.0,ads:21201.9,profit:4736.0,profit_pct:8.0,mkt_pct:37.0,cogs_log_pct:47.5,category:"softtoy"},{date:"8",orders:24,revenue:35176.0,cogs:18046.0,ads:21485.2,profit:-8223.0,profit_pct:-23.0,mkt_pct:61.0,cogs_log_pct:51.3,category:"softtoy"},{date:"9",orders:38,revenue:54862.0,cogs:31038.0,ads:23783.4,profit:-4240.0,profit_pct:-8.0,mkt_pct:43.0,cogs_log_pct:56.6,category:"softtoy"},{date:"10",orders:136641,revenue:100041771.0,cogs:86088674.0,ads:24895.8,profit:13923720.0,profit_pct:14.0,mkt_pct:0.0,cogs_log_pct:86.0,category:"softtoy"},{date:"11",orders:32,revenue:43568.0,cogs:23380.0,ads:18884.7,profit:-2096.0,profit_pct:-5.0,mkt_pct:43.0,cogs_log_pct:53.7,category:"softtoy"},{date:"12",orders:14,revenue:19786.0,cogs:11396.0,ads:11453.0,profit:-5125.0,profit_pct:-26.0,mkt_pct:58.0,cogs_log_pct:57.6,category:"softtoy"},{date:"13",orders:13,revenue:18937.0,cogs:11732.0,ads:7830.0,profit:-2034.0,profit_pct:-11.0,mkt_pct:41.0,cogs_log_pct:62.0,category:"softtoy"},{date:"14",orders:9,revenue:12791.0,cogs:7924.0,ads:7789.5,profit:-4325.0,profit_pct:-34.0,mkt_pct:61.0,cogs_log_pct:62.0,category:"softtoy"},{date:"15",orders:11,revenue:16139.0,cogs:10150.0,ads:7019.5,profit:-2294.0,profit_pct:-14.0,mkt_pct:43.0,cogs_log_pct:62.9,category:"softtoy"},{date:"16",orders:5,revenue:7295.0,cogs:4760.0,ads:6591.3,profit:-5243.0,profit_pct:-72.0,mkt_pct:90.0,cogs_log_pct:65.2,category:"softtoy"},{date:"17",orders:4,revenue:6346.0,cogs:2856.0,ads:8582.0,profit:-6637.0,profit_pct:-105.0,mkt_pct:135.0,cogs_log_pct:45.0,category:"softtoy"},{date:"18",orders:19,revenue:27711.0,cogs:15218.0,ads:11164.2,profit:-680.0,profit_pct:-2.0,mkt_pct:40.0,cogs_log_pct:54.9,category:"softtoy"},{date:"19",orders:15,revenue:20735.0,cogs:12026.0,ads:16097.3,profit:-10286.0,profit_pct:-50.0,mkt_pct:78.0,cogs_log_pct:58.0,category:"softtoy"},{date:"20",orders:15,revenue:21735.0,cogs:13636.0,ads:17701.3,profit:-12789.0,profit_pct:-59.0,mkt_pct:81.0,cogs_log_pct:62.7,category:"softtoy"},{date:"1",orders:3,revenue:2697.0,cogs:876.0,ads:3202.8,profit:-1958.0,profit_pct:-73.0,mkt_pct:119.0,cogs_log_pct:32.5,category:"stem"},{date:"4",orders:7,revenue:6293.0,cogs:2044.0,ads:4654.7,profit:-1244.0,profit_pct:-20.0,mkt_pct:74.0,cogs_log_pct:32.5,category:"stem"},{date:"5",orders:17,revenue:15283.0,cogs:4964.0,ads:5979.2,profit:3264.0,profit_pct:21.0,mkt_pct:39.0,cogs_log_pct:32.5,category:"stem"},{date:"6",orders:15,revenue:13485.0,cogs:4380.0,ads:8230.7,profit:-607.0,profit_pct:-5.0,mkt_pct:61.0,cogs_log_pct:32.5,category:"stem"},{date:"7",orders:30,revenue:26970.0,cogs:8760.0,ads:7478.8,profit:9385.0,profit_pct:35.0,mkt_pct:28.0,cogs_log_pct:32.5,category:"stem"},{date:"8",orders:48,revenue:43152.0,cogs:14016.0,ads:9834.3,profit:17532.0,profit_pct:41.0,mkt_pct:23.0,cogs_log_pct:32.5,category:"stem"},{date:"9",orders:48,revenue:43152.0,cogs:14016.0,ads:10998.7,profit:16157.0,profit_pct:37.0,mkt_pct:25.0,cogs_log_pct:32.5,category:"stem"},{date:"10",orders:47,revenue:42253.0,cogs:13724.0,ads:12352.2,profit:13953.0,profit_pct:33.0,mkt_pct:29.0,cogs_log_pct:32.5,category:"stem"},{date:"11",orders:53,revenue:48447.0,cogs:15476.0,ads:11892.5,profit:18938.0,profit_pct:39.0,mkt_pct:25.0,cogs_log_pct:31.9,category:"stem"},{date:"12",orders:36,revenue:37164.0,cogs:10512.0,ads:12355.0,profit:12073.0,profit_pct:32.0,mkt_pct:33.0,cogs_log_pct:28.3,category:"stem"},{date:"13",orders:45,revenue:48055.0,cogs:13140.0,ads:15184.6,profit:16997.0,profit_pct:35.0,mkt_pct:32.0,cogs_log_pct:27.3,category:"stem"},{date:"14",orders:49,revenue:49251.0,cogs:14308.0,ads:16484.4,profit:15491.0,profit_pct:31.0,mkt_pct:33.0,cogs_log_pct:29.1,category:"stem"},{date:"15",orders:62,revenue:57738.0,cogs:18104.0,ads:25626.8,profit:9394.0,profit_pct:16.0,mkt_pct:44.0,cogs_log_pct:31.4,category:"stem"},{date:"16",orders:84,revenue:77116.0,cogs:24411.0,ads:21413.2,profit:27437.0,profit_pct:36.0,mkt_pct:28.0,cogs_log_pct:31.6,category:"stem"},{date:"17",orders:79,revenue:71821.0,cogs:22834.0,ads:25133.8,profit:19329.0,profit_pct:27.0,mkt_pct:35.0,cogs_log_pct:31.8,category:"stem"},{date:"18",orders:77,revenue:69028.0,cogs:22367.0,ads:28680.1,profit:12818.0,profit_pct:19.0,mkt_pct:42.0,cogs_log_pct:32.4,category:"stem"},{date:"19",orders:38,revenue:33208.0,cogs:10745.0,ads:31766.6,profit:-15021.0,profit_pct:-45.0,mkt_pct:96.0,cogs_log_pct:32.4,category:"stem"},{date:"28",orders:39,revenue:33073.0,cogs:10920.0,ads:10889.9,profit:9303.0,profit_pct:28.0,mkt_pct:33.0,cogs_log_pct:33.0,category:"stem"}],"Mar 2026":[{date:"1",orders:190,revenue:227180.0,cogs:102903.0,ads:140167.0,profit:-41120.0,profit_pct:-18.0,mkt_pct:62.0,cogs_log_pct:45.3,category:"busyboard"},{date:"2",orders:158,revenue:192464.0,cogs:87456.0,ads:116922.0,profit:-33280.0,profit_pct:-17.0,mkt_pct:61.0,cogs_log_pct:45.4,category:"busyboard"},{date:"3",orders:198,revenue:245523.0,cogs:110442.0,ads:128816.0,profit:-16922.0,profit_pct:-7.0,mkt_pct:52.0,cogs_log_pct:45.0,category:"busyboard"},{date:"4",orders:191,revenue:233452.0,cogs:107434.0,ads:139283.0,profit:-38643.0,profit_pct:-17.0,mkt_pct:60.0,cogs_log_pct:46.0,category:"busyboard"},{date:"5",orders:191,revenue:218365.0,cogs:103078.0,ads:108357.0,profit:-12806.0,profit_pct:-6.0,mkt_pct:50.0,cogs_log_pct:47.2,category:"busyboard"},{date:"6",orders:161,revenue:188361.0,cogs:88071.0,ads:78607.0,profit:-10379.0,profit_pct:-6.0,mkt_pct:42.0,cogs_log_pct:46.8,category:"busyboard"},{date:"7",orders:137,revenue:168154.0,cogs:79400.0,ads:74977.0,profit:-32928.0,profit_pct:-20.0,mkt_pct:45.0,cogs_log_pct:47.2,category:"busyboard"},{date:"8",orders:137,revenue:166070.0,cogs:78075.0,ads:71058.0,profit:-27239.0,profit_pct:-16.0,mkt_pct:43.0,cogs_log_pct:47.0,category:"busyboard"},{date:"9",orders:152,revenue:182762.0,cogs:84019.0,ads:79521.0,profit:4908.0,profit_pct:3.0,mkt_pct:44.0,cogs_log_pct:46.0,category:"busyboard"},{date:"10",orders:188,revenue:207582.0,cogs:96157.0,ads:87834.0,profit:7781.0,profit_pct:4.0,mkt_pct:42.0,cogs_log_pct:46.3,category:"busyboard"},{date:"11",orders:174,revenue:199844.0,cogs:91321.0,ads:82599.0,profit:11056.0,profit_pct:6.0,mkt_pct:41.0,cogs_log_pct:45.7,category:"busyboard"},{date:"12",orders:157,revenue:180857.0,cogs:82581.0,ads:73588.0,profit:11442.0,profit_pct:6.0,mkt_pct:41.0,cogs_log_pct:45.7,category:"busyboard"},{date:"13",orders:157,revenue:182558.0,cogs:84676.0,ads:74746.0,profit:9682.0,profit_pct:5.0,mkt_pct:41.0,cogs_log_pct:46.4,category:"busyboard"},{date:"14",orders:153,revenue:181840.0,cogs:82933.0,ads:82519.0,profit:1534.0,profit_pct:1.0,mkt_pct:45.0,cogs_log_pct:45.6,category:"busyboard"},{date:"15",orders:94,revenue:100230.0,cogs:44889.0,ads:48241.0,profit:-1583.0,profit_pct:-2.0,mkt_pct:48.0,cogs_log_pct:44.8,category:"busyboard"},{date:"1",orders:38,revenue:52762.0,cogs:23610.0,ads:12584.0,profit:14303.0,profit_pct:27.0,mkt_pct:24.0,cogs_log_pct:44.8,category:"softtoy"},{date:"2",orders:56,revenue:72284.0,cogs:37910.0,ads:15642.0,profit:15917.0,profit_pct:22.0,mkt_pct:22.0,cogs_log_pct:52.5,category:"softtoy"},{date:"3",orders:53,revenue:68567.0,cogs:35356.0,ads:22570.0,profit:6578.0,profit_pct:10.0,mkt_pct:33.0,cogs_log_pct:51.6,category:"softtoy"},{date:"4",orders:49,revenue:63701.0,cogs:32756.0,ads:23864.0,profit:2785.0,profit_pct:4.0,mkt_pct:37.0,cogs_log_pct:51.4,category:"softtoy"},{date:"5",orders:71,revenue:92449.0,cogs:47962.0,ads:23561.0,profit:16686.0,profit_pct:18.0,mkt_pct:25.0,cogs_log_pct:51.9,category:"softtoy"},{date:"6",orders:64,revenue:84136.0,cogs:44318.0,ads:24243.0,profit:11212.0,profit_pct:13.0,mkt_pct:29.0,cogs_log_pct:52.7,category:"softtoy"},{date:"7",orders:53,revenue:68797.0,cogs:35356.0,ads:24167.0,profit:4924.0,profit_pct:7.0,mkt_pct:35.0,cogs_log_pct:51.4,category:"softtoy"},{date:"8",orders:45,revenue:58075.0,cogs:30458.0,ads:24121.0,profit:-846.0,profit_pct:-1.0,mkt_pct:42.0,cogs_log_pct:52.5,category:"softtoy"},{date:"9",orders:60,revenue:78140.0,cogs:40510.0,ads:29107.0,profit:3284.0,profit_pct:4.0,mkt_pct:37.0,cogs_log_pct:51.8,category:"softtoy"},{date:"10",orders:65,revenue:84516.0,cogs:44968.0,ads:26349.0,profit:8456.0,profit_pct:10.0,mkt_pct:31.0,cogs_log_pct:53.2,category:"softtoy"},{date:"11",orders:65,revenue:83650.0,cogs:43458.0,ads:27615.0,profit:7607.0,profit_pct:9.0,mkt_pct:33.0,cogs_log_pct:52.0,category:"softtoy"},{date:"12",orders:94,revenue:122096.0,cogs:63818.0,ads:37757.0,profit:13725.0,profit_pct:11.0,mkt_pct:31.0,cogs_log_pct:52.3,category:"softtoy"},{date:"13",orders:74,revenue:95537.0,cogs:50516.0,ads:25805.0,profit:14570.0,profit_pct:15.0,mkt_pct:27.0,cogs_log_pct:52.9,category:"softtoy"},{date:"14",orders:25,revenue:31815.0,cogs:16552.0,ads:6780.0,profit:7263.0,profit_pct:23.0,mkt_pct:21.0,cogs_log_pct:52.0,category:"softtoy"},{date:"15",orders:3,revenue:3847.0,cogs:1950.0,ads:0.0,profit:1897.0,profit_pct:49.0,mkt_pct:0.0,cogs_log_pct:50.7,category:"softtoy"},{date:"1",orders:65,revenue:55498.0,cogs:18395.0,ads:16851.0,profit:17219.0,profit_pct:31.0,mkt_pct:30.0,cogs_log_pct:33.1,category:"stem"},{date:"2",orders:46,revenue:39775.0,cogs:12730.0,ads:19422.0,profit:4127.0,profit_pct:10.0,mkt_pct:49.0,cogs_log_pct:32.0,category:"stem"},{date:"3",orders:56,revenue:48186.0,cogs:15650.0,ads:18378.0,profit:10850.0,profit_pct:23.0,mkt_pct:38.0,cogs_log_pct:32.5,category:"stem"},{date:"4",orders:40,revenue:34431.0,cogs:11329.0,ads:17324.0,profit:2660.0,profit_pct:8.0,mkt_pct:50.0,cogs_log_pct:32.9,category:"stem"},{date:"5",orders:55,revenue:47023.0,cogs:14539.0,ads:21644.0,profit:6944.0,profit_pct:15.0,mkt_pct:46.0,cogs_log_pct:30.9,category:"stem"},{date:"7",orders:44,revenue:38108.0,cogs:12029.0,ads:15192.0,profit:8152.0,profit_pct:21.0,mkt_pct:40.0,cogs_log_pct:31.6,category:"stem"},{date:"6",orders:32,revenue:27599.0,cogs:8642.0,ads:20829.0,profit:-5621.0,profit_pct:-20.0,mkt_pct:75.0,cogs_log_pct:31.3,category:"stem"},{date:"8",orders:66,revenue:56991.0,cogs:18219.0,ads:17904.0,profit:17645.0,profit_pct:31.0,mkt_pct:31.0,cogs_log_pct:32.0,category:"stem"},{date:"9",orders:61,revenue:52297.0,cogs:17227.0,ads:19762.0,profit:11750.0,profit_pct:22.0,mkt_pct:38.0,cogs_log_pct:32.9,category:"stem"},{date:"10",orders:58,revenue:50539.0,cogs:16351.0,ads:22476.0,profit:7666.0,profit_pct:15.0,mkt_pct:44.0,cogs_log_pct:32.4,category:"stem"},{date:"11",orders:52,revenue:45819.0,cogs:14365.0,ads:28563.0,profit:-2250.0,profit_pct:-5.0,mkt_pct:62.0,cogs_log_pct:31.4,category:"stem"},{date:"12",orders:60,revenue:51752.0,cogs:16818.0,ads:21916.0,profit:9074.0,profit_pct:18.0,mkt_pct:42.0,cogs_log_pct:32.5,category:"stem"},{date:"13",orders:53,revenue:45709.0,cogs:14774.0,ads:22504.0,profit:4381.0,profit_pct:10.0,mkt_pct:49.0,cogs_log_pct:32.3,category:"stem"},{date:"15",orders:64,revenue:56003.0,cogs:18337.0,ads:24393.0,profit:8882.0,profit_pct:16.0,mkt_pct:44.0,cogs_log_pct:32.7,category:"stem"}]};
+const DAILY_AMZ={"Oct 2025":[],"Nov 2025":[],"Dec 2025":[],"Jan 2026":[],"Feb 2026":[],"Mar 2026":[{date:"1",orders:184,revenue:183685.31,cogs:61044.0,ads:27760.68,commissions:30610.3,profit:64270.33,profit_pct:35.0,comm_pct:16.7,mkt_pct:15.1},{date:"2",orders:168,revenue:155857.24,cogs:54498.0,ads:34032.71,commissions:16523.32,profit:50803.21,profit_pct:32.6,comm_pct:10.6,mkt_pct:21.8},{date:"3",orders:146,revenue:134521.05,cogs:48421.0,ads:38555.57,commissions:22417.31,profit:25127.17,profit_pct:18.7,comm_pct:16.7,mkt_pct:28.7},{date:"4",orders:139,revenue:127352.72,cogs:43407.0,ads:30842.83,commissions:21222.74,profit:31880.15,profit_pct:25.0,comm_pct:16.7,mkt_pct:24.2},{date:"5",orders:138,revenue:141109.06,cogs:49222.0,ads:31997.53,commissions:20475.63,profit:39413.9,profit_pct:27.9,comm_pct:14.5,mkt_pct:22.7},{date:"6",orders:168,revenue:160256.82,cogs:57841.0,ads:33266.41,commissions:26706.05,profit:42443.36,profit_pct:26.5,comm_pct:16.7,mkt_pct:20.8},{date:"7",orders:181,revenue:162288.47,cogs:58387.0,ads:29709.01,commissions:22075.96,profit:52116.5,profit_pct:32.1,comm_pct:13.6,mkt_pct:18.3},{date:"8",orders:159,revenue:151603.47,cogs:56027.0,ads:30551.62,commissions:23619.23,profit:41405.62,profit_pct:27.3,comm_pct:15.6,mkt_pct:20.1},{date:"9",orders:131,revenue:119756.71,cogs:39944.0,ads:28236.54,commissions:30042.83,profit:21533.34,profit_pct:18.0,comm_pct:25.1,mkt_pct:23.6},{date:"10",orders:187,revenue:182368.92,cogs:62256.0,ads:40169.02,commissions:20766.07,profit:59177.83,profit_pct:32.5,comm_pct:11.4,mkt_pct:22.0},{date:"11",orders:168,revenue:150591.13,cogs:51675.0,ads:40610.51,commissions:17309.57,profit:40996.05,profit_pct:27.2,comm_pct:11.5,mkt_pct:27.0},{date:"12",orders:163,revenue:135514.1,cogs:42028.0,ads:36843.06,commissions:25848.45,profit:30794.59,profit_pct:22.7,comm_pct:19.1,mkt_pct:27.2},{date:"13",orders:95,revenue:91945.13,cogs:23451.0,ads:25696.93,commissions:23161.2,profit:19636.0,profit_pct:21.4,comm_pct:25.2,mkt_pct:27.9},{date:"14",orders:99,revenue:83390.54,cogs:27621.0,ads:23122.75,commissions:25911.93,profit:6734.86,profit_pct:8.1,comm_pct:31.1,mkt_pct:27.7},{date:"15",orders:156,revenue:105882.69,cogs:46207.0,ads:29992.72,commissions:20952.14,profit:8730.83,profit_pct:8.2,comm_pct:19.8,mkt_pct:28.3}]};
+// ── DAILY_DATA_END ──
+
+// ── State ──
+let curMonth = '';
+let curDay = null;
+
+// ── Helpers ──
+function fmt(n) {
+  if (n == null || isNaN(n)) return '—';
+  const abs = Math.abs(n), sign = n < 0 ? '-' : '';
+  if (abs >= 1e7) return sign + '\u20B9' + (abs/1e7).toFixed(2) + 'Cr';
+  if (abs >= 1e5) return sign + '\u20B9' + (abs/1e5).toFixed(2) + 'L';
+  if (abs >= 1e3) return sign + '\u20B9' + (abs/1e3).toFixed(1) + 'K';
+  return sign + '\u20B9' + Math.round(abs);
+}
+function clr(v) { return v >= 0 ? 'positive' : 'negative'; }
+
+// ── Get data for a specific day ──
+function getD2CDay(day) {
+  const rows = DAILY_D2C[curMonth] || [];
+  const matched = rows.filter(r => r.date === String(day));
+  if (matched.length === 0) return null;
+  // Aggregate categories
+  const total = {orders:0,revenue:0,cogs:0,ads:0,profit:0};
+  const cats = {};
+  matched.forEach(r => {
+    total.orders += r.orders||0;
+    total.revenue += r.revenue||0;
+    total.cogs += r.cogs||0;
+    total.ads += r.ads||0;
+    total.profit += r.profit||0;
+    cats[r.category] = r;
+  });
+  return {total, cats};
+}
+
+function getAMZDay(day) {
+  const rows = DAILY_AMZ[curMonth] || [];
+  return rows.find(r => r.date === String(day)) || null;
+}
+
+// ── Build month buttons ──
+function buildMonths() {
+  const allMonths = new Set([...Object.keys(DAILY_D2C), ...Object.keys(DAILY_AMZ)]);
+  const months = [...allMonths].filter(m => (DAILY_D2C[m]||[]).length > 0 || (DAILY_AMZ[m]||[]).length > 0);
+  const order = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  months.sort((a,b) => {
+    const [ma,ya] = [a.split(' ')[0], parseInt(a.split(' ')[1])];
+    const [mb,yb] = [b.split(' ')[0], parseInt(b.split(' ')[1])];
+    return ya !== yb ? ya-yb : order.indexOf(ma)-order.indexOf(mb);
+  });
+  const row = document.getElementById('monthRow');
+  months.forEach(m => {
+    const btn = document.createElement('button');
+    btn.className = 'month-btn';
+    btn.textContent = m;
+    btn.onclick = () => { curMonth = m; curDay = null; render(); };
+    row.appendChild(btn);
+  });
+  if (months.length > 0) curMonth = months[months.length - 1];
+}
+
+// ── Build calendar ──
+function buildCalendar() {
+  const grid = document.getElementById('calGrid');
+  grid.innerHTML = '';
+
+  // Get days with data
+  const d2cDays = new Set((DAILY_D2C[curMonth]||[]).map(r => parseInt(r.date)));
+  const amzDays = new Set((DAILY_AMZ[curMonth]||[]).map(r => parseInt(r.date)));
+  const allDataDays = new Set([...d2cDays, ...amzDays]);
+
+  // Quick revenue lookup per day (D2C only for preview)
+  const dayRev = {};
+  (DAILY_D2C[curMonth]||[]).forEach(r => {
+    const d = parseInt(r.date);
+    dayRev[d] = (dayRev[d]||0) + (r.revenue||0);
+  });
+  (DAILY_AMZ[curMonth]||[]).forEach(r => {
+    const d = parseInt(r.date);
+    dayRev[d] = (dayRev[d]||0) + (r.revenue||0);
+  });
+
+  // Determine max day in this month
+  const maxDay = Math.max(28, ...allDataDays);
+  const totalDays = Math.min(maxDay, 31);
+
+  for (let d = 1; d <= totalDays; d++) {
+    const btn = document.createElement('button');
+    const hasData = allDataDays.has(d);
+    btn.className = 'day-btn' + (hasData ? ' has-data' : '') + (curDay === d ? ' active' : '');
+    let inner = '<span>' + d + '</span>';
+    if (hasData && dayRev[d]) {
+      inner += '<span class="day-rev">' + fmt(dayRev[d]) + '</span>';
+    }
+    btn.innerHTML = inner;
+    if (hasData) {
+      btn.onclick = () => { curDay = d; render(); };
+    }
+    grid.appendChild(btn);
+  }
+
+  // Highlight active month button
+  document.querySelectorAll('.month-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent === curMonth);
+  });
+}
+
+// ── Render P&L for selected day ──
+function renderPnL() {
+  const el = document.getElementById('pnlContent');
+
+  if (!curDay) {
+    // Show MTD summary
+    const d2cRows = DAILY_D2C[curMonth] || [];
+    const amzRows = DAILY_AMZ[curMonth] || [];
+    if (d2cRows.length === 0 && amzRows.length === 0) {
+      el.innerHTML = '<div class="no-data">No daily data for ' + curMonth + '<br><span style="font-size:11px">Run <code>python3 sync_daily_dashboard.py</code></span></div>';
+      return;
+    }
+
+    // MTD totals
+    let d2c = {orders:0,revenue:0,cogs:0,ads:0,profit:0};
+    d2cRows.forEach(r => { d2c.orders+=r.orders||0; d2c.revenue+=r.revenue||0; d2c.cogs+=r.cogs||0; d2c.ads+=r.ads||0; d2c.profit+=r.profit||0; });
+    let amz = {orders:0,revenue:0,cogs:0,ads:0,comm:0,profit:0};
+    amzRows.forEach(r => { amz.orders+=r.orders||0; amz.revenue+=r.revenue||0; amz.cogs+=r.cogs||0; amz.ads+=r.ads||0; amz.comm+=r.commissions||0; amz.profit+=r.profit||0; });
+
+    const totalRev = d2c.revenue + amz.revenue;
+    const totalOrd = d2c.orders + amz.orders;
+    const totalAds = d2c.ads + amz.ads;
+    const totalProfit = d2c.profit + amz.profit;
+
+    let html = '<div class="pnl-card">';
+    html += '<div class="pnl-title">MTD Summary <span class="badge">' + curMonth + '</span></div>';
+    html += '<div class="highlight-row">';
+    html += highlight('Revenue', fmt(totalRev), '');
+    html += highlight('Orders', totalOrd.toLocaleString(), 'AOV ' + fmt(totalOrd > 0 ? totalRev/totalOrd : 0));
+    html += highlight('Ads', fmt(totalAds), 'ROAS ' + (totalAds > 0 ? (totalRev/totalAds).toFixed(2) + 'x' : '—'));
+    html += highlight('Profit', fmt(totalProfit), totalRev > 0 ? (totalProfit/totalRev*100).toFixed(1)+'%' : '0%', totalProfit);
+    html += '</div>';
+
+    html += '<div class="sep"></div>';
+    html += '<div class="metric-grid">';
+    html += metric('D2C Revenue', fmt(d2c.revenue));
+    html += metric('Amazon Revenue', fmt(amz.revenue));
+    html += metric('D2C Orders', d2c.orders.toLocaleString());
+    html += metric('Amazon Orders', amz.orders.toLocaleString());
+    html += metric('D2C Ads', fmt(d2c.ads));
+    html += metric('Amazon Commissions', fmt(amz.comm));
+    html += metric('D2C Profit', fmt(d2c.profit), d2c.profit);
+    html += metric('Amazon Profit', fmt(amz.profit), amz.profit);
+    html += '</div>';
+    html += '</div>';
+
+    el.innerHTML = html;
+    return;
+  }
+
+  // Day-specific P&L
+  const d2c = getD2CDay(curDay);
+  const amz = getAMZDay(curDay);
+
+  if (!d2c && !amz) {
+    el.innerHTML = '<div class="no-data">No data for day ' + curDay + '</div>';
+    return;
+  }
+
+  let html = '';
+
+  // Combined highlights
+  const totalRev = (d2c ? d2c.total.revenue : 0) + (amz ? amz.revenue : 0);
+  const totalOrd = (d2c ? d2c.total.orders : 0) + (amz ? amz.orders : 0);
+  const totalAds = (d2c ? d2c.total.ads : 0) + (amz ? amz.ads : 0);
+  const totalProfit = (d2c ? d2c.total.profit : 0) + (amz ? amz.profit : 0);
+  const totalCogs = (d2c ? d2c.total.cogs : 0) + (amz ? amz.cogs : 0);
+
+  html += '<div class="pnl-card">';
+  html += '<div class="pnl-title">Day ' + curDay + ' <span class="badge">' + curMonth + '</span></div>';
+  html += '<div class="highlight-row">';
+  html += highlight('Revenue', fmt(totalRev), '');
+  html += highlight('Orders', totalOrd.toLocaleString(), 'AOV ' + fmt(totalOrd > 0 ? totalRev/totalOrd : 0));
+  html += highlight('Ads', fmt(totalAds), 'ROAS ' + (totalAds > 0 ? (totalRev/totalAds).toFixed(2) + 'x' : '—'));
+  html += highlight('Profit', fmt(totalProfit), totalRev > 0 ? (totalProfit/totalRev*100).toFixed(1)+'%' : '0%', totalProfit);
+  html += '</div></div>';
+
+  // D2C Card
+  if (d2c) {
+    html += '<div class="pnl-card">';
+    html += '<div class="pnl-title">D2C (Shiprocket)</div>';
+    html += '<div class="metric-grid">';
+    html += metric('Revenue', fmt(d2c.total.revenue));
+    html += metric('Orders', d2c.total.orders.toLocaleString());
+    html += metric('COGS', fmt(d2c.total.cogs));
+    html += metric('Ads', fmt(d2c.total.ads));
+    html += metric('Profit', fmt(d2c.total.profit), d2c.total.profit);
+    html += metric('ROAS', d2c.total.ads > 0 ? (d2c.total.revenue/d2c.total.ads).toFixed(2)+'x' : '—');
+    html += metric('CAC', fmt(d2c.total.orders > 0 ? d2c.total.ads/d2c.total.orders : 0));
+    html += metric('AOV', fmt(d2c.total.orders > 0 ? d2c.total.revenue/d2c.total.orders : 0));
+    html += '</div>';
+
+    // Category split
+    const catLabels = {busyboard:'Busy Board', softtoy:'Soft Toy', stem:'STEM'};
+    const catColors = {busyboard:'var(--primary)', softtoy:'var(--teal)', stem:'var(--green)'};
+    if (Object.keys(d2c.cats).length > 1) {
+      html += '<div class="sep"></div>';
+      html += '<div style="font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Category Split</div>';
+      for (const cat in d2c.cats) {
+        const c = d2c.cats[cat];
+        html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.03)">';
+        html += '<span style="font-size:11px;color:' + (catColors[cat]||'var(--text)') + ';font-weight:600">' + (catLabels[cat]||cat) + '</span>';
+        html += '<span style="font-size:11px">' + (c.orders||0) + ' orders &middot; ' + fmt(c.revenue) + ' &middot; <span class="' + clr(c.profit) + '">' + fmt(c.profit) + '</span></span>';
+        html += '</div>';
+      }
+    }
+    html += '</div>';
+  }
+
+  // Amazon Card
+  if (amz) {
+    html += '<div class="pnl-card">';
+    html += '<div class="pnl-title">Amazon</div>';
+    html += '<div class="metric-grid">';
+    html += metric('Revenue', fmt(amz.revenue));
+    html += metric('Orders', amz.orders.toLocaleString());
+    html += metric('COGS', fmt(amz.cogs));
+    html += metric('Commissions', fmt(amz.commissions));
+    html += metric('Ad Spend', fmt(amz.ads));
+    html += metric('Profit', fmt(amz.profit), amz.profit);
+    html += metric('Profit %', amz.profit_pct + '%');
+    html += metric('Commission %', amz.comm_pct + '%');
+    html += '</div>';
+    html += '</div>';
+  }
+
+  el.innerHTML = html;
+}
+
+function highlight(label, val, sub, colorVal) {
+  const c = colorVal !== undefined ? ' ' + clr(colorVal) : '';
+  return '<div class="highlight"><div class="highlight-label">' + label + '</div><div class="highlight-val' + c + '">' + val + '</div>' + (sub ? '<div class="highlight-sub">' + sub + '</div>' : '') + '</div>';
+}
+
+function metric(label, val, colorVal) {
+  const c = colorVal !== undefined ? ' ' + clr(colorVal) : '';
+  return '<div class="metric"><span class="metric-label">' + label + '</span><span class="metric-value sm' + c + '">' + val + '</span></div>';
+}
+
+// ── Main render ──
+function render() {
+  buildCalendar();
+  renderPnL();
+}
+
+// ── Init ──
+buildMonths();
+render();
+</script>
+</body>
+</html>

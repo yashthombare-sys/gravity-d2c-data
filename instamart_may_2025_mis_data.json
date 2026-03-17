@@ -1,0 +1,29 @@
+{
+  "V1": {
+    "revenue": 16721.0,
+    "total_orders": 23,
+    "delivered": 23,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 225,
+    "ad_spend": 0
+  },
+  "V2": {
+    "revenue": 46458.0,
+    "total_orders": 58,
+    "delivered": 58,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 275,
+    "ad_spend": 0
+  },
+  "V4": {
+    "revenue": 16940.0,
+    "total_orders": 44,
+    "delivered": 44,
+    "returned": 0,
+    "cancelled": 0,
+    "cogs_unit": 170,
+    "ad_spend": 0
+  }
+}

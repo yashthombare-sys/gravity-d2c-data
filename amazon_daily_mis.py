@@ -1,0 +1,865 @@
+#!/usr/bin/env python3
+"""
+Amazon Daily MIS — Fetches Amazon orders + fees via SP-API, aggregates daily,
+and pushes to a dedicated Google Sheet.
+
+Usage:
+    python3 amazon_daily_mis.py                    # Current month (Mar 1 to yesterday)
+    python3 amazon_daily_mis.py 2026-03            # Specific month (1st to yesterday or end of month)
+    python3 amazon_daily_mis.py --yesterday        # Only yesterday (for daily cron at 6 AM)
+"""
+import sys, os, json, time
+
+# Add automation/ to path for config imports
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "automation"))
+
+import requests
+from datetime import datetime, timedelta
+from collections import defaultdict
+from config import load_env, AMAZON_SKU_MAP, COGS_MAP
+
+import gspread
+from google.oauth2.service_account import Credentials
+
+# ── Amazon SP-API config ──────────────────────────────────
+MARKETPLACE_ID = "A21TJRUUN4KGV"  # Amazon.in
+TOKEN_URL = "https://api.amazon.com/auth/o2/token"
+SP_API_BASE = "https://sellingpartnerapi-eu.amazon.com"  # India is in EU region
+
+# ── Google Sheets config ──────────────────────────────────
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+CREDS_FILE = os.path.join(BASE_DIR, "shiproket-mis-70c28ae6e7fb.json")
+SHEET_ID_FILE = os.path.join(BASE_DIR, ".amazon_daily_sheet_id")
+
+SCOPES = [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive",
+]
+
+HEADERS = [
+    "Date", "Total Revenue", "Total Expense", "Product Expense",
+    "Ad Spend", "Commissions", "Total Orders", "Profit",
+    "Profit %", "Commissions %", "Marketing %", "Sessions", "Conversion %",
+]
+
+
+# ══════════════════════════════════════════════════════════
+#  AMAZON SP-API FUNCTIONS
+# ══════════════════════════════════════════════════════════
+
+def get_access_token():
+    """Exchange refresh token for access token."""
+    env = load_env()
+    resp = requests.post(TOKEN_URL, data={
+        "grant_type": "refresh_token",
+        "refresh_token": env.get("AMAZON_REFRESH_TOKEN", ""),
+        "client_id": env.get("AMAZON_CLIENT_ID", ""),
+        "client_secret": env.get("AMAZON_CLIENT_SECRET", ""),
+    }, timeout=15)
+    if resp.status_code != 200:
+        raise PermissionError(f"Token refresh failed: {resp.status_code} {resp.text}")
+    return resp.json()["access_token"]
+
+
+def api_get(url, headers, retries=3, max_429_retries=20, silent_400=False):
+    """GET with rate-limit handling. 429s don't count against retries."""
+    error_count = 0
+    rate_limit_count = 0
+
+    while error_count < retries and rate_limit_count < max_429_retries:
+        try:
+            resp = requests.get(url, headers=headers, timeout=30)
+        except requests.exceptions.RequestException as e:
+            print(f"    Network error: {e}", flush=True)
+            error_count += 1
+            time.sleep(3)
+            continue
+
+        if resp.status_code == 429:
+            wait = max(int(resp.headers.get("x-amz-rate-limit-reset", 5)), 5)
+            rate_limit_count += 1
+            if rate_limit_count % 5 == 1:
+                print(f"    Rate limited (#{rate_limit_count}), waiting {wait}s...", flush=True)
+            time.sleep(wait)
+            continue
+
+        if resp.status_code == 200:
+            return resp.json()
+
+        if resp.status_code == 400 and silent_400:
+            return None  # Expected for dates with no financial events
+
+        print(f"    API error {resp.status_code}: {resp.text[:200]}", flush=True)
+        error_count += 1
+        time.sleep(2)
+
+    return None
+
+
+def fetch_traffic_report(date_from, date_to, access_token):
+    """
+    Fetch Sales & Traffic report for a date range.
+    Returns: {date_str: {sessions, page_views, conversion_pct}}
+    """
+    import gzip
+    headers = {"x-amz-access-token": access_token, "Content-Type": "application/json"}
+
+    report_body = {
+        "reportType": "GET_SALES_AND_TRAFFIC_REPORT",
+        "marketplaceIds": [MARKETPLACE_ID],
+        "dataStartTime": f"{date_from}T00:00:00Z",
+        "dataEndTime": f"{date_to}T23:59:59Z",
+        "reportOptions": {
+            "dateGranularity": "DAY",
+            "asinGranularity": "SKU"
+        }
+    }
+
+    print(f"    Requesting traffic report...", flush=True)
+    resp = requests.post(
+        f"{SP_API_BASE}/reports/2021-06-30/reports",
+        headers=headers, json=report_body, timeout=30
+    )
+    if resp.status_code not in (200, 202):
+        print(f"    Traffic report request failed: {resp.status_code} {resp.text[:200]}", flush=True)
+        return {}
+
+    report_id = resp.json().get("reportId")
+    print(f"    Report ID: {report_id}, waiting...", flush=True)
+
+    # Poll for completion
+    for attempt in range(30):
+        time.sleep(10)
+        status_resp = requests.get(
+            f"{SP_API_BASE}/reports/2021-06-30/reports/{report_id}",
+            headers=headers, timeout=30
+        )
+        status_data = status_resp.json()
+        processing_status = status_data.get("processingStatus", "UNKNOWN")
+
+        if processing_status == "DONE":
+            doc_id = status_data.get("reportDocumentId")
+            break
+        elif processing_status in ("CANCELLED", "FATAL"):
+            print(f"    Traffic report failed: {processing_status}", flush=True)
+            return {}
+    else:
+        print(f"    Traffic report timed out", flush=True)
+        return {}
+
+    # Download report
+    doc_resp = requests.get(
+        f"{SP_API_BASE}/reports/2021-06-30/documents/{doc_id}",
+        headers=headers, timeout=30
+    )
+    doc_data = doc_resp.json()
+    download_url = doc_data.get("url")
+    if not download_url:
+        return {}
+
+    report_resp = requests.get(download_url, timeout=30)
+    compression = doc_data.get("compressionAlgorithm", "")
+    if compression == "GZIP":
+        report_text = gzip.decompress(report_resp.content).decode("utf-8")
+    else:
+        report_text = report_resp.text
+
+    import json as _json
+    report_data = _json.loads(report_text)
+
+    # Extract daily traffic totals
+    result = {}
+    for day_data in report_data.get("salesAndTrafficByDate", []):
+        date_str = day_data.get("date", "")
+        traffic = day_data.get("trafficByDate", {})
+        sessions = traffic.get("sessions", 0)
+        conversion = traffic.get("unitSessionPercentage", 0)
+        result[date_str] = {
+            "sessions": sessions,
+            "conversion_pct": round(conversion, 2),
+        }
+        print(f"    {date_str}: {sessions} sessions, {conversion:.2f}% conversion", flush=True)
+
+    return result
+
+
+def fetch_all_orders(date_from, date_to, access_token):
+    """
+    Fetch ALL Amazon orders for a date range in one batch.
+    Returns list of order dicts (without individual items — uses OrderTotal).
+    """
+    headers = {"x-amz-access-token": access_token, "Content-Type": "application/json"}
+    created_after = f"{date_from}T00:00:00Z"
+    created_before = f"{date_to}T23:59:59Z"
+
+    all_orders = []
+    next_token = None
+    page = 0
+
+    while True:
+        if next_token:
+            url = (f"{SP_API_BASE}/orders/v0/orders"
+                   f"?NextToken={requests.utils.quote(next_token)}"
+                   f"&MarketplaceIds={MARKETPLACE_ID}")
+        else:
+            url = (f"{SP_API_BASE}/orders/v0/orders"
+                   f"?MarketplaceIds={MARKETPLACE_ID}"
+                   f"&CreatedAfter={created_after}"
+                   f"&CreatedBefore={created_before}"
+                   f"&MaxResultsPerPage=100")
+
+        data = api_get(url, headers)
+        if not data:
+            break
+
+        orders = data.get("payload", {}).get("Orders", [])
+        all_orders.extend(orders)
+        page += 1
+
+        if page % 5 == 0:
+            print(f"    Page {page}: {len(all_orders)} orders so far...", flush=True)
+
+        next_token = data.get("payload", {}).get("NextToken")
+        if not next_token:
+            break
+        time.sleep(2)  # Generous wait to avoid rate limiting
+
+    return all_orders
+
+
+def fetch_order_items_batch(order_ids, access_token):
+    """Fetch order items for a list of order IDs. Returns {order_id: [items]}.
+    Slower for large batches but gives accurate COGS."""
+    headers = {"x-amz-access-token": access_token, "Content-Type": "application/json"}
+    result = {}
+
+    total = len(order_ids)
+    for i, order_id in enumerate(order_ids):
+        if (i + 1) % 100 == 0:
+            print(f"    Fetching items: {i+1}/{total}...", flush=True)
+
+        items_url = f"{SP_API_BASE}/orders/v0/orders/{order_id}/orderItems"
+        data = api_get(items_url, headers)
+        if data:
+            result[order_id] = data.get("payload", {}).get("OrderItems", [])
+        else:
+            result[order_id] = []
+        time.sleep(0.5)  # Generous wait to avoid rate limit wall
+
+        # Refresh token every 200 orders
+        if (i + 1) % 200 == 0:
+            print(f"    Refreshing token at {i+1}...", flush=True)
+            access_token = get_access_token()
+            headers["x-amz-access-token"] = access_token
+
+    return result, access_token
+
+
+def fetch_fees_for_day(date_str, access_token):
+    """Fetch financial events for a single day."""
+    headers = {"x-amz-access-token": access_token, "Content-Type": "application/json"}
+    # Use previous day end as PostedAfter (API rejects same-day T00:00:00Z for some dates)
+    prev_day = (datetime.strptime(date_str, "%Y-%m-%d") - timedelta(days=1)).strftime("%Y-%m-%d")
+    posted_after = f"{prev_day}T23:59:59Z"
+    posted_before = f"{date_str}T23:59:59Z"
+
+    total_commission = 0
+    total_fba = 0
+    total_closing = 0
+    next_token = None
+
+    while True:
+        if next_token:
+            url = (f"{SP_API_BASE}/finances/v0/financialEvents"
+                   f"?NextToken={requests.utils.quote(next_token)}")
+        else:
+            url = (f"{SP_API_BASE}/finances/v0/financialEvents"
+                   f"?PostedAfter={posted_after}"
+                   f"&PostedBefore={posted_before}"
+                   f"&MaxResultsPerPage=100")
+
+        data = api_get(url, headers, silent_400=True)
+        if not data:
+            break  # 400 = no financial events for this date (normal for some days)
+
+        events = data.get("payload", {}).get("FinancialEvents", {})
+
+        for event in events.get("ShipmentEventList", []):
+            for item in event.get("ShipmentItemList", []):
+                for fee in item.get("ItemFeeList", []):
+                    fee_type = fee.get("FeeType", "")
+                    amount = abs(float(fee.get("FeeAmount", {}).get("CurrencyAmount", 0)))
+                    if "Commission" in fee_type:
+                        total_commission += amount
+                    elif "FBA" in fee_type or "Fulfilment" in fee_type:
+                        total_fba += amount
+                    elif "ClosingFee" in fee_type or "closing" in fee_type.lower():
+                        total_closing += amount
+
+        next_token = data.get("payload", {}).get("NextToken")
+        if not next_token:
+            break
+        time.sleep(0.5)
+
+    return {
+        "commission": round(total_commission, 2),
+        "fba_fee": round(total_fba, 2),
+        "closing_fee": round(total_closing, 2),
+        "total": round(total_commission + total_fba + total_closing, 2),
+    }
+
+
+def fetch_all_fees(date_from, date_to, access_token):
+    """
+    Fetch financial events day-by-day (Amazon API rejects wide date ranges).
+    Returns: {date_str: {commission, fba_fee, closing_fee, total}}
+    """
+    result = {}
+    start = datetime.strptime(date_from, "%Y-%m-%d")
+    end = datetime.strptime(date_to, "%Y-%m-%d")
+    current = start
+    total_days = (end - start).days + 1
+    day_num = 0
+
+    # Refresh token before starting fees (orders may have used it heavily)
+    access_token = get_access_token()
+
+    while current <= end:
+        day_num += 1
+        ds = current.strftime("%Y-%m-%d")
+
+        # Retry with fresh token if first attempt fails
+        fees = fetch_fees_for_day(ds, access_token)
+        result[ds] = fees
+        if fees["total"] > 0:
+            print(f"    {ds}: ₹{fees['total']:,.0f} ({day_num}/{total_days})", flush=True)
+        current += timedelta(days=1)
+        time.sleep(0.5)
+
+        # Refresh token every 5 days
+        if day_num % 5 == 0:
+            access_token = get_access_token()
+
+    return result
+
+
+def aggregate_orders_by_day(orders, items_by_order=None):
+    """
+    Group orders by date and calculate daily revenue, order count, and COGS.
+    If items_by_order is provided, uses actual SKU data for COGS.
+    Otherwise, uses OrderTotal for revenue and estimates COGS at 36%.
+    Returns: {date_str: {revenue, orders, cogs}}
+    """
+    daily = defaultdict(lambda: {"revenue": 0, "orders": 0, "cogs": 0})
+
+    for order in orders:
+        status = order.get("OrderStatus", "")
+        if status in ("Canceled", "Cancelled"):
+            continue
+
+        purchase_date = order.get("PurchaseDate", "")[:10]
+        if not purchase_date:
+            continue
+
+        order_id = order.get("AmazonOrderId", "")
+        items = (items_by_order or {}).get(order_id, [])
+
+        if items:
+            for item in items:
+                sku = item.get("SellerSKU", "")
+                product = AMAZON_SKU_MAP.get(sku)
+                if not product:
+                    from config import classify_product
+                    product = classify_product(item.get("Title", ""))
+
+                qty = int(item.get("QuantityOrdered", 1))
+                price_info = item.get("ItemPrice", {})
+                price = float(price_info.get("Amount", 0)) if price_info else 0
+                promo_info = item.get("PromotionDiscount", {})
+                promo = float(promo_info.get("Amount", 0)) if promo_info else 0
+
+                daily[purchase_date]["revenue"] += price - promo
+                daily[purchase_date]["orders"] += qty
+                daily[purchase_date]["cogs"] += COGS_MAP.get(product, 0) * qty
+        else:
+            # Use OrderTotal for revenue, estimate COGS at 36% (historical avg)
+            order_total = order.get("OrderTotal", {})
+            amount = float(order_total.get("Amount", 0)) if order_total else 0
+            num_items = int(order.get("NumberOfItemsShipped", 0)) + int(order.get("NumberOfItemsUnshipped", 0))
+            if num_items == 0:
+                num_items = 1
+
+            daily[purchase_date]["revenue"] += amount
+            daily[purchase_date]["orders"] += num_items
+            daily[purchase_date]["cogs"] += amount * 0.36
+
+    result = {}
+    for date_str, d in daily.items():
+        result[date_str] = {
+            "revenue": round(d["revenue"], 2),
+            "orders": d["orders"],
+            "cogs": round(d["cogs"], 2),
+        }
+    return result
+
+
+# ══════════════════════════════════════════════════════════
+#  GOOGLE SHEETS FUNCTIONS
+# ══════════════════════════════════════════════════════════
+
+def get_gsheet_client():
+    creds = Credentials.from_service_account_file(CREDS_FILE, scopes=SCOPES)
+    return gspread.authorize(creds)
+
+
+def get_or_create_spreadsheet(gc):
+    """Get existing spreadsheet or create a new one."""
+    if os.path.exists(SHEET_ID_FILE):
+        with open(SHEET_ID_FILE) as f:
+            sheet_id = f.read().strip()
+        if sheet_id:
+            try:
+                spreadsheet = gc.open_by_key(sheet_id)
+                print(f"  Using existing sheet: {spreadsheet.url}", flush=True)
+                return spreadsheet
+            except Exception as e:
+                print(f"  Saved sheet not accessible: {e}", flush=True)
+
+    spreadsheet = gc.create("Amazon Daily MIS")
+    spreadsheet.share("hmthombare121@gmail.com", perm_type="user", role="writer")
+    print(f"  Created new spreadsheet: {spreadsheet.url}", flush=True)
+    print(f"  Shared with hmthombare121@gmail.com", flush=True)
+
+    with open(SHEET_ID_FILE, "w") as f:
+        f.write(spreadsheet.id)
+
+    return spreadsheet
+
+
+def get_month_tab(spreadsheet, month_str):
+    """Get or create a tab for the given month."""
+    try:
+        ws = spreadsheet.worksheet(month_str)
+        return ws, False
+    except gspread.exceptions.WorksheetNotFound:
+        ws = spreadsheet.add_worksheet(title=month_str, rows=35, cols=len(HEADERS))
+        ws.update(values=[HEADERS], range_name="A1")
+        ws.format("A1:M1", {
+            "backgroundColor": {"red": 0.15, "green": 0.24, "blue": 0.46},
+            "textFormat": {
+                "foregroundColor": {"red": 1, "green": 1, "blue": 1},
+                "bold": True, "fontSize": 10,
+            },
+            "horizontalAlignment": "CENTER",
+        })
+        ws.freeze(rows=1)
+
+        reqs = []
+        widths = [120, 130, 130, 130, 110, 120, 110, 120, 90, 120, 110, 100, 110]
+        for i, w in enumerate(widths):
+            reqs.append({
+                "updateDimensionProperties": {
+                    "range": {"sheetId": ws.id, "dimension": "COLUMNS",
+                              "startIndex": i, "endIndex": i + 1},
+                    "properties": {"pixelSize": w},
+                    "fields": "pixelSize",
+                }
+            })
+        spreadsheet.batch_update({"requests": reqs})
+        return ws, True
+
+
+def push_to_sheet(daily_data, month_label):
+    """Push daily data to Google Sheet."""
+    print(f"\nPushing to Google Sheets ({month_label})...", flush=True)
+
+    gc = get_gsheet_client()
+    spreadsheet = get_or_create_spreadsheet(gc)
+    ws, is_new = get_month_tab(spreadsheet, month_label)
+
+    if is_new:
+        print(f"  Created new tab: '{month_label}'", flush=True)
+
+    # Get existing data
+    existing_dates = set()
+    all_vals = ws.col_values(1)
+    if not is_new and len(all_vals) > 1:
+        existing_dates = set(all_vals[1:])
+
+    next_row = len(all_vals) + 1
+
+    # Build all rows first, then batch update
+    rows_to_push = []
+    update_map = {}  # date -> row_index for existing dates
+
+    for day in daily_data:
+        date_str = day["date"]
+        revenue = day["revenue"]
+        cogs = day["cogs"]
+        commissions = day["fees_total"]
+        ad_spend = day.get("ad_spend", 0)
+        orders = day["orders"]
+        sessions = day.get("sessions", 0)
+        conversion_pct = day.get("conversion_pct", 0)
+
+        total_expense = cogs + commissions + ad_spend
+        profit = revenue - total_expense
+        profit_pct = (profit / revenue * 100) if revenue > 0 else 0
+        comm_pct = (commissions / revenue * 100) if revenue > 0 else 0
+        mktg_pct = (ad_spend / revenue * 100) if revenue > 0 else 0
+
+        row = [
+            date_str,
+            round(revenue, 2),
+            round(total_expense, 2),
+            round(cogs, 2),
+            round(ad_spend, 2),
+            round(commissions, 2),
+            orders,
+            round(profit, 2),
+            round(profit_pct, 2),
+            round(comm_pct, 2),
+            round(mktg_pct, 2),
+            sessions,
+            round(conversion_pct, 2),
+        ]
+
+        if date_str in existing_dates:
+            row_idx = all_vals.index(date_str) + 1
+            update_map[row_idx] = row
+        else:
+            rows_to_push.append(row)
+
+    # Batch update existing rows
+    for row_idx, row in update_map.items():
+        ws.update(values=[row], range_name=f"A{row_idx}:M{row_idx}")
+        time.sleep(0.3)
+
+    # Batch append new rows
+    if rows_to_push:
+        cell_range = f"A{next_row}:M{next_row + len(rows_to_push) - 1}"
+        ws.update(values=rows_to_push, range_name=cell_range)
+
+    # Apply formatting
+    end_row = next_row + len(rows_to_push) - 1
+    if end_row >= 2:
+        currency_cols = [1, 2, 3, 4, 5, 7]
+        pct_cols = [8, 9, 10, 12]  # Profit%, Comm%, Mkt%, Conversion%
+        reqs = []
+
+        for col_idx in currency_cols:
+            reqs.append({
+                "repeatCell": {
+                    "range": {"sheetId": ws.id, "startRowIndex": 1, "endRowIndex": end_row,
+                              "startColumnIndex": col_idx, "endColumnIndex": col_idx + 1},
+                    "cell": {"userEnteredFormat": {
+                        "numberFormat": {"type": "NUMBER", "pattern": "₹#,##0.00"},
+                        "horizontalAlignment": "RIGHT",
+                    }},
+                    "fields": "userEnteredFormat(numberFormat,horizontalAlignment)",
+                }
+            })
+
+        for col_idx in pct_cols:
+            reqs.append({
+                "repeatCell": {
+                    "range": {"sheetId": ws.id, "startRowIndex": 1, "endRowIndex": end_row,
+                              "startColumnIndex": col_idx, "endColumnIndex": col_idx + 1},
+                    "cell": {"userEnteredFormat": {
+                        "numberFormat": {"type": "NUMBER", "pattern": "0.00\"%\""},
+                        "horizontalAlignment": "RIGHT",
+                    }},
+                    "fields": "userEnteredFormat(numberFormat,horizontalAlignment)",
+                }
+            })
+
+        # Orders column center
+        reqs.append({
+            "repeatCell": {
+                "range": {"sheetId": ws.id, "startRowIndex": 1, "endRowIndex": end_row,
+                          "startColumnIndex": 6, "endColumnIndex": 7},
+                "cell": {"userEnteredFormat": {
+                    "numberFormat": {"type": "NUMBER", "pattern": "#,##0"},
+                    "horizontalAlignment": "CENTER",
+                }},
+                "fields": "userEnteredFormat(numberFormat,horizontalAlignment)",
+            }
+        })
+
+        # Sessions column center
+        reqs.append({
+            "repeatCell": {
+                "range": {"sheetId": ws.id, "startRowIndex": 1, "endRowIndex": end_row,
+                          "startColumnIndex": 11, "endColumnIndex": 12},
+                "cell": {"userEnteredFormat": {
+                    "numberFormat": {"type": "NUMBER", "pattern": "#,##0"},
+                    "horizontalAlignment": "CENTER",
+                }},
+                "fields": "userEnteredFormat(numberFormat,horizontalAlignment)",
+            }
+        })
+
+        # Date bold
+        reqs.append({
+            "repeatCell": {
+                "range": {"sheetId": ws.id, "startRowIndex": 1, "endRowIndex": end_row,
+                          "startColumnIndex": 0, "endColumnIndex": 1},
+                "cell": {"userEnteredFormat": {
+                    "horizontalAlignment": "LEFT",
+                    "textFormat": {"bold": True},
+                }},
+                "fields": "userEnteredFormat(horizontalAlignment,textFormat)",
+            }
+        })
+
+        spreadsheet.batch_update({"requests": reqs})
+
+    total_pushed = len(rows_to_push) + len(update_map)
+    print(f"  Pushed {total_pushed} days ({len(rows_to_push)} new, {len(update_map)} updated)", flush=True)
+    print(f"  Sheet URL: {spreadsheet.url}", flush=True)
+    return spreadsheet.url
+
+
+def save_daily_json(daily_data, month_label):
+    """Save raw daily data to JSON for backup."""
+    filename = f"amazon_daily_{month_label.lower().replace(' ', '_')}.json"
+    filepath = os.path.join(BASE_DIR, filename)
+    with open(filepath, "w") as f:
+        json.dump(daily_data, f, indent=2)
+    print(f"  Saved backup: {filename}", flush=True)
+
+
+# ══════════════════════════════════════════════════════════
+#  MAIN PIPELINE
+# ══════════════════════════════════════════════════════════
+
+def fetch_month(year, month, up_to_date=None):
+    """
+    Fetch Amazon daily data for an entire month in ONE batch.
+    Much faster than day-by-day fetching.
+    """
+    from calendar import monthrange
+
+    last_day = monthrange(year, month)[1]
+    if up_to_date:
+        last_day = min(last_day, up_to_date)
+
+    date_from = f"{year}-{month:02d}-01"
+    date_to = f"{year}-{month:02d}-{last_day:02d}"
+
+    print(f"\nFetching Amazon data: {date_from} to {date_to}", flush=True)
+    print("=" * 60, flush=True)
+
+    # Step 1: Authenticate
+    print("Step 1: Authenticating...", flush=True)
+    access_token = get_access_token()
+    print("  OK", flush=True)
+
+    # Step 2: Fetch all orders for the range (one batch)
+    print(f"\nStep 2: Fetching all orders ({date_from} to {date_to})...", flush=True)
+    orders = fetch_all_orders(date_from, date_to, access_token)
+    non_cancelled = [o for o in orders if o.get("OrderStatus") not in ("Canceled", "Cancelled")]
+    print(f"  {len(orders)} total orders, {len(non_cancelled)} non-cancelled", flush=True)
+
+    # Step 3: Fetch order items for actual COGS calculation
+    print(f"\nStep 3: Fetching order items ({len(non_cancelled)} orders) for actual COGS...", flush=True)
+    order_ids = [o["AmazonOrderId"] for o in non_cancelled]
+    items_by_order, access_token = fetch_order_items_batch(order_ids, access_token)
+    print(f"  Items fetched for {len(items_by_order)} orders", flush=True)
+
+    # Step 3b: Aggregate orders by day with actual COGS
+    print(f"\nAggregating by day...", flush=True)
+    daily_orders = aggregate_orders_by_day(orders, items_by_order)
+
+    # Step 4: Fetch all financial events for the range (one batch)
+    print(f"\nStep 4: Fetching financial events...", flush=True)
+    daily_fees = fetch_all_fees(date_from, date_to, access_token)
+    print(f"  Fees for {len(daily_fees)} days", flush=True)
+
+    # Step 5: Calculate avg commission rate from days where BOTH revenue and fees exist
+    days_with_both = []
+    for ds in daily_fees:
+        rev = daily_orders.get(ds, {}).get("revenue", 0)
+        fees = daily_fees[ds]["total"]
+        if rev > 0 and fees > 0:
+            days_with_both.append((rev, fees))
+
+    if days_with_both:
+        total_rev_known = sum(r for r, _ in days_with_both)
+        total_fees_known = sum(f for _, f in days_with_both)
+        avg_fee_rate = total_fees_known / total_rev_known if total_rev_known > 0 else 0.15
+        # Sanity check: commission rate should be 10-20%, cap at 20%
+        if avg_fee_rate > 0.25:
+            print(f"  Calculated rate {avg_fee_rate*100:.1f}% seems high, capping at 15%", flush=True)
+            avg_fee_rate = 0.15
+        else:
+            print(f"  Avg commission rate (from {len(days_with_both)} days with data): {avg_fee_rate*100:.1f}%", flush=True)
+    else:
+        avg_fee_rate = 0.15  # Historical average ~15%
+        print(f"  No matched fee+revenue data, using default 15% estimate", flush=True)
+
+    # Step 5b: Fetch traffic data (sessions, conversion)
+    print(f"\nStep 5b: Fetching traffic report...", flush=True)
+    access_token = get_access_token()
+    daily_traffic = fetch_traffic_report(date_from, date_to, access_token)
+    print(f"  Traffic for {len(daily_traffic)} days", flush=True)
+
+    # Step 6: Combine into daily data (estimate fees for missing days)
+    print(f"\nStep 6: Building daily data...", flush=True)
+    daily_data = []
+    for day in range(1, last_day + 1):
+        date_str = f"{year}-{month:02d}-{day:02d}"
+        order_data = daily_orders.get(date_str, {"revenue": 0, "orders": 0, "cogs": 0})
+        fee_data = daily_fees.get(date_str, {"commission": 0, "fba_fee": 0, "closing_fee": 0, "total": 0})
+
+        # If no fees from API, estimate at avg rate
+        if fee_data["total"] == 0 and order_data["revenue"] > 0:
+            estimated_fees = round(order_data["revenue"] * avg_fee_rate, 2)
+            fee_data = {
+                "commission": estimated_fees,
+                "fba_fee": 0,
+                "closing_fee": 0,
+                "total": estimated_fees,
+            }
+
+        daily_data.append({
+            "date": date_str,
+            "revenue": order_data["revenue"],
+            "orders": order_data["orders"],
+            "cogs": order_data["cogs"],
+            "fees_commission": fee_data["commission"],
+            "fees_fba": fee_data["fba_fee"],
+            "fees_closing": fee_data["closing_fee"],
+            "fees_total": fee_data["total"],
+            "ad_spend": 0,
+            "sessions": daily_traffic.get(date_str, {}).get("sessions", 0),
+            "conversion_pct": daily_traffic.get(date_str, {}).get("conversion_pct", 0),
+        })
+
+        t = daily_traffic.get(date_str, {})
+        print(f"  {date_str}: ₹{order_data['revenue']:>10,.2f} rev | {order_data['orders']:>4} orders | ₹{fee_data['total']:>8,.2f} fees | {t.get('sessions',0):>5} sessions | {t.get('conversion_pct',0):.2f}%", flush=True)
+
+    return daily_data
+
+
+def print_summary(daily_data, month_label):
+    total_rev = sum(d["revenue"] for d in daily_data)
+    total_orders = sum(d["orders"] for d in daily_data)
+    total_cogs = sum(d["cogs"] for d in daily_data)
+    total_fees = sum(d["fees_total"] for d in daily_data)
+    total_profit = total_rev - total_cogs - total_fees
+    print(f"\n{'='*60}", flush=True)
+    print(f"MONTH SUMMARY — {month_label}", flush=True)
+    print(f"  Revenue:     ₹{total_rev:>12,.2f}", flush=True)
+    print(f"  Orders:       {total_orders:>12,}", flush=True)
+    print(f"  COGS:        ₹{total_cogs:>12,.2f}", flush=True)
+    print(f"  Commissions: ₹{total_fees:>12,.2f}", flush=True)
+    print(f"  Profit:      ₹{total_profit:>12,.2f}", flush=True)
+    print(f"  Profit %:     {(total_profit/total_rev*100) if total_rev else 0:>11.1f}%", flush=True)
+
+
+def main():
+    args = sys.argv[1:]
+    today = datetime.now()
+    yesterday = today - timedelta(days=1)
+
+    if "--yesterday" in args:
+        # Cron mode: fetch only yesterday
+        date_str = yesterday.strftime("%Y-%m-%d")
+        month_label = yesterday.strftime("%B %Y")
+
+        print(f"Cron mode: fetching {date_str}", flush=True)
+        print("=" * 60, flush=True)
+
+        access_token = get_access_token()
+
+        print(f"  Fetching orders...", flush=True)
+        orders = fetch_all_orders(date_str, date_str, access_token)
+        non_cancelled = [o for o in orders if o.get("OrderStatus") not in ("Canceled", "Cancelled")]
+        print(f"  {len(orders)} orders ({len(non_cancelled)} non-cancelled)", flush=True)
+
+        print(f"  Fetching order items...", flush=True)
+        order_ids = [o["AmazonOrderId"] for o in non_cancelled]
+        items_by_order, access_token = fetch_order_items_batch(order_ids, access_token)
+
+        daily_orders = aggregate_orders_by_day(orders, items_by_order)
+
+        print(f"  Fetching fees...", flush=True)
+        daily_fees = fetch_all_fees(date_str, date_str, access_token)
+
+        print(f"  Fetching traffic...", flush=True)
+        access_token = get_access_token()
+        daily_traffic = fetch_traffic_report(date_str, date_str, access_token)
+
+        order_data = daily_orders.get(date_str, {"revenue": 0, "orders": 0, "cogs": 0})
+        fee_data = daily_fees.get(date_str, {"commission": 0, "fba_fee": 0, "closing_fee": 0, "total": 0})
+        traffic_data = daily_traffic.get(date_str, {"sessions": 0, "conversion_pct": 0})
+
+        # Estimate fees at 15% if API returned nothing for this day
+        if fee_data["total"] == 0 and order_data["revenue"] > 0:
+            estimated = round(order_data["revenue"] * 0.15, 2)
+            fee_data = {"commission": estimated, "fba_fee": 0, "closing_fee": 0, "total": estimated}
+            print(f"  Fees estimated at 15% (no API data for this date)", flush=True)
+
+        day_data = [{
+            "date": date_str,
+            "revenue": order_data["revenue"],
+            "orders": order_data["orders"],
+            "cogs": order_data["cogs"],
+            "fees_commission": fee_data["commission"],
+            "fees_fba": fee_data["fba_fee"],
+            "fees_closing": fee_data["closing_fee"],
+            "fees_total": fee_data["total"],
+            "ad_spend": 0,
+            "sessions": traffic_data["sessions"],
+            "conversion_pct": traffic_data["conversion_pct"],
+        }]
+
+        print(f"\n  Revenue: ₹{order_data['revenue']:,.2f}", flush=True)
+        print(f"  Orders: {order_data['orders']}", flush=True)
+        print(f"  COGS: ₹{order_data['cogs']:,.2f}", flush=True)
+        print(f"  Commissions: ₹{fee_data['total']:,.2f}", flush=True)
+        print(f"  Sessions: {traffic_data['sessions']}", flush=True)
+        print(f"  Conversion: {traffic_data['conversion_pct']}%", flush=True)
+
+        url = push_to_sheet(day_data, month_label)
+        print(f"\nDone! Sheet: {url}", flush=True)
+
+    elif len(args) == 1 and len(args[0]) == 7:
+        # Specific month
+        year, month = int(args[0][:4]), int(args[0][5:7])
+        if year == today.year and month == today.month:
+            up_to = yesterday.day
+        else:
+            up_to = None
+
+        month_label = datetime(year, month, 1).strftime("%B %Y")
+        daily_data = fetch_month(year, month, up_to_date=up_to)
+
+        if daily_data:
+            save_daily_json(daily_data, month_label)
+            url = push_to_sheet(daily_data, month_label)
+            print_summary(daily_data, month_label)
+            print(f"\nSheet: {url}", flush=True)
+        else:
+            print("No data fetched.", flush=True)
+
+    else:
+        # Default: current month up to yesterday
+        year, month = today.year, today.month
+        up_to = yesterday.day
+        month_label = today.strftime("%B %Y")
+
+        daily_data = fetch_month(year, month, up_to_date=up_to)
+
+        if daily_data:
+            save_daily_json(daily_data, month_label)
+            url = push_to_sheet(daily_data, month_label)
+            print_summary(daily_data, month_label)
+            print(f"\nSheet: {url}", flush=True)
+        else:
+            print("No data fetched.", flush=True)
+
+
+if __name__ == "__main__":
+    main()
