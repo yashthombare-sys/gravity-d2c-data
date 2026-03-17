@@ -2132,14 +2132,30 @@ function renderMTD() {
     '</div>';
   }
 
+  const mtdAov = mtd.orders > 0 ? fmt(mtd.revenue / mtd.orders) : '—';
+  const mtdBbAov = mtd.bb_orders > 0 ? fmt(mtd.bb_rev / mtd.bb_orders) : '—';
+  const mtdStAov = mtd.stem_orders > 0 ? fmt(mtd.stem_rev / mtd.stem_orders) : '—';
+  const mtdSfAov = mtd.soft_orders > 0 ? fmt(mtd.soft_rev / mtd.soft_orders) : '—';
+  const mtdAmzAov = mtd.amz_orders > 0 ? fmt(mtd.amz_rev / mtd.amz_orders) : '—';
+
   mtdEl.innerHTML =
     (channel !== 'amazon' ? mkMtdKpi('sessions', 'MTD Sessions', mtd.sessions.toLocaleString(), '', (mtd.sessions>0?(mtd.orders/mtd.sessions*100).toFixed(2)+'% CR | '+fmt(mtd.ad_spend/mtd.sessions)+'/session | '+Math.round(mtd.sessions/n)+'/day':''),
       '<span><span class="sub-label">Busy Board</span><span class="sub-val">'+(mtd.bb_sessions||0).toLocaleString()+'</span></span>' +
       '<span><span class="sub-label">STEM</span><span class="sub-val">'+(mtd.stem_sessions||0).toLocaleString()+'</span></span>' +
       '<span><span class="sub-label">Soft Toy</span><span class="sub-val">'+(mtd.soft_sessions||0).toLocaleString()+'</span></span>') : '') +
     mkMtdKpi('rev', 'MTD Revenue', fmt(mtd.revenue), '', monthDates.length+' days | '+fmt(mtd.revenue/n)+'/day', mtdBk('rev')) +
-    mkMtdKpi('orders', 'MTD Units', mtd.orders.toLocaleString(), '', Math.round(mtd.orders/n)+' units/day | AOV: '+(mtd.orders>0?fmt(mtd.revenue/mtd.orders):'—'), mtdBk('orders', numFmtM)) +
+    mkMtdKpi('orders', 'MTD Units', mtd.orders.toLocaleString(), '', Math.round(mtd.orders/n)+' units/day', mtdBk('orders', numFmtM)) +
     mkMtdKpi('ads', 'MTD Ad Spend <span style="font-size:8px;color:var(--muted);font-weight:400">(inc GST)</span>', fmt(mtd.ad_spend), '', fmt(mtd.ad_spend/n)+'/day | ROAS: '+mtdRoas, mtdBk('ads')) +
+    mkMtdKpi('aov', 'MTD AOV', mtdAov, '', mtd.orders.toLocaleString()+' units',
+      '<span><span class="sub-label">Busy Board</span><span class="sub-val">'+mtdBbAov+'</span></span>' +
+      '<span><span class="sub-label">STEM</span><span class="sub-val">'+mtdStAov+'</span></span>' +
+      '<span><span class="sub-label">Soft Toy</span><span class="sub-val">'+mtdSfAov+'</span></span>' +
+      (channel==='combined'?'<span><span class="sub-label">Amazon</span><span class="sub-val">'+mtdAmzAov+'</span></span>':'')) +
+    mkMtdKpi('cac', 'MTD CAC <span style="font-size:8px;color:var(--muted);font-weight:400">(inc GST)</span>', mtdCac, (mtd.orders>0&&mtd.ad_spend/mtd.orders>550)?'negative':'positive', fmt(mtd.ad_spend/n)+'/day ads',
+      '<span><span class="sub-label">Busy Board</span><span class="sub-val">'+mtdBbCac+'</span></span>' +
+      '<span><span class="sub-label">STEM</span><span class="sub-val">'+mtdStCac+'</span></span>' +
+      '<span><span class="sub-label">Soft Toy</span><span class="sub-val">'+mtdSfCac+'</span></span>' +
+      (channel==='combined'?'<span><span class="sub-label">Amazon</span><span class="sub-val">'+mtdAmzCac+'</span></span>':'')) +
     (function(){
       const mtdRtoLoss = (mtd.bb_orders*0.10 + mtd.stem_orders*0.18 + mtd.soft_orders*0.22) * 100;
       const mtdAdjProfit = mtd.profit - mtdRtoLoss;
@@ -2150,11 +2166,6 @@ function renderMTD() {
         '<span><span class="sub-label">Soft (22%)</span><span class="sub-val">-'+fmt(mtd.soft_orders*0.22*100)+'</span></span>' +
         '<span><span class="sub-label">Raw Profit</span><span class="sub-val">'+fmt(mtd.profit)+'</span></span>');
     })() +
-    mkMtdKpi('cac', 'MTD CAC <span style="font-size:8px;color:var(--muted);font-weight:400">(inc GST)</span>', mtdCac, (mtd.orders>0&&mtd.ad_spend/mtd.orders>550)?'negative':'positive', fmt(mtd.ad_spend/n)+'/day ads',
-      '<span><span class="sub-label">Busy Board</span><span class="sub-val">'+mtdBbCac+'</span></span>' +
-      '<span><span class="sub-label">STEM</span><span class="sub-val">'+mtdStCac+'</span></span>' +
-      '<span><span class="sub-label">Soft Toy</span><span class="sub-val">'+mtdSfCac+'</span></span>' +
-      (channel==='combined'?'<span><span class="sub-label">Amazon</span><span class="sub-val">'+mtdAmzCac+'</span></span>':'')) +
     mkMtdKpi('roas', 'MTD ROAS', mtdRoas, parseFloat(mtdRoas)>=2.5?'positive':'negative', 'Revenue / Ad Spend',
       '<span><span class="sub-label">Busy Board</span><span class="sub-val">'+mtdBbRoas+'</span></span>' +
       '<span><span class="sub-label">STEM</span><span class="sub-val">'+mtdStRoas+'</span></span>' +
@@ -2228,30 +2239,30 @@ function renderMTD() {
       '<span><span class="sub-label">Soft Toy</span><span class="sub-val">'+(s.soft_sessions||0).toLocaleString()+'</span></span>',
       growthBadgeMtd(s.sessions, prev.sessions||0)) : '') +
     mkKpi('rev', 'Revenue', fmt(s.revenue), '', channel==='combined'?'D2C: '+fmt(s.d2c_rev)+' | Amz: '+fmt(s.amz_rev):'', bk('rev'), growthBadgeMtd(s.revenue, prev.revenue)) +
-    mkKpi('aov', 'AOV', s.orders>0?fmt(s.revenue/s.orders):'—', '', s.orders>0?s.orders+' orders':'',
+    mkKpi('orders', 'Units Sold', s.orders.toLocaleString(), '', channel==='combined'?'D2C: '+s.d2c_orders+' | Amz: '+s.amz_orders:'', bk('orders', numFmt), growthBadgeMtd(s.orders, prev.orders)) +
+    mkKpi('ads', 'Ad Spend <span style="font-size:8px;color:var(--muted);font-weight:400">(inc GST)</span>', fmt(s.ad_spend), '', (s.revenue>0?(s.ad_spend/s.revenue*100).toFixed(1)+'% of revenue':'') + (channel==='combined'?' | D2C: '+fmt(s.d2c_ads)+' | Amz: '+fmt(s.amz_ads):''), bk('ads'), growthBadgeMtd(s.ad_spend, prev.ad_spend)) +
+    mkKpi('aov', 'AOV', s.orders>0?fmt(s.revenue/s.orders):'—', '', s.orders>0?s.orders+' units':'',
       '<span><span class="sub-label">Busy Board</span><span class="sub-val">'+(s.bb_orders>0?fmt(s.bb_rev/s.bb_orders):'—')+'</span></span>' +
       '<span><span class="sub-label">STEM</span><span class="sub-val">'+(s.stem_orders>0?fmt(s.stem_rev/s.stem_orders):'—')+'</span></span>' +
       '<span><span class="sub-label">Soft Toy</span><span class="sub-val">'+(s.soft_orders>0?fmt(s.soft_rev/s.soft_orders):'—')+'</span></span>' +
       (channel==='combined'?'<span><span class="sub-label">Amazon</span><span class="sub-val">'+(s.amz_orders>0?fmt(s.amz_rev/s.amz_orders):'—')+'</span></span>':''),
       growthBadgeMtd(s.orders>0?s.revenue/s.orders:0, prev.orders>0?prev.revenue/prev.orders:0)) +
-    mkKpi('orders', 'Units Sold', s.orders.toLocaleString(), '', channel==='combined'?'D2C: '+s.d2c_orders+' | Amz: '+s.amz_orders:'', bk('orders', numFmt), growthBadgeMtd(s.orders, prev.orders)) +
-    mkKpi('ads', 'Ad Spend <span style="font-size:8px;color:var(--muted);font-weight:400">(inc GST)</span>', fmt(s.ad_spend), '', (s.revenue>0?(s.ad_spend/s.revenue*100).toFixed(1)+'% of revenue':'') + (channel==='combined'?' | D2C: '+fmt(s.d2c_ads)+' | Amz: '+fmt(s.amz_ads):''), bk('ads'), growthBadgeMtd(s.ad_spend, prev.ad_spend)) +
-    mkKpi('cac', 'CAC <span style="font-size:8px;color:var(--muted);font-weight:400">(inc GST)</span>', selCac, (sel.orders>0&&sel.ad_spend/sel.orders>550)?'negative':'positive', 'Cost per order',
+    mkKpi('cac', 'CAC <span style="font-size:8px;color:var(--muted);font-weight:400">(inc GST)</span>', selCac, (sel.orders>0&&sel.ad_spend/sel.orders>550)?'negative':'positive', 'Cost per unit',
       '<span><span class="sub-label">Busy Board</span><span class="sub-val">' + bbCac + '</span></span>' +
       '<span><span class="sub-label">STEM</span><span class="sub-val">' + stCac + '</span></span>' +
       '<span><span class="sub-label">Soft Toy</span><span class="sub-val">' + sfCac + '</span></span>' +
       (channel==='combined' ? '<span><span class="sub-label">Amazon</span><span class="sub-val">' + amzCac + '</span></span>' : '')) +
-    mkKpi('roas', 'ROAS', selRoas, parseFloat(selRoas)>=2.5?'positive':'negative', 'Revenue / Ad Spend',
-      '<span><span class="sub-label">Busy Board</span><span class="sub-val">' + bbRoas + '</span></span>' +
-      '<span><span class="sub-label">STEM</span><span class="sub-val">' + stRoas + '</span></span>' +
-      '<span><span class="sub-label">Soft Toy</span><span class="sub-val">' + sfRoas + '</span></span>' +
-      (channel==='combined' ? '<span><span class="sub-label">Amazon</span><span class="sub-val">' + amzRoas + '</span></span>' : '')) +
     mkKpi('profit', 'Profit (RTO adj)', fmt(selAdjProfit), selAdjProfit>=0?'positive':'negative', selProfitPct + ' | RTO loss: ' + fmt(selRtoLoss),
       '<span><span class="sub-label">BB (10% RTO)</span><span class="sub-val">-' + fmt(sel.bb_orders*RTO_RATES.bb*RTO_COST) + '</span></span>' +
       '<span><span class="sub-label">STEM (18% RTO)</span><span class="sub-val">-' + fmt(sel.stem_orders*RTO_RATES.stem*RTO_COST) + '</span></span>' +
       '<span><span class="sub-label">Soft (22% RTO)</span><span class="sub-val">-' + fmt(sel.soft_orders*RTO_RATES.soft*RTO_COST) + '</span></span>' +
       '<span><span class="sub-label">Raw Profit</span><span class="sub-val">' + fmt(s.profit) + '</span></span>',
-      growthBadgeMtd(selAdjProfit, prevAdjProfit));
+      growthBadgeMtd(selAdjProfit, prevAdjProfit)) +
+    mkKpi('roas', 'ROAS', selRoas, parseFloat(selRoas)>=2.5?'positive':'negative', 'Revenue / Ad Spend',
+      '<span><span class="sub-label">Busy Board</span><span class="sub-val">' + bbRoas + '</span></span>' +
+      '<span><span class="sub-label">STEM</span><span class="sub-val">' + stRoas + '</span></span>' +
+      '<span><span class="sub-label">Soft Toy</span><span class="sub-val">' + sfRoas + '</span></span>' +
+      (channel==='combined' ? '<span><span class="sub-label">Amazon</span><span class="sub-val">' + amzRoas + '</span></span>' : ''));
   // (old hidden chart removed)
 
   // ── Category Analytics Charts ──
