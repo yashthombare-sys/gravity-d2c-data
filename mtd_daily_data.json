@@ -434,9 +434,9 @@
       "revenue": 109798.0,
       "orders": 109,
       "ad_spend": 35329.1,
-      "cogs": 47513.0,
-      "total_expense": 82842.0,
-      "profit": 26955.0,
+      "cogs": 49312.0,
+      "total_expense": 84641.0,
+      "profit": 25156.0,
       "sessions": 3312,
       "shopify_orders": 61
     },
@@ -1714,10 +1714,10 @@
       "revenue": 25457.0,
       "orders": 29,
       "ad_spend": 13777.7,
-      "cogs": 8351.0,
-      "total_expense": 22129.0,
-      "profit": 3328.0,
-      "cogs_logistics": 32.8,
+      "cogs": 10150.0,
+      "total_expense": 23928.0,
+      "profit": 1529.0,
+      "cogs_logistics": 39.87,
       "sessions": 0,
       "shopify_orders": 0
     },
@@ -1852,32 +1852,41 @@
       "profit": 19636.0
     },
     "2026-03-14": {
-      "revenue": 83390.54,
+      "revenue": 86131.57,
       "orders": 99,
-      "ad_spend": 23122.75,
+      "ad_spend": 10630.62,
       "commissions": 25911.93,
       "product_expense": 27621.0,
-      "total_expense": 76655.68,
-      "profit": 6734.86
+      "total_expense": 64163.55,
+      "profit": 21968.02
     },
     "2026-03-15": {
-      "revenue": 105882.69,
+      "revenue": 123983.83,
       "orders": 156,
-      "ad_spend": 29992.72,
+      "ad_spend": 20994.56,
       "commissions": 20952.14,
       "product_expense": 46207.0,
-      "total_expense": 97151.86,
-      "profit": 8730.83
+      "total_expense": 88153.7,
+      "profit": 35830.13
     },
     "2026-03-16": {
-      "revenue": 101350.39,
+      "revenue": 116101.45,
       "orders": 131,
       "ad_spend": 18597.98,
       "commissions": 25775.8,
       "product_expense": 40791.0,
       "total_expense": 85164.78,
-      "profit": 16185.61
+      "profit": 30936.67
+    },
+    "2026-03-17": {
+      "revenue": 115321.64,
+      "orders": 142,
+      "ad_spend": 20326.68,
+      "commissions": 17298.25,
+      "product_expense": 43183.0,
+      "total_expense": 80807.93,
+      "profit": 34513.71
     }
   },
-  "last_synced": "2026-03-18T11:26:06"
+  "last_synced": "2026-03-18T13:01:11"
 }
