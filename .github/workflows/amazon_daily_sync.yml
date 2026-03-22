@@ -28,12 +28,13 @@ jobs:
         run: printf '%s' "$GOOGLE_CREDENTIALS" > shiproket-mis-70c28ae6e7fb.json
 
       - name: Write .env file
+        env:
+          AMAZON_CLIENT_ID: ${{ secrets.AMAZON_CLIENT_ID }}
+          AMAZON_CLIENT_SECRET: ${{ secrets.AMAZON_CLIENT_SECRET }}
+          AMAZON_REFRESH_TOKEN: ${{ secrets.AMAZON_REFRESH_TOKEN }}
         run: |
-          cat > .env <<'ENVEOF'
-          AMAZON_CLIENT_ID=${{ secrets.AMAZON_CLIENT_ID }}
-          AMAZON_CLIENT_SECRET=${{ secrets.AMAZON_CLIENT_SECRET }}
-          AMAZON_REFRESH_TOKEN=${{ secrets.AMAZON_REFRESH_TOKEN }}
-          ENVEOF
+          printf 'AMAZON_CLIENT_ID=%s\nAMAZON_CLIENT_SECRET=%s\nAMAZON_REFRESH_TOKEN=%s\n' \
+            "$AMAZON_CLIENT_ID" "$AMAZON_CLIENT_SECRET" "$AMAZON_REFRESH_TOKEN" > .env
 
       - name: Run Amazon daily sync (last 4 days)
         run: python3 amazon_daily_mis.py --last4
