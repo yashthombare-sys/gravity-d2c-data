@@ -24,8 +24,11 @@ jobs:
 
       - name: Write Google credentials
         env:
-          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
-        run: printf '%s' "$GOOGLE_CREDENTIALS" > shiproket-mis-70c28ae6e7fb.json
+          GOOGLE_CREDENTIALS_B64: ${{ secrets.GOOGLE_CREDENTIALS_B64 }}
+        run: echo "$GOOGLE_CREDENTIALS_B64" | base64 -d > shiproket-mis-70c28ae6e7fb.json
+
+      - name: Verify credentials file
+        run: python3 -c "import json; json.load(open('shiproket-mis-70c28ae6e7fb.json')); print('Credentials JSON is valid')"
 
       - name: Run MTD sync
         run: python3 sync_mtd.py
