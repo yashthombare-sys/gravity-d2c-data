@@ -16,8 +16,7 @@ concurrency:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    strategy:
-      max-parallel: 1
+    timeout-minutes: 60
 
     steps:
       - name: Checkout repo
@@ -64,32 +63,16 @@ jobs:
             echo "⚠️ AMAZON_SHEET_ID secret not set — will use existing file or create new sheet"
           fi
 
-      - name: Run Amazon daily sync (attempt 1)
-        id: attempt1
-        continue-on-error: true
-        run: python3 amazon_daily_mis.py --last4
-
-      - name: Wait 20 minutes and retry if first attempt failed
-        if: steps.attempt1.outcome == 'failure'
-        run: |
-          echo "⚠️ First attempt failed. Waiting 20 minutes before retry..."
-          echo "  (Most Amazon SP-API failures are transient — rate limits, temporary outages)"
-          sleep 1200
-
-      - name: Run Amazon daily sync (attempt 2 — retry)
-        if: steps.attempt1.outcome == 'failure'
+      - name: Run Amazon daily sync (last 4 days, with smart retry)
         run: python3 amazon_daily_mis.py --last4
 
       - name: Commit and push updated data
-        if: steps.attempt1.outcome == 'success' || steps.attempt1.outcome == 'failure'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add amazon_daily_*.json
           git diff --staged --quiet || git commit -m "Auto-sync Amazon daily data $(date -u +%Y-%m-%d)"
-          # Pull in case MTD sync pushed while we were running
           git pull --rebase origin main
-          # Retry push up to 3 times
           for i in 1 2 3; do
             git push && break
             echo "Push attempt $i failed, pulling and retrying..."
@@ -100,9 +83,9 @@ jobs:
       - name: Report failure
         if: failure()
         run: |
-          echo "::error::Amazon Daily Sync failed BOTH attempts at $(date -u +%Y-%m-%dT%H:%M:%S)Z"
-          echo "Both attempt 1 and retry after 20min failed. This is likely NOT transient."
-          echo "Check the logs above for details. Common causes:"
+          echo "::error::Amazon Daily Sync failed at $(date -u +%Y-%m-%dT%H:%M:%S)Z"
+          echo "The script retries failed steps after 20 min automatically."
+          echo "If you see this, BOTH attempts failed. Check logs above."
+          echo "Common causes:"
           echo "  - Amazon SP-API refresh token expired (re-authorize in Seller Central)"
           echo "  - Google Sheets API quota exhausted"
-          echo "  - Amazon SP-API endpoint down for extended period"
