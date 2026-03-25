@@ -503,12 +503,22 @@
     "2026-03-23": {
       "revenue": 183438.0,
       "orders": 164,
-      "ad_spend": 78600.1,
+      "ad_spend": 78690.0,
       "cogs": 85276.0,
-      "total_expense": 163876.0,
-      "profit": 19562.0,
-      "sessions": 3385,
+      "total_expense": 163965.0,
+      "profit": 19471.0,
+      "sessions": 3519,
       "shopify_orders": 96
+    },
+    "2026-03-24": {
+      "revenue": 189123.0,
+      "orders": 176,
+      "ad_spend": 82273.2,
+      "cogs": 88491.0,
+      "total_expense": 170764.0,
+      "profit": 18358.0,
+      "sessions": 2800,
+      "shopify_orders": 93
     }
   },
   "d2c_busyboard": {
@@ -1065,13 +1075,24 @@
     "2026-03-23": {
       "revenue": 138930.0,
       "orders": 121,
-      "ad_spend": 55354.1,
+      "ad_spend": 55429.5,
       "cogs": 63608.0,
-      "total_expense": 118962.0,
-      "profit": 19968.0,
+      "total_expense": 119037.0,
+      "profit": 19892.0,
       "cogs_logistics": 45.78,
-      "sessions": 3385,
+      "sessions": 3519,
       "shopify_orders": 96
+    },
+    "2026-03-24": {
+      "revenue": 121681.0,
+      "orders": 111,
+      "ad_spend": 52853.3,
+      "cogs": 55209.0,
+      "total_expense": 108062.0,
+      "profit": 13619.0,
+      "cogs_logistics": 45.37,
+      "sessions": 2800,
+      "shopify_orders": 93
     }
   },
   "d2c_stem": {
@@ -1529,11 +1550,22 @@
     "2026-03-23": {
       "revenue": 18337.0,
       "orders": 13,
-      "ad_spend": 8209.9,
+      "ad_spend": 8217.1,
       "cogs": 11168.0,
-      "total_expense": 19378.0,
-      "profit": -1041.0,
+      "total_expense": 19385.0,
+      "profit": -1048.0,
       "cogs_logistics": 60.9,
+      "sessions": 0,
+      "shopify_orders": 0
+    },
+    "2026-03-24": {
+      "revenue": 27631.0,
+      "orders": 19,
+      "ad_spend": 10822.6,
+      "cogs": 17182.0,
+      "total_expense": 28005.0,
+      "profit": -374.0,
+      "cogs_logistics": 62.18,
       "sessions": 0,
       "shopify_orders": 0
     }
@@ -1971,11 +2003,22 @@
     "2026-03-23": {
       "revenue": 26171.0,
       "orders": 30,
-      "ad_spend": 15036.1,
+      "ad_spend": 15043.4,
       "cogs": 10500.0,
-      "total_expense": 25536.0,
-      "profit": 635.0,
+      "total_expense": 25543.0,
+      "profit": 627.0,
       "cogs_logistics": 40.12,
+      "sessions": 0,
+      "shopify_orders": 0
+    },
+    "2026-03-24": {
+      "revenue": 39811.0,
+      "orders": 46,
+      "ad_spend": 18597.3,
+      "cogs": 16100.0,
+      "total_expense": 34697.0,
+      "profit": 5113.0,
+      "cogs_logistics": 40.44,
       "sessions": 0,
       "shopify_orders": 0
     }
@@ -2153,23 +2196,50 @@
       "profit": 25085.99
     },
     "2026-03-20": {
-      "revenue": 85128.34,
+      "revenue": 95593.41,
       "orders": 113,
-      "ad_spend": 18144.86,
+      "ad_spend": 0.0,
       "commissions": 17791.28,
       "product_expense": 33270.0,
-      "total_expense": 69206.14,
-      "profit": 15922.2
+      "total_expense": 51061.28,
+      "profit": 44532.13
     },
     "2026-03-21": {
-      "revenue": 74124.58,
+      "revenue": 91575.47,
       "orders": 95,
-      "ad_spend": 14465.62,
+      "ad_spend": 0.0,
       "commissions": 15226.23,
       "product_expense": 30118.0,
-      "total_expense": 59809.85,
-      "profit": 14314.73
+      "total_expense": 45344.23,
+      "profit": 46231.24
+    },
+    "2026-03-22": {
+      "revenue": 89252.98,
+      "orders": 103,
+      "ad_spend": 0.0,
+      "commissions": 12842.4,
+      "product_expense": 30294.0,
+      "total_expense": 43136.4,
+      "profit": 46116.58
+    },
+    "2026-03-23": {
+      "revenue": 99310.55,
+      "orders": 121,
+      "ad_spend": 0.0,
+      "commissions": 18804.16,
+      "product_expense": 35144.0,
+      "total_expense": 53948.16,
+      "profit": 45362.39
+    },
+    "2026-03-24": {
+      "revenue": 117128.75,
+      "orders": 134,
+      "ad_spend": 0.0,
+      "commissions": 19955.39,
+      "product_expense": 39834.0,
+      "total_expense": 59789.39,
+      "profit": 57339.36
     }
   },
-  "last_synced": "2026-03-24T08:21:47"
+  "last_synced": "2026-03-25T06:13:32"
 }
