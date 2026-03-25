@@ -855,131 +855,108 @@ def main():
 
     if "--last4" in args:
         # Cron mode: fetch past 4 days (re-syncs recent data for accuracy)
-        # Smart retry: each step runs independently, failed steps retry after 20 min
+        # Smart retry: each step independent, failed steps retry after delays
+        #   Attempt 1: immediate (~6:00 AM)
+        #   Attempt 2: +20 min   (~6:20 AM) — only failed steps
+        #   Attempt 3: +20 min   (~6:40 AM) — only still-failed steps
+        # Pushes best available data after all attempts
         end_date = yesterday
         start_date = today - timedelta(days=4)
-        RETRY_DELAY = 20 * 60  # 20 minutes in seconds
+        RETRY_DELAYS = [20 * 60, 20 * 60]  # wait times between attempts (seconds)
+        MAX_ATTEMPTS = 3
 
         print(f"Cron mode: fetching last 4 days ({start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')})", flush=True)
+        print(f"  Max attempts: {MAX_ATTEMPTS} (retry delays: {[d//60 for d in RETRY_DELAYS]} min)", flush=True)
         print("=" * 60, flush=True)
 
-        access_token = get_access_token()
         date_from = start_date.strftime("%Y-%m-%d")
         date_to = end_date.strftime("%Y-%m-%d")
 
-        # Results — None means "not yet fetched"
+        # Results — None means "not yet fetched successfully"
         orders = None
         non_cancelled = None
         items_by_order = None
         daily_fees = None
         daily_traffic = None
+        access_token = get_access_token()
 
-        failed_steps = []  # track which steps failed
+        def run_failed_steps(failed, attempt_num):
+            """Run only the steps that are in the failed list. Returns updated failed list."""
+            nonlocal orders, non_cancelled, items_by_order, daily_fees, daily_traffic, access_token
+            still_failed = []
 
-        # ── ATTEMPT 1 ──────────────────────────────────────────
-        print(f"\n{'='*60}", flush=True)
-        print(f"  ATTEMPT 1", flush=True)
-        print(f"{'='*60}", flush=True)
-
-        # Step 1: Fetch orders (CRITICAL)
-        print(f"\n  Step 1: Fetching orders...", flush=True)
-        try:
-            orders = fetch_all_orders(date_from, date_to, access_token)
-            non_cancelled = [o for o in orders if o.get("OrderStatus") not in ("Canceled", "Cancelled")]
-            print(f"  ✅ {len(orders)} orders ({len(non_cancelled)} non-cancelled)", flush=True)
-        except Exception as e:
-            print(f"  ❌ Orders fetch FAILED: {e}", flush=True)
-            failed_steps.append("orders")
-
-        # Step 2: Fetch order items for COGS
-        if orders is not None:
-            print(f"\n  Step 2: Fetching order items for COGS...", flush=True)
-            try:
-                order_ids = [o["AmazonOrderId"] for o in non_cancelled]
-                items_by_order, access_token = fetch_order_items_batch(order_ids, access_token)
-                print(f"  ✅ Items fetched for {len(items_by_order)} orders", flush=True)
-            except Exception as e:
-                print(f"  ❌ Order items failed: {e}", flush=True)
-                failed_steps.append("items")
-
-        # Step 3: Fetch fees
-        if orders is not None:
-            print(f"\n  Step 3: Fetching fees...", flush=True)
-            try:
-                daily_fees = fetch_all_fees(date_from, date_to, access_token)
-                print(f"  ✅ Fees for {len(daily_fees)} days", flush=True)
-            except Exception as e:
-                print(f"  ❌ Fees failed: {e}", flush=True)
-                failed_steps.append("fees")
-
-        # Step 4: Fetch traffic
-        if orders is not None:
-            print(f"\n  Step 4: Fetching traffic...", flush=True)
-            try:
-                access_token = get_access_token()
-                daily_traffic = fetch_traffic_report(date_from, date_to, access_token)
-                print(f"  ✅ Traffic for {len(daily_traffic)} days", flush=True)
-            except Exception as e:
-                print(f"  ❌ Traffic failed: {e}", flush=True)
-                failed_steps.append("traffic")
-
-        # ── RETRY FAILED STEPS (after 20 min) ──────────────────
-        if failed_steps:
-            print(f"\n{'='*60}", flush=True)
-            print(f"  {len(failed_steps)} step(s) failed: {', '.join(failed_steps)}", flush=True)
-            print(f"  Waiting 20 minutes before retrying...", flush=True)
-            print(f"{'='*60}", flush=True)
-            time.sleep(RETRY_DELAY)
-
-            print(f"\n{'='*60}", flush=True)
-            print(f"  RETRY — re-fetching: {', '.join(failed_steps)}", flush=True)
-            print(f"{'='*60}", flush=True)
-
-            # Fresh token for retry
-            access_token = get_access_token()
-
-            if "orders" in failed_steps:
-                print(f"\n  Retry: Fetching orders...", flush=True)
+            if "orders" in failed:
+                print(f"\n  Fetching orders...", flush=True)
                 try:
                     orders = fetch_all_orders(date_from, date_to, access_token)
                     non_cancelled = [o for o in orders if o.get("OrderStatus") not in ("Canceled", "Cancelled")]
                     print(f"  ✅ {len(orders)} orders ({len(non_cancelled)} non-cancelled)", flush=True)
-                    failed_steps.remove("orders")
                 except Exception as e:
-                    print(f"  ❌ Orders STILL failing: {e}", flush=True)
+                    print(f"  ❌ Orders failed: {e}", flush=True)
+                    still_failed.append("orders")
 
-            if orders is not None and "items" in failed_steps:
-                print(f"\n  Retry: Fetching order items...", flush=True)
+            if orders is not None and "items" in failed:
+                print(f"\n  Fetching order items for COGS...", flush=True)
                 try:
                     order_ids = [o["AmazonOrderId"] for o in non_cancelled]
                     items_by_order, access_token = fetch_order_items_batch(order_ids, access_token)
                     print(f"  ✅ Items fetched for {len(items_by_order)} orders", flush=True)
-                    failed_steps.remove("items")
                 except Exception as e:
-                    print(f"  ❌ Order items STILL failing: {e}", flush=True)
+                    print(f"  ❌ Order items failed: {e}", flush=True)
+                    still_failed.append("items")
 
-            if orders is not None and "fees" in failed_steps:
-                print(f"\n  Retry: Fetching fees...", flush=True)
+            if orders is not None and "fees" in failed:
+                print(f"\n  Fetching fees...", flush=True)
                 try:
                     daily_fees = fetch_all_fees(date_from, date_to, access_token)
                     print(f"  ✅ Fees for {len(daily_fees)} days", flush=True)
-                    failed_steps.remove("fees")
                 except Exception as e:
-                    print(f"  ❌ Fees STILL failing: {e}", flush=True)
+                    print(f"  ❌ Fees failed: {e}", flush=True)
+                    still_failed.append("fees")
 
-            if orders is not None and "traffic" in failed_steps:
-                print(f"\n  Retry: Fetching traffic...", flush=True)
+            if orders is not None and "traffic" in failed:
+                print(f"\n  Fetching traffic...", flush=True)
                 try:
                     access_token = get_access_token()
                     daily_traffic = fetch_traffic_report(date_from, date_to, access_token)
                     print(f"  ✅ Traffic for {len(daily_traffic)} days", flush=True)
-                    failed_steps.remove("traffic")
                 except Exception as e:
-                    print(f"  ❌ Traffic STILL failing: {e}", flush=True)
+                    print(f"  ❌ Traffic failed: {e}", flush=True)
+                    still_failed.append("traffic")
 
-        # ── If orders still failed after retry, we can't do anything ──
+            return still_failed
+
+        # ── Run all attempts ──────────────────────────────────
+        failed_steps = ["orders", "items", "fees", "traffic"]  # all steps to run
+
+        for attempt in range(MAX_ATTEMPTS):
+            print(f"\n{'='*60}", flush=True)
+            print(f"  ATTEMPT {attempt + 1} of {MAX_ATTEMPTS} — fetching: {', '.join(failed_steps)}", flush=True)
+            print(f"{'='*60}", flush=True)
+
+            if attempt > 0:
+                # Fresh token for retry
+                access_token = get_access_token()
+
+            failed_steps = run_failed_steps(failed_steps, attempt + 1)
+
+            if not failed_steps:
+                print(f"\n  ✅ All steps succeeded on attempt {attempt + 1}!", flush=True)
+                break
+
+            # If there are more attempts, wait before retrying
+            if attempt < MAX_ATTEMPTS - 1:
+                delay = RETRY_DELAYS[attempt]
+                print(f"\n  {len(failed_steps)} step(s) still failed: {', '.join(failed_steps)}", flush=True)
+                print(f"  Waiting {delay // 60} minutes before attempt {attempt + 2}...", flush=True)
+                time.sleep(delay)
+
+        # ── If orders still failed after all attempts, we can't do anything ──
         if orders is None:
-            raise RuntimeError("Orders fetch failed on both attempts. Cannot push any data.")
+            raise RuntimeError(
+                f"Orders fetch failed on all {MAX_ATTEMPTS} attempts. Cannot push any data.\n"
+                f"  This is likely a persistent Amazon SP-API issue."
+            )
 
         # ── BUILD & PUSH with best available data ──────────────
         print(f"\n  Building daily data and pushing...", flush=True)
@@ -1028,8 +1005,14 @@ def main():
             url = push_to_sheet(day_data, month_label)
 
         if failed_steps:
-            print(f"\n⚠️  Completed with {len(failed_steps)} step(s) still failed: {', '.join(failed_steps)}", flush=True)
-            print(f"  Data pushed with estimates where actual data was unavailable.", flush=True)
+            print(f"\n⚠️  Completed with {len(failed_steps)} step(s) still failed after {MAX_ATTEMPTS} attempts: {', '.join(failed_steps)}", flush=True)
+            if "items" in failed_steps:
+                print(f"  → COGS estimated at 36% (order items unavailable)", flush=True)
+            if "fees" in failed_steps:
+                print(f"  → Commissions estimated at 15% (fees API unavailable)", flush=True)
+            if "traffic" in failed_steps:
+                print(f"  → Sessions = 0 (traffic report unavailable)", flush=True)
+            print(f"  Data pushed with estimates. Will correct on next successful run.", flush=True)
         else:
             print(f"\n✅ Done! All data fetched successfully.", flush=True)
         print(f"  Sheet: {url}", flush=True)
