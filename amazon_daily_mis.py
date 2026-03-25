@@ -855,6 +855,7 @@ def main():
 
     if "--last4" in args:
         # Cron mode: fetch past 4 days (re-syncs recent data for accuracy)
+        # Each step is independent — if one fails, we push whatever we got
         end_date = yesterday
         start_date = today - timedelta(days=4)
 
@@ -865,29 +866,54 @@ def main():
         date_from = start_date.strftime("%Y-%m-%d")
         date_to = end_date.strftime("%Y-%m-%d")
 
-        # Fetch orders
-        print(f"  Fetching orders...", flush=True)
-        orders = fetch_all_orders(date_from, date_to, access_token)
-        non_cancelled = [o for o in orders if o.get("OrderStatus") not in ("Canceled", "Cancelled")]
-        print(f"  {len(orders)} orders ({len(non_cancelled)} non-cancelled)", flush=True)
+        warnings = []  # track partial failures
 
-        # Fetch order items
-        print(f"  Fetching order items...", flush=True)
-        order_ids = [o["AmazonOrderId"] for o in non_cancelled]
-        items_by_order, access_token = fetch_order_items_batch(order_ids, access_token)
+        # Step 1: Fetch orders (CRITICAL — without this, nothing to push)
+        print(f"\n  Step 1: Fetching orders...", flush=True)
+        try:
+            orders = fetch_all_orders(date_from, date_to, access_token)
+            non_cancelled = [o for o in orders if o.get("OrderStatus") not in ("Canceled", "Cancelled")]
+            print(f"  {len(orders)} orders ({len(non_cancelled)} non-cancelled)", flush=True)
+        except Exception as e:
+            print(f"  ❌ Orders fetch FAILED: {e}", flush=True)
+            raise  # Can't continue without orders
+
+        # Step 2: Fetch order items for COGS (OPTIONAL — falls back to 36% estimate)
+        print(f"\n  Step 2: Fetching order items for COGS...", flush=True)
+        items_by_order = {}
+        try:
+            order_ids = [o["AmazonOrderId"] for o in non_cancelled]
+            items_by_order, access_token = fetch_order_items_batch(order_ids, access_token)
+            print(f"  Items fetched for {len(items_by_order)} orders", flush=True)
+        except Exception as e:
+            warnings.append(f"Order items failed (COGS will be estimated at 36%): {e}")
+            print(f"  ⚠️  Order items failed, will estimate COGS: {e}", flush=True)
 
         daily_orders = aggregate_orders_by_day(orders, items_by_order)
 
-        # Fetch fees
-        print(f"  Fetching fees...", flush=True)
-        daily_fees = fetch_all_fees(date_from, date_to, access_token)
+        # Step 3: Fetch fees (OPTIONAL — falls back to 15% estimate)
+        print(f"\n  Step 3: Fetching fees...", flush=True)
+        daily_fees = {}
+        try:
+            daily_fees = fetch_all_fees(date_from, date_to, access_token)
+            print(f"  Fees for {len(daily_fees)} days", flush=True)
+        except Exception as e:
+            warnings.append(f"Fees fetch failed (will estimate at 15%): {e}")
+            print(f"  ⚠️  Fees failed, will estimate at 15%: {e}", flush=True)
 
-        # Fetch traffic
-        print(f"  Fetching traffic...", flush=True)
-        access_token = get_access_token()
-        daily_traffic = fetch_traffic_report(date_from, date_to, access_token)
+        # Step 4: Fetch traffic (OPTIONAL — sessions will be 0 if this fails)
+        print(f"\n  Step 4: Fetching traffic...", flush=True)
+        daily_traffic = {}
+        try:
+            access_token = get_access_token()
+            daily_traffic = fetch_traffic_report(date_from, date_to, access_token)
+            print(f"  Traffic for {len(daily_traffic)} days", flush=True)
+        except Exception as e:
+            warnings.append(f"Traffic fetch failed (sessions will be 0): {e}")
+            print(f"  ⚠️  Traffic failed, sessions will be 0: {e}", flush=True)
 
-        # Group by month and push
+        # Step 5: Combine and push (always runs if we have orders)
+        print(f"\n  Step 5: Building daily data and pushing...", flush=True)
         from collections import defaultdict as dd
         months = dd(list)
         current = start_date
@@ -924,7 +950,14 @@ def main():
             save_daily_json(day_data, month_label)
             url = push_to_sheet(day_data, month_label)
 
-        print(f"\nDone! Sheet: {url}", flush=True)
+        if warnings:
+            print(f"\n⚠️  Completed with {len(warnings)} warning(s):", flush=True)
+            for w in warnings:
+                print(f"   - {w}", flush=True)
+            print(f"  Data was pushed with estimates where needed.", flush=True)
+        else:
+            print(f"\n✅ Done! All data fetched successfully.", flush=True)
+        print(f"  Sheet: {url}", flush=True)
 
     elif "--yesterday" in args:
         # Cron mode: fetch only yesterday

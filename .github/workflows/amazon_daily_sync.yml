@@ -16,6 +16,8 @@ concurrency:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
 
     steps:
       - name: Checkout repo
@@ -62,10 +64,24 @@ jobs:
             echo "⚠️ AMAZON_SHEET_ID secret not set — will use existing file or create new sheet"
           fi
 
-      - name: Run Amazon daily sync (last 4 days)
+      - name: Run Amazon daily sync (attempt 1)
+        id: attempt1
+        continue-on-error: true
+        run: python3 amazon_daily_mis.py --last4
+
+      - name: Wait 20 minutes and retry if first attempt failed
+        if: steps.attempt1.outcome == 'failure'
+        run: |
+          echo "⚠️ First attempt failed. Waiting 20 minutes before retry..."
+          echo "  (Most Amazon SP-API failures are transient — rate limits, temporary outages)"
+          sleep 1200
+
+      - name: Run Amazon daily sync (attempt 2 — retry)
+        if: steps.attempt1.outcome == 'failure'
         run: python3 amazon_daily_mis.py --last4
 
       - name: Commit and push updated data
+        if: steps.attempt1.outcome == 'success' || steps.attempt1.outcome == 'failure'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -84,8 +100,9 @@ jobs:
       - name: Report failure
         if: failure()
         run: |
-          echo "::error::Amazon Daily Sync failed at $(date -u +%Y-%m-%dT%H:%M:%S)Z"
+          echo "::error::Amazon Daily Sync failed BOTH attempts at $(date -u +%Y-%m-%dT%H:%M:%S)Z"
+          echo "Both attempt 1 and retry after 20min failed. This is likely NOT transient."
           echo "Check the logs above for details. Common causes:"
           echo "  - Amazon SP-API refresh token expired (re-authorize in Seller Central)"
-          echo "  - Google Sheets API rate limit (429)"
-          echo "  - Git push conflict with MTD sync"
+          echo "  - Google Sheets API quota exhausted"
+          echo "  - Amazon SP-API endpoint down for extended period"
