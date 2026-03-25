@@ -10,8 +10,9 @@ Sources:
 Usage: python3 sync_mtd.py
 """
 
-import os, json, time, warnings, re
+import os, json, time, warnings, re, sys, calendar
 from datetime import datetime, date
+from dateutil.relativedelta import relativedelta
 import gspread
 from google.oauth2.service_account import Credentials
 
@@ -25,73 +26,124 @@ DASHBOARD = os.path.join(BASE, "dashboard.html")
 D2C_SHEET_URL = "https://docs.google.com/spreadsheets/d/1LfLi67xq8P1bxEAmJysQuci7vOOuqxEoYxTrYEab0yA/"
 AMZ_SHEET_URL = "https://docs.google.com/spreadsheets/d/1u7hupogAQjxyQO6uNxDk9T3ehWDis5PwBgUaYlmIGZc/"
 
-# D2C Shiprocket ROI columns (0-indexed)
-D2C_COL = {
-    "date": 17,       # R
-    "ad_spend": 4,    # E - Total ad Spent (with GST, from Shopify ROI section)
-    "sessions": 5,    # F - Sessions
-    "shopify_orders": 7, # H - Shopify Orders
-    "orders": 19,     # T - Total Product Quantity
-    "revenue": 20,    # U - Total Sales
-    "cogs": 21,       # V - Total Cogs
-    "total_expense": 22,  # W - Total Spends
-    "profit": 23,     # X - Profit
-    "profit_pct": 24, # Y - Profit %
-    "mkt_pct": 25,    # Z - Marketing spends %
-    "cogs_logistics": 26, # AA - COGS+Logistics
+# How many months of history to sync (current month + N previous months)
+LOOKBACK_MONTHS = 5
+
+# ── D2C header names to search for (case-insensitive partial match) ──
+# These map logical field names to possible header strings found in the sheet.
+# The script will scan the header/marker rows to find column indices dynamically.
+D2C_HEADER_MAP = {
+    "date":           ["date"],
+    "ad_spend":       ["total ad spent", "ad spent", "ad spend", "total ad spend"],
+    "sessions":       ["sessions", "session"],
+    "shopify_orders": ["shopify orders", "shopify order"],
+    "orders":         ["total product quantity", "total quantity", "product quantity"],
+    "revenue":        ["total sales", "total revenue", "revenue", "sales"],
+    "cogs":           ["total cogs", "cogs"],
+    "total_expense":  ["total spends", "total spend", "total expense", "total expenses"],
+    "profit":         ["profit"],
+    "profit_pct":     ["profit %", "profit%"],
+    "mkt_pct":        ["marketing spends %", "marketing spend %", "mkt %", "marketing %"],
+    "cogs_logistics": ["cogs+logistics", "cogs + logistics", "cogs logistics"],
 }
 
-# Amazon columns (0-indexed)
-AMZ_COL = {
-    "date": 0,
-    "revenue": 1,
-    "total_expense": 2,
-    "product_expense": 3,
-    "ad_spend": 4,
-    "commissions": 5,
-    "orders": 6,
-    "profit": 7,
-    "profit_pct": 8,
+# Fallback hardcoded column indices (used only if header detection fails)
+D2C_COL_FALLBACK = {
+    "date": 17, "ad_spend": 4, "sessions": 5, "shopify_orders": 7,
+    "orders": 19, "revenue": 20, "cogs": 21, "total_expense": 22,
+    "profit": 23, "profit_pct": 24, "mkt_pct": 25, "cogs_logistics": 26,
 }
 
-# Tab name variants per month
-MONTH_TABS = {
-    "Mar 2026": {
-        "d2c": ["March", "Mar26", "March 2026"],
-        "amz": ["March 2026"],
-    },
-    "Feb 2026": {
-        "d2c": ["Feb26", "February", "February 2026"],
-        "amz": ["February 2026"],
-    },
-    "Jan 2026": {
-        "d2c": ["Jan26", "January", "January 2026"],
-        "amz": ["January 2026"],
-    },
-    "Dec 2025": {
-        "d2c": ["Dec25", "December", "December 2025"],
-        "amz": ["December 2025"],
-    },
-    "Nov 2025": {
-        "d2c": ["Nov25", "November", "November 2025"],
-        "amz": ["November 2025"],
-    },
-    "Oct 2025": {
-        "d2c": ["Oct25", "October", "October 2025"],
-        "amz": ["October 2025"],
-    },
+# Amazon header names (searched in row 1)
+AMZ_HEADER_MAP = {
+    "date":            ["date"],
+    "revenue":         ["total revenue", "revenue"],
+    "total_expense":   ["total expense", "total expenses"],
+    "product_expense": ["product expense", "product expenses"],
+    "ad_spend":        ["ad spend", "ad spent"],
+    "commissions":     ["commissions", "commission"],
+    "orders":          ["total orders", "orders"],
+    "profit":          ["profit"],
+    "profit_pct":      ["profit %", "profit%"],
+}
+
+AMZ_COL_FALLBACK = {
+    "date": 0, "revenue": 1, "total_expense": 2, "product_expense": 3,
+    "ad_spend": 4, "commissions": 5, "orders": 6, "profit": 7, "profit_pct": 8,
 }
 
 
-def safe_float(val):
+# ── Dynamic month tab generation ──────────────────────────
+def generate_month_tabs(lookback=LOOKBACK_MONTHS):
+    """Auto-generate tab name candidates for the current month + N previous months."""
+    today = date.today()
+    tabs = {}
+    for i in range(lookback + 1):
+        dt = today.replace(day=1) - relativedelta(months=i)
+        month_name = dt.strftime("%B")       # "March"
+        month_abbr = dt.strftime("%b")       # "Mar"
+        year_full = dt.strftime("%Y")        # "2026"
+        year_short = dt.strftime("%y")       # "26"
+        key = f"{month_abbr} {year_full}"    # "Mar 2026"
+
+        tabs[key] = {
+            "d2c": [
+                month_name,                           # "March"
+                f"{month_abbr}{year_short}",          # "Mar26"
+                f"{month_name} {year_full}",          # "March 2026"
+                f"{month_abbr} {year_full}",          # "Mar 2026"
+                f"{month_abbr}{year_full}",           # "Mar2026"
+                f"{month_name} {year_short}",         # "March 26"
+            ],
+            "amz": [
+                f"{month_name} {year_full}",          # "March 2026"
+                month_name,                           # "March"
+                f"{month_abbr} {year_full}",          # "Mar 2026"
+            ],
+        }
+    return tabs
+
+
+# ── Header-based column detection ──────────────────────────
+def find_columns_by_header(header_row, header_map, fallback_map):
+    """
+    Scan a header row and match column indices by name.
+    Returns a dict of {field_name: column_index}.
+    Falls back to hardcoded indices for any field not found.
+    """
+    col_map = {}
+    header_lower = [str(h).strip().lower() for h in header_row]
+
+    for field, candidates in header_map.items():
+        found = False
+        for candidate in candidates:
+            candidate_lower = candidate.lower()
+            for idx, h in enumerate(header_lower):
+                if candidate_lower == h or candidate_lower in h:
+                    col_map[field] = idx
+                    found = True
+                    break
+            if found:
+                break
+        if not found and field in fallback_map:
+            col_map[field] = fallback_map[field]
+            print(f"    ⚠️  Column '{field}' not found in headers, using fallback index {fallback_map[field]}")
+
+    return col_map
+
+
+def safe_float(val, field_name=None):
     if val is None:
         return 0.0
     s = str(val).replace("₹", "").replace(",", "").replace("%", "").strip()
     if s in ("", "-", "#DIV/0!", "#REF!", "#VALUE!", "#N/A"):
         return 0.0
+    # Handle Google Sheets serial date numbers that end up in numeric fields
     try:
         return float(s)
     except ValueError:
+        if field_name:
+            print(f"    ⚠️  Unexpected value in '{field_name}': '{val}'")
         return 0.0
 
 
@@ -103,40 +155,24 @@ def parse_date(val):
     if not s or s in ("-", "#REF!"):
         return None
 
-    # Try YYYY-MM-DD
+    # Handle Google Sheets serial date numbers (e.g., 46112 for 2026-03-25)
     try:
-        d = datetime.strptime(s, "%Y-%m-%d")
-        return d.strftime("%Y-%m-%d")
-    except ValueError:
+        num = float(s)
+        if 30000 < num < 60000:  # plausible serial date range
+            from datetime import timedelta
+            epoch = datetime(1899, 12, 30)
+            d = epoch + timedelta(days=int(num))
+            return d.strftime("%Y-%m-%d")
+    except (ValueError, TypeError):
         pass
 
-    # Try D-Mon-YYYY (e.g., 1-Mar-2026)
-    try:
-        d = datetime.strptime(s, "%d-%b-%Y")
-        return d.strftime("%Y-%m-%d")
-    except ValueError:
-        pass
-
-    # Try D-Mon-YY
-    try:
-        d = datetime.strptime(s, "%d-%b-%y")
-        return d.strftime("%Y-%m-%d")
-    except ValueError:
-        pass
-
-    # Try DD/MM/YYYY
-    try:
-        d = datetime.strptime(s, "%d/%m/%Y")
-        return d.strftime("%Y-%m-%d")
-    except ValueError:
-        pass
-
-    # Try Mon D, YYYY
-    try:
-        d = datetime.strptime(s, "%b %d, %Y")
-        return d.strftime("%Y-%m-%d")
-    except ValueError:
-        pass
+    for fmt in ("%Y-%m-%d", "%d-%b-%Y", "%d-%b-%y", "%d/%m/%Y", "%b %d, %Y",
+                "%d-%m-%Y", "%m/%d/%Y", "%Y/%m/%d"):
+        try:
+            d = datetime.strptime(s, fmt)
+            return d.strftime("%Y-%m-%d")
+        except ValueError:
+            continue
 
     return None
 
@@ -151,106 +187,186 @@ def find_tab(sh, tab_names):
     return None
 
 
-def read_d2c_section(data, start_idx):
+def api_call_with_retry(func, max_retries=3, base_delay=5):
+    """Wrap a Google Sheets API call with exponential backoff retry."""
+    for attempt in range(max_retries):
+        try:
+            return func()
+        except gspread.exceptions.APIError as e:
+            status = e.response.status_code if hasattr(e, 'response') else 0
+            if status == 429 or status >= 500:
+                delay = base_delay * (2 ** attempt)
+                print(f"    ⚠️  API error {status}, retrying in {delay}s (attempt {attempt+1}/{max_retries})")
+                time.sleep(delay)
+            else:
+                raise
+        except Exception as e:
+            if attempt < max_retries - 1:
+                delay = base_delay * (2 ** attempt)
+                print(f"    ⚠️  Error: {e}, retrying in {delay}s (attempt {attempt+1}/{max_retries})")
+                time.sleep(delay)
+            else:
+                raise
+    return func()  # final attempt
+
+
+def read_d2c_section(data, start_idx, col_map):
     """Read one D2C Shiprocket ROI section starting from a data row index."""
     result = {}
+    min_cols = max(col_map.get("revenue", 0), col_map.get("orders", 0)) + 1
+
     for row in data[start_idx:]:
-        if len(row) <= D2C_COL["revenue"]:
+        if len(row) < min_cols:
             continue
 
-        # Stop conditions: Total row, section marker, or header row
+        # Stop conditions: Total row or next section marker
         cell_a = str(row[0]).strip() if row[0] else ""
-        cell_r = str(row[D2C_COL["date"]]).strip() if len(row) > D2C_COL["date"] else ""
+        date_col = col_map.get("date", 17)
+        cell_r = str(row[date_col]).strip() if len(row) > date_col else ""
         cell_a_up = cell_a.upper()
-        cell_r_up = cell_r.upper()
 
-        if "TOTAL" in cell_a_up or "TOTAL" in cell_r_up:
+        if "TOTAL" in cell_a_up or "TOTAL" in cell_r.upper():
             break
-        if "START" in cell_a_up or "SOOPER" in cell_a_up or "CLAPCUDDLE" in cell_a_up:
+        # Only stop on section markers in column A (not data columns)
+        if re.match(r'^(SOOPER|CLAPCUDDLE|CLAP\s*CUDDLE|STEM|SOFT\s*TOY)', cell_a_up):
             break
 
-        dt = parse_date(row[D2C_COL["date"]])
+        dt = parse_date(row[date_col])
         if not dt:
             continue
 
-        revenue = safe_float(row[D2C_COL["revenue"]])
-        orders = int(safe_float(row[D2C_COL["orders"]]))
+        revenue = safe_float(row[col_map["revenue"]], "revenue")
+        orders = int(safe_float(row[col_map["orders"]], "orders"))
 
         if revenue == 0 and orders == 0:
             continue
 
-        sessions = int(safe_float(row[D2C_COL["sessions"]])) if len(row) > D2C_COL["sessions"] else 0
-        shopify_orders = int(safe_float(row[D2C_COL["shopify_orders"]])) if len(row) > D2C_COL["shopify_orders"] else 0
+        sessions_idx = col_map.get("sessions")
+        shopify_idx = col_map.get("shopify_orders")
 
         result[dt] = {
             "revenue": round(revenue, 2),
             "orders": orders,
-            "ad_spend": round(safe_float(row[D2C_COL["ad_spend"]]), 2),
-            "cogs": round(safe_float(row[D2C_COL["cogs"]]), 2),
-            "total_expense": round(safe_float(row[D2C_COL["total_expense"]]), 2),
-            "profit": round(safe_float(row[D2C_COL["profit"]]), 2),
-            "cogs_logistics": round(safe_float(row[D2C_COL["cogs_logistics"]]) if len(row) > D2C_COL["cogs_logistics"] else 0, 2),
-            "sessions": sessions,
-            "shopify_orders": shopify_orders,
+            "ad_spend": round(safe_float(row[col_map["ad_spend"]], "ad_spend") if len(row) > col_map.get("ad_spend", 999) else 0, 2),
+            "cogs": round(safe_float(row[col_map["cogs"]], "cogs") if len(row) > col_map.get("cogs", 999) else 0, 2),
+            "total_expense": round(safe_float(row[col_map["total_expense"]], "total_expense") if len(row) > col_map.get("total_expense", 999) else 0, 2),
+            "profit": round(safe_float(row[col_map["profit"]], "profit") if len(row) > col_map.get("profit", 999) else 0, 2),
+            "cogs_logistics": round(safe_float(row[col_map["cogs_logistics"]], "cogs_logistics") if len(row) > col_map.get("cogs_logistics", 999) else 0, 2),
+            "sessions": int(safe_float(row[sessions_idx], "sessions")) if sessions_idx and len(row) > sessions_idx else 0,
+            "shopify_orders": int(safe_float(row[shopify_idx], "shopify_orders")) if shopify_idx and len(row) > shopify_idx else 0,
         }
 
     return result
 
 
-def read_d2c_daily(sh, month_key):
-    """Read D2C Shiprocket ROI for all 3 categories (Busy Board, STEM, Soft Toy)."""
-    tabs = MONTH_TABS.get(month_key, {}).get("d2c", [])
-    ws = find_tab(sh, tabs)
-    if not ws:
-        return {}, {}, {}
-
-    data = ws.get_all_values()
-
-    # Find section start rows by looking for markers
-    # Busy Board: starts at row 4 (index 3) — default first section
-    # STEM (Sooperbrains): row with "SOOPER_BRAINS_START" or header row after it
-    # Soft Toy (Clapcuddles): row with "CLAPCUDDLES_START" or header row after it
-    bb_start = 3  # default: row 4 (index 3)
+def find_section_markers(data):
+    """
+    Find section start rows for Busy Board, STEM, and Soft Toy.
+    Returns (bb_start, stem_start, soft_start).
+    Only matches markers at the START of column A text. Stops after first match per section.
+    """
+    bb_start = None
     stem_start = None
     soft_start = None
 
     for i, row in enumerate(data):
         cell_a = str(row[0]).strip().upper() if row[0] else ""
-        if "SOOPER" in cell_a or "STEM" in cell_a:
-            # Data starts 2 rows after marker (marker, header, data)
+        if not cell_a:
+            continue
+
+        # Busy Board section: look for "BUSY BOARD" or the first ROI header
+        if bb_start is None and re.match(r'^(BUSY\s*BOARD|MONTESSORI)', cell_a):
+            bb_start = i + 2  # marker row, header row, then data
+
+        # STEM section
+        if stem_start is None and re.match(r'^(SOOPER|STEM)', cell_a):
             stem_start = i + 2
-        if "CLAPCUDDLE" in cell_a or "SOFT" in cell_a:
+
+        # Soft Toy section
+        if soft_start is None and re.match(r'^(CLAPCUDDLE|CLAP\s*CUDDLE|SOFT\s*TOY)', cell_a):
             soft_start = i + 2
 
+    # Default: if no busy board marker, data starts at row 4 (index 3)
+    if bb_start is None:
+        bb_start = 3
+
+    # Validate ordering
+    if stem_start is not None and soft_start is not None and stem_start > soft_start:
+        print(f"    ⚠️  Section order issue: STEM (row {stem_start}) after Soft Toy (row {soft_start})")
+
+    return bb_start, stem_start, soft_start
+
+
+def find_d2c_header_row(data, section_start):
+    """Find the header row just before data starts in a D2C section."""
+    # The header row is typically 1 row before data start (section_start - 1)
+    header_idx = max(0, section_start - 1)
+    if header_idx < len(data):
+        return data[header_idx]
+    return []
+
+
+def read_d2c_daily(sh, month_key, month_tabs):
+    """Read D2C Shiprocket ROI for all 3 categories (Busy Board, STEM, Soft Toy)."""
+    tabs = month_tabs.get(month_key, {}).get("d2c", [])
+    ws = find_tab(sh, tabs)
+    if not ws:
+        return {}, {}, {}
+
+    data = api_call_with_retry(lambda: ws.get_all_values())
+
+    bb_start, stem_start, soft_start = find_section_markers(data)
+
+    # Detect columns from the header row of the first section
+    header_row = find_d2c_header_row(data, bb_start)
+    col_map = find_columns_by_header(header_row, D2C_HEADER_MAP, D2C_COL_FALLBACK)
+
     # Read each category
-    bb_data = read_d2c_section(data, bb_start)
-    stem_data = read_d2c_section(data, stem_start) if stem_start else {}
-    soft_data = read_d2c_section(data, soft_start) if soft_start else {}
+    bb_data = read_d2c_section(data, bb_start, col_map)
+
+    # For STEM/Soft, re-detect headers in case their section has different column layout
+    if stem_start:
+        stem_header = find_d2c_header_row(data, stem_start)
+        stem_cols = find_columns_by_header(stem_header, D2C_HEADER_MAP, D2C_COL_FALLBACK) if any(stem_header) else col_map
+        stem_data = read_d2c_section(data, stem_start, stem_cols)
+    else:
+        stem_data = {}
+
+    if soft_start:
+        soft_header = find_d2c_header_row(data, soft_start)
+        soft_cols = find_columns_by_header(soft_header, D2C_HEADER_MAP, D2C_COL_FALLBACK) if any(soft_header) else col_map
+        soft_data = read_d2c_section(data, soft_start, soft_cols)
+    else:
+        soft_data = {}
 
     return bb_data, stem_data, soft_data
 
 
-def read_amazon_daily(sh, month_key):
+def read_amazon_daily(sh, month_key, month_tabs):
     """Read Amazon daily MIS for a month."""
-    tabs = MONTH_TABS.get(month_key, {}).get("amz", [])
+    tabs = month_tabs.get(month_key, {}).get("amz", [])
     ws = find_tab(sh, tabs)
     if not ws:
         return {}
 
-    data = ws.get_all_values()
-    result = {}
+    data = api_call_with_retry(lambda: ws.get_all_values())
+    if not data:
+        return {}
 
-    # Row 1 is headers, data starts row 2 (index 1)
+    # Detect columns from header row
+    col_map = find_columns_by_header(data[0], AMZ_HEADER_MAP, AMZ_COL_FALLBACK)
+
+    result = {}
     for row in data[1:]:
-        if len(row) <= AMZ_COL["orders"]:
+        if len(row) <= col_map.get("orders", 6):
             continue
 
-        dt = parse_date(row[AMZ_COL["date"]])
+        dt = parse_date(row[col_map["date"]])
         if not dt:
             continue
 
-        revenue = safe_float(row[AMZ_COL["revenue"]])
-        orders = int(safe_float(row[AMZ_COL["orders"]]))
+        revenue = safe_float(row[col_map["revenue"]], "revenue")
+        orders = int(safe_float(row[col_map["orders"]], "orders"))
 
         if revenue == 0 and orders == 0:
             continue
@@ -258,11 +374,11 @@ def read_amazon_daily(sh, month_key):
         result[dt] = {
             "revenue": round(revenue, 2),
             "orders": orders,
-            "ad_spend": round(safe_float(row[AMZ_COL["ad_spend"]]), 2),
-            "commissions": round(safe_float(row[AMZ_COL["commissions"]]), 2),
-            "product_expense": round(safe_float(row[AMZ_COL["product_expense"]]), 2),
-            "total_expense": round(safe_float(row[AMZ_COL["total_expense"]]), 2),
-            "profit": round(safe_float(row[AMZ_COL["profit"]]), 2),
+            "ad_spend": round(safe_float(row[col_map["ad_spend"]], "ad_spend") if len(row) > col_map.get("ad_spend", 999) else 0, 2),
+            "commissions": round(safe_float(row[col_map["commissions"]], "commissions") if len(row) > col_map.get("commissions", 999) else 0, 2),
+            "product_expense": round(safe_float(row[col_map["product_expense"]], "product_expense") if len(row) > col_map.get("product_expense", 999) else 0, 2),
+            "total_expense": round(safe_float(row[col_map["total_expense"]], "total_expense") if len(row) > col_map.get("total_expense", 999) else 0, 2),
+            "profit": round(safe_float(row[col_map["profit"]], "profit") if len(row) > col_map.get("profit", 999) else 0, 2),
         }
 
     return result
@@ -278,39 +394,54 @@ def main():
 
     print("\n🔄 Syncing MTD daily data\n")
 
-    # Open both sheets
-    d2c_sh = gc.open_by_url(D2C_SHEET_URL)
-    amz_sh = gc.open_by_url(AMZ_SHEET_URL)
+    # Generate month tabs dynamically
+    month_tabs = generate_month_tabs()
+    print(f"  Syncing {len(month_tabs)} months: {', '.join(month_tabs.keys())}\n")
+
+    # Open both sheets with retry
+    d2c_sh = api_call_with_retry(lambda: gc.open_by_url(D2C_SHEET_URL))
+    amz_sh = api_call_with_retry(lambda: gc.open_by_url(AMZ_SHEET_URL))
 
     all_bb = {}    # Busy Board (Montessori Labs)
     all_stem = {}  # STEM (Sooperbrains)
     all_soft = {}  # Soft Toy (Clapcuddles)
     all_amz = {}
+    errors = []
 
-    for month_key in MONTH_TABS:
+    for month_key in month_tabs:
         print(f"  {month_key}:")
 
-        bb, stem, soft = read_d2c_daily(d2c_sh, month_key)
-        if bb:
-            all_bb.update(bb)
-            print(f"    Busy Board: {len(bb)} days, Revenue=₹{sum(v['revenue'] for v in bb.values()):,.0f}")
-        if stem:
-            all_stem.update(stem)
-            print(f"    STEM: {len(stem)} days, Revenue=₹{sum(v['revenue'] for v in stem.values()):,.0f}")
-        if soft:
-            all_soft.update(soft)
-            print(f"    Soft Toy: {len(soft)} days, Revenue=₹{sum(v['revenue'] for v in soft.values()):,.0f}")
-        if not bb and not stem and not soft:
-            print(f"    D2C: no tab found")
+        try:
+            bb, stem, soft = read_d2c_daily(d2c_sh, month_key, month_tabs)
+            if bb:
+                all_bb.update(bb)
+                print(f"    Busy Board: {len(bb)} days, Revenue=₹{sum(v['revenue'] for v in bb.values()):,.0f}")
+            if stem:
+                all_stem.update(stem)
+                print(f"    STEM: {len(stem)} days, Revenue=₹{sum(v['revenue'] for v in stem.values()):,.0f}")
+            if soft:
+                all_soft.update(soft)
+                print(f"    Soft Toy: {len(soft)} days, Revenue=₹{sum(v['revenue'] for v in soft.values()):,.0f}")
+            if not bb and not stem and not soft:
+                print(f"    D2C: no tab found (tried: {month_tabs[month_key]['d2c']})")
+        except Exception as e:
+            msg = f"D2C {month_key}: {e}"
+            errors.append(msg)
+            print(f"    ❌ D2C error: {e}")
         time.sleep(1)
 
-        amz = read_amazon_daily(amz_sh, month_key)
-        if amz:
-            all_amz.update(amz)
-            total_rev = sum(v["revenue"] for v in amz.values())
-            print(f"    Amazon: {len(amz)} days, Revenue=₹{total_rev:,.0f}")
-        else:
-            print(f"    Amazon: no tab found")
+        try:
+            amz = read_amazon_daily(amz_sh, month_key, month_tabs)
+            if amz:
+                all_amz.update(amz)
+                total_rev = sum(v["revenue"] for v in amz.values())
+                print(f"    Amazon: {len(amz)} days, Revenue=₹{total_rev:,.0f}")
+            else:
+                print(f"    Amazon: no tab found (tried: {month_tabs[month_key]['amz']})")
+        except Exception as e:
+            msg = f"Amazon {month_key}: {e}"
+            errors.append(msg)
+            print(f"    ❌ Amazon error: {e}")
         time.sleep(1)
 
     # Build combined D2C (sum of all 3 categories per date)
@@ -359,8 +490,20 @@ def main():
     print(f"   Amazon: {len(all_amz)} days | ₹{amz_total/100000:,.2f}L")
     print(f"   Grand Total: ₹{(d2c_total+amz_total)/100000:,.2f}L")
 
+    # Report errors
+    if errors:
+        print(f"\n⚠️  {len(errors)} error(s) during sync:")
+        for err in errors:
+            print(f"   ❌ {err}")
+        # Still inject whatever data we got — partial data is better than none
+        print("   (Injecting partial data into dashboard)")
+
     # Inject into dashboard.html
     inject_into_dashboard(output)
+
+    # Exit with error if there were failures (so GitHub Actions marks the run as failed)
+    if errors:
+        sys.exit(1)
 
 
 def inject_into_dashboard(data):

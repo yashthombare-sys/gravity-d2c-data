@@ -9,6 +9,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: data-sync
+  cancel-in-progress: false
+
 jobs:
   sync:
     runs-on: ubuntu-latest
@@ -16,6 +20,11 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Pull latest changes
+        run: git pull --rebase origin main
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -23,7 +32,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install gspread google-auth requests
+        run: pip install gspread google-auth requests python-dateutil
 
       - name: Write Google credentials
         env:
@@ -42,6 +51,17 @@ jobs:
           printf 'AMAZON_CLIENT_ID=%s\nAMAZON_CLIENT_SECRET=%s\nAMAZON_REFRESH_TOKEN=%s\n' \
             "$AMAZON_CLIENT_ID" "$AMAZON_CLIENT_SECRET" "$AMAZON_REFRESH_TOKEN" > .env
 
+      - name: Write Amazon sheet ID
+        env:
+          AMAZON_SHEET_ID: ${{ secrets.AMAZON_SHEET_ID }}
+        run: |
+          if [ -n "$AMAZON_SHEET_ID" ]; then
+            echo "$AMAZON_SHEET_ID" > .amazon_daily_sheet_id
+            echo "Using sheet ID from secret"
+          else
+            echo "⚠️ AMAZON_SHEET_ID secret not set — will use existing file or create new sheet"
+          fi
+
       - name: Run Amazon daily sync (last 4 days)
         run: python3 amazon_daily_mis.py --last4
 
@@ -51,4 +71,21 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add amazon_daily_*.json
           git diff --staged --quiet || git commit -m "Auto-sync Amazon daily data $(date -u +%Y-%m-%d)"
-          git push
+          # Pull in case MTD sync pushed while we were running
+          git pull --rebase origin main
+          # Retry push up to 3 times
+          for i in 1 2 3; do
+            git push && break
+            echo "Push attempt $i failed, pulling and retrying..."
+            sleep 5
+            git pull --rebase origin main
+          done
+
+      - name: Report failure
+        if: failure()
+        run: |
+          echo "::error::Amazon Daily Sync failed at $(date -u +%Y-%m-%dT%H:%M:%S)Z"
+          echo "Check the logs above for details. Common causes:"
+          echo "  - Amazon SP-API refresh token expired (re-authorize in Seller Central)"
+          echo "  - Google Sheets API rate limit (429)"
+          echo "  - Git push conflict with MTD sync"
