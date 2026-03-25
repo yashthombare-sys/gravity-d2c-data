@@ -2198,48 +2198,48 @@
     "2026-03-20": {
       "revenue": 95593.41,
       "orders": 113,
-      "ad_spend": 0.0,
+      "ad_spend": 18144.86,
       "commissions": 17791.28,
       "product_expense": 33270.0,
-      "total_expense": 51061.28,
-      "profit": 44532.13
+      "total_expense": 69206.14,
+      "profit": 26387.27
     },
     "2026-03-21": {
       "revenue": 91575.47,
       "orders": 95,
-      "ad_spend": 0.0,
+      "ad_spend": 14453.82,
       "commissions": 15226.23,
       "product_expense": 30118.0,
-      "total_expense": 45344.23,
-      "profit": 46231.24
+      "total_expense": 59798.05,
+      "profit": 31777.42
     },
     "2026-03-22": {
       "revenue": 89252.98,
       "orders": 103,
-      "ad_spend": 0.0,
+      "ad_spend": 17596.16,
       "commissions": 12842.4,
       "product_expense": 30294.0,
-      "total_expense": 43136.4,
-      "profit": 46116.58
+      "total_expense": 60732.56,
+      "profit": 28520.42
     },
     "2026-03-23": {
       "revenue": 99310.55,
       "orders": 121,
-      "ad_spend": 0.0,
+      "ad_spend": 13621.92,
       "commissions": 18804.16,
       "product_expense": 35144.0,
-      "total_expense": 53948.16,
-      "profit": 45362.39
+      "total_expense": 67570.08,
+      "profit": 31740.47
     },
     "2026-03-24": {
       "revenue": 117128.75,
       "orders": 134,
-      "ad_spend": 0.0,
+      "ad_spend": 18271.12,
       "commissions": 19955.39,
       "product_expense": 39834.0,
-      "total_expense": 59789.39,
-      "profit": 57339.36
+      "total_expense": 78060.51,
+      "profit": 39068.24
     }
   },
-  "last_synced": "2026-03-25T06:13:32"
+  "last_synced": "2026-03-25T12:10:19"
 }

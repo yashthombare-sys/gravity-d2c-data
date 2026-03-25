@@ -48,18 +48,69 @@ HEADERS = [
 #  AMAZON SP-API FUNCTIONS
 # ══════════════════════════════════════════════════════════
 
-def get_access_token():
+def get_access_token(retry=True):
     """Exchange refresh token for access token."""
     env = load_env()
-    resp = requests.post(TOKEN_URL, data={
-        "grant_type": "refresh_token",
-        "refresh_token": env.get("AMAZON_REFRESH_TOKEN", ""),
-        "client_id": env.get("AMAZON_CLIENT_ID", ""),
-        "client_secret": env.get("AMAZON_CLIENT_SECRET", ""),
-    }, timeout=15)
-    if resp.status_code != 200:
-        raise PermissionError(f"Token refresh failed: {resp.status_code} {resp.text}")
-    return resp.json()["access_token"]
+
+    client_id = env.get("AMAZON_CLIENT_ID", "")
+    client_secret = env.get("AMAZON_CLIENT_SECRET", "")
+    refresh_token = env.get("AMAZON_REFRESH_TOKEN", "")
+
+    if not all([client_id, client_secret, refresh_token]):
+        missing = []
+        if not client_id: missing.append("AMAZON_CLIENT_ID")
+        if not client_secret: missing.append("AMAZON_CLIENT_SECRET")
+        if not refresh_token: missing.append("AMAZON_REFRESH_TOKEN")
+        raise PermissionError(
+            f"Missing credentials in .env: {', '.join(missing)}\n"
+            f"  Set these in GitHub Secrets or in the local .env file."
+        )
+
+    for attempt in range(3 if retry else 1):
+        try:
+            resp = requests.post(TOKEN_URL, data={
+                "grant_type": "refresh_token",
+                "refresh_token": refresh_token,
+                "client_id": client_id,
+                "client_secret": client_secret,
+            }, timeout=15)
+        except requests.exceptions.RequestException as e:
+            if attempt < 2:
+                print(f"  Token request network error: {e}, retrying...", flush=True)
+                time.sleep(3)
+                continue
+            raise PermissionError(f"Token request failed after 3 attempts: {e}")
+
+        if resp.status_code == 200:
+            return resp.json()["access_token"]
+
+        # Check for permanent failures
+        try:
+            error_data = resp.json()
+            error_code = error_data.get("error", "")
+        except Exception:
+            error_code = ""
+
+        if error_code == "invalid_grant":
+            raise PermissionError(
+                f"AMAZON REFRESH TOKEN EXPIRED OR REVOKED.\n"
+                f"  Go to Amazon Seller Central → Apps → Authorize your app → get a new refresh token.\n"
+                f"  Then update the AMAZON_REFRESH_TOKEN in GitHub Secrets and .env."
+            )
+        elif error_code == "invalid_client":
+            raise PermissionError(
+                f"AMAZON CLIENT CREDENTIALS INVALID.\n"
+                f"  Check AMAZON_CLIENT_ID and AMAZON_CLIENT_SECRET in GitHub Secrets."
+            )
+
+        if attempt < 2 and resp.status_code >= 500:
+            print(f"  Token server error {resp.status_code}, retrying...", flush=True)
+            time.sleep(3)
+            continue
+
+        raise PermissionError(f"Token refresh failed: {resp.status_code} {resp.text[:300]}")
+
+    raise PermissionError("Token refresh failed after all retries")
 
 
 def api_get(url, headers, retries=3, max_429_retries=20, silent_400=False):
@@ -470,6 +521,29 @@ def get_month_tab(spreadsheet, month_str):
         return ws, True
 
 
+def gsheet_retry(func, max_retries=3, base_delay=5):
+    """Wrap a Google Sheets API call with exponential backoff retry."""
+    for attempt in range(max_retries):
+        try:
+            return func()
+        except gspread.exceptions.APIError as e:
+            status = e.response.status_code if hasattr(e, 'response') else 0
+            if status == 429 or status >= 500:
+                delay = base_delay * (2 ** attempt)
+                print(f"    Sheets API error {status}, retrying in {delay}s (attempt {attempt+1}/{max_retries})", flush=True)
+                time.sleep(delay)
+            else:
+                raise
+        except Exception as e:
+            if attempt < max_retries - 1:
+                delay = base_delay * (2 ** attempt)
+                print(f"    Sheets error: {e}, retrying in {delay}s", flush=True)
+                time.sleep(delay)
+            else:
+                raise
+    return func()
+
+
 def push_to_sheet(daily_data, month_label):
     """Push daily data to Google Sheet."""
     print(f"\nPushing to Google Sheets ({month_label})...", flush=True)
@@ -481,17 +555,20 @@ def push_to_sheet(daily_data, month_label):
     if is_new:
         print(f"  Created new tab: '{month_label}'", flush=True)
 
-    # Get existing data
-    existing_dates = set()
-    all_vals = ws.col_values(1)
-    if not is_new and len(all_vals) > 1:
-        existing_dates = set(all_vals[1:])
+    # Get ALL existing data (not just dates) so we can preserve ad_spend
+    all_existing = gsheet_retry(lambda: ws.get_all_values())
+    existing_date_rows = {}  # date_str -> (row_index_1based, row_data)
+    if not is_new and len(all_existing) > 1:
+        for idx, row in enumerate(all_existing[1:], start=2):  # skip header, 1-based row nums
+            date_val = row[0] if row else ""
+            if date_val and date_val not in existing_date_rows:
+                existing_date_rows[date_val] = (idx, row)
 
-    next_row = len(all_vals) + 1
+    next_row = len(all_existing) + 1
 
-    # Build all rows first, then batch update
-    rows_to_push = []
-    update_map = {}  # date -> row_index for existing dates
+    # Build all rows, preserving existing ad_spend if we have 0
+    batch_updates = []  # list of (range, [row]) for batch
+    rows_to_append = []
 
     for day in daily_data:
         date_str = day["date"]
@@ -502,6 +579,17 @@ def push_to_sheet(daily_data, month_label):
         orders = day["orders"]
         sessions = day.get("sessions", 0)
         conversion_pct = day.get("conversion_pct", 0)
+
+        # Preserve manually-entered ad_spend from existing sheet data
+        if ad_spend == 0 and date_str in existing_date_rows:
+            _, existing_row = existing_date_rows[date_str]
+            if len(existing_row) > 4:
+                try:
+                    existing_ad = float(str(existing_row[4]).replace("₹", "").replace(",", "").strip() or "0")
+                    if existing_ad > 0:
+                        ad_spend = existing_ad
+                except (ValueError, TypeError):
+                    pass
 
         total_expense = cogs + commissions + ad_spend
         profit = revenue - total_expense
@@ -525,24 +613,25 @@ def push_to_sheet(daily_data, month_label):
             round(conversion_pct, 2),
         ]
 
-        if date_str in existing_dates:
-            row_idx = all_vals.index(date_str) + 1
-            update_map[row_idx] = row
+        if date_str in existing_date_rows:
+            row_idx, _ = existing_date_rows[date_str]
+            batch_updates.append((f"A{row_idx}:M{row_idx}", [row]))
         else:
-            rows_to_push.append(row)
+            rows_to_append.append(row)
 
-    # Batch update existing rows
-    for row_idx, row in update_map.items():
-        ws.update(values=[row], range_name=f"A{row_idx}:M{row_idx}")
-        time.sleep(0.3)
+    # Batch update existing rows (single batch call instead of one-by-one)
+    if batch_updates:
+        gsheet_retry(lambda: ws.batch_update(
+            [{"range": r, "values": v} for r, v in batch_updates]
+        ))
 
     # Batch append new rows
-    if rows_to_push:
-        cell_range = f"A{next_row}:M{next_row + len(rows_to_push) - 1}"
-        ws.update(values=rows_to_push, range_name=cell_range)
+    if rows_to_append:
+        cell_range = f"A{next_row}:M{next_row + len(rows_to_append) - 1}"
+        gsheet_retry(lambda: ws.update(values=rows_to_append, range_name=cell_range))
 
     # Apply formatting
-    end_row = next_row + len(rows_to_push) - 1
+    end_row = next_row + len(rows_to_append) - 1
     if end_row >= 2:
         currency_cols = [1, 2, 3, 4, 5, 7]
         pct_cols = [8, 9, 10, 12]  # Profit%, Comm%, Mkt%, Conversion%
@@ -615,8 +704,8 @@ def push_to_sheet(daily_data, month_label):
 
         spreadsheet.batch_update({"requests": reqs})
 
-    total_pushed = len(rows_to_push) + len(update_map)
-    print(f"  Pushed {total_pushed} days ({len(rows_to_push)} new, {len(update_map)} updated)", flush=True)
+    total_pushed = len(rows_to_append) + len(batch_updates)
+    print(f"  Pushed {total_pushed} days ({len(rows_to_append)} new, {len(batch_updates)} updated)", flush=True)
     print(f"  Sheet URL: {spreadsheet.url}", flush=True)
     return spreadsheet.url
 
@@ -832,6 +921,7 @@ def main():
             current += timedelta(days=1)
 
         for month_label, day_data in months.items():
+            save_daily_json(day_data, month_label)
             url = push_to_sheet(day_data, month_label)
 
         print(f"\nDone! Sheet: {url}", flush=True)
@@ -935,4 +1025,24 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except PermissionError as e:
+        print(f"\n❌ AUTHENTICATION ERROR:\n  {e}", flush=True)
+        sys.exit(1)
+    except gspread.exceptions.APIError as e:
+        status = e.response.status_code if hasattr(e, 'response') else 'unknown'
+        print(f"\n❌ GOOGLE SHEETS API ERROR (HTTP {status}):\n  {e}", flush=True)
+        if status == 429:
+            print("  Cause: Rate limit exceeded. The script retries automatically,", flush=True)
+            print("  but too many rapid calls can exhaust the quota.", flush=True)
+        sys.exit(1)
+    except requests.exceptions.RequestException as e:
+        print(f"\n❌ NETWORK ERROR:\n  {e}", flush=True)
+        print("  Check internet connectivity and API endpoint availability.", flush=True)
+        sys.exit(1)
+    except Exception as e:
+        print(f"\n❌ UNEXPECTED ERROR:\n  {type(e).__name__}: {e}", flush=True)
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
