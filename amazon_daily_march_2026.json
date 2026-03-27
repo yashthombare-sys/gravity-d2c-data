@@ -1,18 +1,5 @@
 [
   {
-    "date": "2026-03-22",
-    "revenue": 89252.98,
-    "orders": 103,
-    "cogs": 30294,
-    "fees_commission": 2303.82,
-    "fees_fba": 7557.9,
-    "fees_closing": 2980.68,
-    "fees_total": 12842.4,
-    "ad_spend": 0,
-    "sessions": 2247,
-    "conversion_pct": 4.63
-  },
-  {
     "date": "2026-03-23",
     "revenue": 99310.55,
     "orders": 121,
@@ -27,26 +14,39 @@
   },
   {
     "date": "2026-03-24",
-    "revenue": 123322.72,
-    "orders": 134,
-    "cogs": 39834,
+    "revenue": 124291.74,
+    "orders": 133,
+    "cogs": 39056,
     "fees_commission": 5584.17,
     "fees_fba": 9967.46,
     "fees_closing": 4403.76,
     "fees_total": 19955.39,
     "ad_spend": 0,
     "sessions": 2630,
-    "conversion_pct": 5.17
+    "conversion_pct": 5.13
   },
   {
     "date": "2026-03-25",
-    "revenue": 79090.37,
+    "revenue": 84774.38,
     "orders": 112,
     "cogs": 32209,
     "fees_commission": 5228.36,
     "fees_fba": 10931.52,
     "fees_closing": 5279.32,
     "fees_total": 21439.2,
+    "ad_spend": 0,
+    "sessions": 2011,
+    "conversion_pct": 5.62
+  },
+  {
+    "date": "2026-03-26",
+    "revenue": 94250.77,
+    "orders": 126,
+    "cogs": 37023,
+    "fees_commission": 4545.51,
+    "fees_fba": 9202.82,
+    "fees_closing": 4048.58,
+    "fees_total": 17796.91,
     "ad_spend": 0,
     "sessions": 0,
     "conversion_pct": 0
