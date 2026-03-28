@@ -539,6 +539,16 @@
       "profit": 21571.0,
       "sessions": 3567,
       "shopify_orders": 118
+    },
+    "2026-03-27": {
+      "revenue": 145898.0,
+      "orders": 136,
+      "ad_spend": 30654.6,
+      "cogs": 66036.0,
+      "total_expense": 96691.0,
+      "profit": 49207.0,
+      "sessions": 3709,
+      "shopify_orders": 92
     }
   },
   "d2c_busyboard": {
@@ -1135,6 +1145,17 @@
       "cogs_logistics": 46.93,
       "sessions": 3567,
       "shopify_orders": 118
+    },
+    "2026-03-27": {
+      "revenue": 120911.0,
+      "orders": 107,
+      "ad_spend": 9337.6,
+      "cogs": 55886.0,
+      "total_expense": 65224.0,
+      "profit": 55687.0,
+      "cogs_logistics": 46.22,
+      "sessions": 3709,
+      "shopify_orders": 92
     }
   },
   "d2c_stem": {
@@ -2107,6 +2128,17 @@
       "cogs_logistics": 40.65,
       "sessions": 0,
       "shopify_orders": 0
+    },
+    "2026-03-27": {
+      "revenue": 24987.0,
+      "orders": 29,
+      "ad_spend": 21317.0,
+      "cogs": 10150.0,
+      "total_expense": 31467.0,
+      "profit": -6480.0,
+      "cogs_logistics": 40.62,
+      "sessions": 0,
+      "shopify_orders": 0
     }
   },
   "amazon": {
@@ -2327,23 +2359,32 @@
       "profit": 47009.23
     },
     "2026-03-25": {
-      "revenue": 84774.38,
+      "revenue": 88004.36,
       "orders": 112,
       "ad_spend": 13747.0,
       "commissions": 21439.2,
       "product_expense": 32209.0,
       "total_expense": 67395.2,
-      "profit": 17379.18
+      "profit": 20609.16
     },
     "2026-03-26": {
-      "revenue": 94250.77,
+      "revenue": 102797.77,
       "orders": 126,
       "ad_spend": 21038.22,
       "commissions": 17796.91,
       "product_expense": 37023.0,
       "total_expense": 75858.13,
-      "profit": 18392.64
+      "profit": 26939.64
+    },
+    "2026-03-27": {
+      "revenue": 57886.71,
+      "orders": 94,
+      "ad_spend": 0.0,
+      "commissions": 18341.0,
+      "product_expense": 26804.0,
+      "total_expense": 45145.0,
+      "profit": 12741.71
     }
   },
-  "last_synced": "2026-03-27T06:48:37"
+  "last_synced": "2026-03-28T05:46:27"
 }
