@@ -2422,21 +2422,21 @@
     "2026-03-27": {
       "revenue": 67096.79,
       "orders": 93,
-      "ad_spend": 0.0,
+      "ad_spend": 25522.22,
       "commissions": 18341.0,
       "product_expense": 26026.0,
-      "total_expense": 44367.0,
-      "profit": 22729.79
+      "total_expense": 69889.22,
+      "profit": -2792.43
     },
     "2026-03-28": {
-      "revenue": 106810.57,
+      "revenue": 115039.69,
       "orders": 140,
-      "ad_spend": 0.0,
+      "ad_spend": 27266.26,
       "commissions": 17131.46,
       "product_expense": 41686.0,
-      "total_expense": 58817.46,
-      "profit": 47993.11
+      "total_expense": 86083.72,
+      "profit": 28955.97
     }
   },
-  "last_synced": "2026-03-29T06:18:28"
+  "last_synced": "2026-03-29T15:57:45"
 }
