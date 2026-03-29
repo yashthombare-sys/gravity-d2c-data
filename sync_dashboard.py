@@ -785,7 +785,7 @@ def update_dashboard(d2c_data, amz_data, amz_ad_map, fk_data, fk_ad_map, fc_data
 def verify_password():
     """Require password before allowing monthly MIS changes."""
     import getpass, hashlib
-    PASS_HASH = "a0f3285b07c26c0dcd2191447f391170d06035e8d57e31a048ba87074f3a9a15"
+    PASS_HASH = "36a563bf4749a28e870b221d2fee544e6029196ca11b2f952763525c32b1f984"
     pw = getpass.getpass("\n🔒 Enter password to unlock Monthly MIS changes: ")
     if hashlib.sha256(pw.encode()).hexdigest() != PASS_HASH:
         print("❌ Wrong password. Monthly MIS update blocked.")
