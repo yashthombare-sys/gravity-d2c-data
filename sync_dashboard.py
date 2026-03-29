@@ -17,19 +17,8 @@ SHEET_URL = "https://docs.google.com/spreadsheets/d/1-aln640f4OxRmoS9R5EBvnQACp6
 CREDS_FILE = os.path.join(BASE, "shiproket-mis-70c28ae6e7fb.json")
 DASHBOARD = os.path.join(BASE, "dashboard.html")
 
+# FY 2025-26 months — actively synced from Google Sheet
 MONTHS = {
-    "Apr 2024": "April 2024 MIS",
-    "May 2024": "May 2024 MIS",
-    "Jun 2024": "June 2024 MIS",
-    "Jul 2024": "July 2024 MIS",
-    "Aug 2024": "August 2024 MIS",
-    "Sep 2024": "September 2024 MIS",
-    "Oct 2024": "October 2024 MIS",
-    "Nov 2024": "November 2024 MIS",
-    "Dec 2024": "December 2024 MIS",
-    "Jan 2025": "January 2025 MIS",
-    "Feb 2025": "February 2025 MIS",
-    "Mar 2025": "March 2025 MIS",
     "Apr 2025": "April 2025 MIS",
     "May 2025": "May 2025 MIS",
     "Jun 2025": "June 2025 MIS",
@@ -44,7 +33,15 @@ MONTHS = {
     "Mar 2026": "March 2026 MIS",
 }
 
-ALL_MONTHS = list(MONTHS.keys())
+# FY 2024-25 months — frozen in dashboard, no longer fetched
+FY24_25_MONTHS = [
+    "Apr 2024", "May 2024", "Jun 2024", "Jul 2024",
+    "Aug 2024", "Sep 2024", "Oct 2024", "Nov 2024",
+    "Dec 2024", "Jan 2025", "Feb 2025", "Mar 2025",
+]
+
+# Full list for dashboard output (both FYs)
+ALL_MONTHS = FY24_25_MONTHS + list(MONTHS.keys())
 
 # ── Column indices for Shiprocket section (0-based) ──
 # A=Products, B=Revenue, C=TotalExpense, D=P/L, E=Profit%, F=P/pcs,
@@ -582,15 +579,64 @@ def update_dashboard(d2c_data, amz_data, amz_ad_map, fk_data, fk_ad_map, fc_data
     months_js = "const MONTHS=" + json.dumps(months) + ";"
     html = re.sub(r'const MONTHS=\[.*?\];', months_js, html)
 
+    # ── Preserve FY24-25 frozen data from existing HTML ──
+    sync_match = re.search(r'// ── SYNC_DATA_START ──(.*?)// ── SYNC_DATA_END ──', html, re.DOTALL)
+    existing_sync = sync_match.group(1) if sync_match else ""
+
+    def extract_frozen(var_pattern, frozen_months, existing_text):
+        """Extract FY24-25 month values from existing SYNC_DATA JS."""
+        result = {}
+        match = re.search(var_pattern + r'\{([^}]*)\}', existing_text)
+        if match:
+            for m in frozen_months:
+                val_match = re.search(rf'"{re.escape(m)}":(\{{[^}}]*\}}|[^,}}]+)', match.group(1))
+                if val_match:
+                    result[m] = val_match.group(1)
+        return result
+
+    # Extract frozen FY24-25 D2C data
+    frozen_d2c = extract_frozen(r'DATA=\{', FY24_25_MONTHS, existing_sync)
+    frozen_amz_ad = extract_frozen(r'AMZ_AD_MAP=\{', FY24_25_MONTHS, existing_sync)
+    frozen_fk_ad = extract_frozen(r'FK_AD_MAP=\{', FY24_25_MONTHS, existing_sync)
+    frozen_bk_ad = extract_frozen(r'BK_AD_MAP=\{', FY24_25_MONTHS, existing_sync)
+    frozen_im_ad = extract_frozen(r'IM_AD_MAP=\{', FY24_25_MONTHS, existing_sync)
+
+    # Extract frozen channel data (AMZ_DATA, FK_DATA, etc.)
+    def extract_frozen_channel(var_name, frozen_months, existing_text):
+        """Extract per-month assignment lines for frozen months."""
+        result = {}
+        for m in frozen_months:
+            pat = re.escape(f'{var_name}["{m}"]=') + r'(\{[^;]*\});'
+            val_match = re.search(pat, existing_text)
+            if val_match:
+                result[m] = val_match.group(1)
+        return result
+
+    frozen_amz_data = extract_frozen_channel('AMZ_DATA', FY24_25_MONTHS, existing_sync)
+    frozen_fk_data = extract_frozen_channel('FK_DATA', FY24_25_MONTHS, existing_sync)
+    frozen_fc_data = extract_frozen_channel('FC_DATA', FY24_25_MONTHS, existing_sync)
+    frozen_bk_data = extract_frozen_channel('BK_DATA', FY24_25_MONTHS, existing_sync)
+    frozen_im_data = extract_frozen_channel('IM_DATA', FY24_25_MONTHS, existing_sync)
+    frozen_cred_data = extract_frozen_channel('CRED_DATA', FY24_25_MONTHS, existing_sync)
+
     # Build DATA= line (D2C)
     d2c_obj = {}
     for m in months:
-        d2c_obj[m] = to_js_obj(d2c_data.get(m, {}))
+        if m in frozen_d2c:
+            d2c_obj[m] = frozen_d2c[m]  # raw JS from existing HTML
+        else:
+            d2c_obj[m] = to_js_obj(d2c_data.get(m, {}))
     data_js = "DATA={" + ",".join(f'"{m}":{d2c_obj[m]}' for m in months) + "};"
+
+    # Helper: get ad map value (frozen or fresh)
+    def ad_val(ad_map_fresh, frozen_ad, m):
+        if m in frozen_ad:
+            return frozen_ad[m]
+        return str(ad_map_fresh.get(m, 0))
 
     # Build AMZ_AD_MAP line
     ad_map_js = "const AMZ_AD_MAP={" + ",".join(
-        f'"{m}":{amz_ad_map.get(m, 0)}' for m in months
+        f'"{m}":{ad_val(amz_ad_map, frozen_amz_ad, m)}' for m in months
     ) + "};"
 
     # Build AMZ_DATA lines
@@ -598,12 +644,14 @@ def update_dashboard(d2c_data, amz_data, amz_ad_map, fk_data, fk_ad_map, fc_data
     amz_init = ",".join(f'"{m}":{{}}' for m in months)
     amz_lines.append(f'const AMZ_DATA={{{amz_init}}};')
     for m in months:
-        if amz_data.get(m):
+        if m in frozen_amz_data:
+            amz_lines.append(f'AMZ_DATA["{m}"]={frozen_amz_data[m]};')
+        elif amz_data.get(m):
             amz_lines.append(f'AMZ_DATA["{m}"]={to_js_obj(amz_data[m], include_ad_spend=True)};')
 
     # Build FK_AD_MAP line
     fk_ad_map_js = "const FK_AD_MAP={" + ",".join(
-        f'"{m}":{fk_ad_map.get(m, 0)}' for m in months
+        f'"{m}":{ad_val(fk_ad_map, frozen_fk_ad, m)}' for m in months
     ) + "};"
 
     # Build FK_DATA lines
@@ -611,7 +659,9 @@ def update_dashboard(d2c_data, amz_data, amz_ad_map, fk_data, fk_ad_map, fc_data
     fk_init = ",".join(f'"{m}":{{}}' for m in months)
     fk_lines.append(f'const FK_DATA={{{fk_init}}};')
     for m in months:
-        if fk_data.get(m):
+        if m in frozen_fk_data:
+            fk_lines.append(f'FK_DATA["{m}"]={frozen_fk_data[m]};')
+        elif fk_data.get(m):
             fk_lines.append(f'FK_DATA["{m}"]={to_js_obj(fk_data[m], include_ad_spend=True)};')
 
     # Build FC_DATA lines (FirstCry)
@@ -619,12 +669,14 @@ def update_dashboard(d2c_data, amz_data, amz_ad_map, fk_data, fk_ad_map, fc_data
     fc_init = ",".join(f'"{m}":{{}}' for m in months)
     fc_lines.append(f'const FC_DATA={{{fc_init}}};')
     for m in months:
-        if fc_data.get(m):
+        if m in frozen_fc_data:
+            fc_lines.append(f'FC_DATA["{m}"]={frozen_fc_data[m]};')
+        elif fc_data.get(m):
             fc_lines.append(f'FC_DATA["{m}"]={to_js_obj(fc_data[m])};')
 
     # Build BK_AD_MAP line
     bk_ad_map_js = "const BK_AD_MAP={" + ",".join(
-        f'"{m}":{bk_ad_map.get(m, 0)}' for m in months
+        f'"{m}":{ad_val(bk_ad_map, frozen_bk_ad, m)}' for m in months
     ) + "};"
 
     # Build BK_DATA lines (Blinkit)
@@ -632,12 +684,14 @@ def update_dashboard(d2c_data, amz_data, amz_ad_map, fk_data, fk_ad_map, fc_data
     bk_init = ",".join(f'"{m}":{{}}' for m in months)
     bk_lines.append(f'const BK_DATA={{{bk_init}}};')
     for m in months:
-        if bk_data.get(m):
+        if m in frozen_bk_data:
+            bk_lines.append(f'BK_DATA["{m}"]={frozen_bk_data[m]};')
+        elif bk_data.get(m):
             bk_lines.append(f'BK_DATA["{m}"]={to_js_obj(bk_data[m], include_ad_spend=True)};')
 
     # Build IM_AD_MAP line
     im_ad_map_js = "const IM_AD_MAP={" + ",".join(
-        f'"{m}":{im_ad_map.get(m, 0)}' for m in months
+        f'"{m}":{ad_val(im_ad_map, frozen_im_ad, m)}' for m in months
     ) + "};"
 
     # Build IM_DATA lines (Instamart)
@@ -645,7 +699,9 @@ def update_dashboard(d2c_data, amz_data, amz_ad_map, fk_data, fk_ad_map, fc_data
     im_init = ",".join(f'"{m}":{{}}' for m in months)
     im_lines.append(f'const IM_DATA={{{im_init}}};')
     for m in months:
-        if im_data.get(m):
+        if m in frozen_im_data:
+            im_lines.append(f'IM_DATA["{m}"]={frozen_im_data[m]};')
+        elif im_data.get(m):
             im_lines.append(f'IM_DATA["{m}"]={to_js_obj(im_data[m], include_ad_spend=True)};')
 
     # Build CRED_DATA lines
@@ -653,7 +709,9 @@ def update_dashboard(d2c_data, amz_data, amz_ad_map, fk_data, fk_ad_map, fc_data
     cred_init = ",".join(f'"{m}":{{}}' for m in months)
     cred_lines.append(f'const CRED_DATA={{{cred_init}}};')
     for m in months:
-        if cred_data.get(m):
+        if m in frozen_cred_data:
+            cred_lines.append(f'CRED_DATA["{m}"]={frozen_cred_data[m]};')
+        elif cred_data.get(m):
             cred_lines.append(f'CRED_DATA["{m}"]={to_js_obj(cred_data[m])};')
 
     # Replace inline data section between explicit markers
