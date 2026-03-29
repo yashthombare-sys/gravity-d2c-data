@@ -41,6 +41,7 @@ MONTHS = {
     "Dec 2025": "December 2025 MIS",
     "Jan 2026": "January 2026 MIS",
     "Feb 2026": "February 2026 MIS",
+    "Mar 2026": "March 2026 MIS",
 }
 
 ALL_MONTHS = list(MONTHS.keys())
@@ -723,7 +724,22 @@ def update_dashboard(d2c_data, amz_data, amz_ad_map, fk_data, fk_ad_map, fc_data
     return True
 
 
+def verify_password():
+    """Require password before allowing monthly MIS changes."""
+    import getpass, hashlib
+    PASS_HASH = "a0f3285b07c26c0dcd2191447f391170d06035e8d57e31a048ba87074f3a9a15"
+    pw = getpass.getpass("\n🔒 Enter password to unlock Monthly MIS changes: ")
+    if hashlib.sha256(pw.encode()).hexdigest() != PASS_HASH:
+        print("❌ Wrong password. Monthly MIS update blocked.")
+        return False
+    print("✅ Password accepted. Proceeding with sync...\n")
+    return True
+
+
 def main():
+    if not verify_password():
+        return
+
     scopes = [
         "https://www.googleapis.com/auth/spreadsheets.readonly",
         "https://www.googleapis.com/auth/drive.readonly",
