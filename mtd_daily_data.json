@@ -2470,14 +2470,14 @@
       "profit": 30953.95
     },
     "2026-03-29": {
-      "revenue": 79937.57,
+      "revenue": 81585.56,
       "orders": 105,
       "ad_spend": 26718.74,
       "commissions": 13718.53,
       "product_expense": 32904.0,
       "total_expense": 73341.27,
-      "profit": 6596.3
+      "profit": 8244.29
     }
   },
-  "last_synced": "2026-03-30T11:58:01"
+  "last_synced": "2026-03-30T08:11:18"
 }
