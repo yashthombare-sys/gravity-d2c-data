@@ -559,6 +559,16 @@
       "profit": 2090.0,
       "sessions": 3194,
       "shopify_orders": 83
+    },
+    "2026-03-29": {
+      "revenue": 113663.0,
+      "orders": 101,
+      "ad_spend": 61493.9,
+      "cogs": 50076.0,
+      "total_expense": 111570.0,
+      "profit": 2093.0,
+      "sessions": 3577,
+      "shopify_orders": 89
     }
   },
   "d2c_busyboard": {
@@ -1177,6 +1187,17 @@
       "cogs_logistics": 43.55,
       "sessions": 3194,
       "shopify_orders": 83
+    },
+    "2026-03-29": {
+      "revenue": 111910.0,
+      "orders": 99,
+      "ad_spend": 61493.9,
+      "cogs": 49376.0,
+      "total_expense": 110870.0,
+      "profit": 1040.0,
+      "cogs_logistics": 44.12,
+      "sessions": 3577,
+      "shopify_orders": 89
     }
   },
   "d2c_stem": {
@@ -2182,6 +2203,17 @@
       "cogs_logistics": 40.92,
       "sessions": 0,
       "shopify_orders": 0
+    },
+    "2026-03-29": {
+      "revenue": 1753.0,
+      "orders": 2,
+      "ad_spend": 0.0,
+      "cogs": 700.0,
+      "total_expense": 700.0,
+      "profit": 1053.0,
+      "cogs_logistics": 39.93,
+      "sessions": 0,
+      "shopify_orders": 0
     }
   },
   "amazon": {
@@ -2411,32 +2443,41 @@
       "profit": 20609.16
     },
     "2026-03-26": {
-      "revenue": 104696.77,
+      "revenue": 108736.86,
       "orders": 126,
       "ad_spend": 21038.22,
       "commissions": 17796.91,
       "product_expense": 37023.0,
       "total_expense": 75858.13,
-      "profit": 28838.64
+      "profit": 32878.73
     },
     "2026-03-27": {
-      "revenue": 67096.79,
+      "revenue": 67845.79,
       "orders": 93,
       "ad_spend": 25522.22,
       "commissions": 18341.0,
       "product_expense": 26026.0,
       "total_expense": 69889.22,
-      "profit": -2792.43
+      "profit": -2043.43
     },
     "2026-03-28": {
-      "revenue": 115039.69,
+      "revenue": 117037.67,
       "orders": 140,
       "ad_spend": 27266.26,
       "commissions": 17131.46,
       "product_expense": 41686.0,
       "total_expense": 86083.72,
-      "profit": 28955.97
+      "profit": 30953.95
+    },
+    "2026-03-29": {
+      "revenue": 79937.57,
+      "orders": 105,
+      "ad_spend": 0.0,
+      "commissions": 13718.53,
+      "product_expense": 32904.0,
+      "total_expense": 46622.53,
+      "profit": 33315.04
     }
   },
-  "last_synced": "2026-03-29T15:57:45"
+  "last_synced": "2026-03-30T06:07:41"
 }
