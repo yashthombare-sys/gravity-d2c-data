@@ -2,9 +2,9 @@ name: Daily MTD Sync
 
 on:
   schedule:
-    # 8:00 AM IST = 2:30 AM UTC
+    # 8:00 AM IST = 2:30 AM UTC (primary trigger)
     - cron: '30 2 * * *'
-  workflow_dispatch: # Allow manual trigger from GitHub UI
+  workflow_dispatch: # Manual trigger + backup via keep_alive.yml
 
 permissions:
   contents: write

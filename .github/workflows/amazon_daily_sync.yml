@@ -2,9 +2,9 @@ name: Amazon Daily Sync (Last 4 Days)
 
 on:
   schedule:
-    # 6:00 AM IST = 0:30 AM UTC
+    # 6:00 AM IST = 0:30 AM UTC (primary trigger)
     - cron: '30 0 * * *'
-  workflow_dispatch: # Allow manual trigger
+  workflow_dispatch: # Manual trigger + backup via keep_alive.yml
 
 permissions:
   contents: write

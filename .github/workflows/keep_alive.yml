@@ -1,26 +1,62 @@
-name: Keep Alive
+name: Daily Sync Trigger (Backup)
 
 on:
   schedule:
-    # 5:30 AM IST = 0:00 AM UTC — runs 30 min before Amazon sync
-    - cron: '0 0 * * *'
+    # 9:00 AM IST = 3:30 AM UTC — runs AFTER both sync crons
+    # If they already ran via their own cron, this does nothing
+    - cron: '30 3 * * *'
+  workflow_dispatch: # Allow manual trigger
 
 permissions:
-  contents: write
+  actions: write
+  contents: read
 
 jobs:
-  keepalive:
+  check-and-trigger:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Keep alive ping
+      - name: Check if Amazon sync ran today
+        id: check-amazon
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          # Update a timestamp file to keep the repo active
-          echo "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > .last_alive
-          git add .last_alive
-          git diff --staged --quiet || git commit -m "keep-alive $(date -u +%Y-%m-%d)"
-          git push
+          TODAY=$(date -u +%Y-%m-%d)
+          LAST_RUN=$(gh run list --workflow="Amazon Daily Sync (Last 4 Days)" --limit 1 --json createdAt --jq '.[0].createdAt' --repo "$GITHUB_REPOSITORY" 2>/dev/null || echo "")
+          if echo "$LAST_RUN" | grep -q "$TODAY"; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "✅ Amazon sync already ran today ($LAST_RUN)"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            echo "⚠️ Amazon sync has NOT run today — triggering now"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Trigger Amazon sync if missed
+        if: steps.check-amazon.outputs.skip == 'false'
+        run: |
+          gh workflow run "Amazon Daily Sync (Last 4 Days)" --repo "$GITHUB_REPOSITORY"
+          echo "🚀 Amazon sync triggered"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check if MTD sync ran today
+        id: check-mtd
+        run: |
+          TODAY=$(date -u +%Y-%m-%d)
+          LAST_RUN=$(gh run list --workflow="Daily MTD Sync" --limit 1 --json createdAt --jq '.[0].createdAt' --repo "$GITHUB_REPOSITORY" 2>/dev/null || echo "")
+          if echo "$LAST_RUN" | grep -q "$TODAY"; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "✅ MTD sync already ran today ($LAST_RUN)"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            echo "⚠️ MTD sync has NOT run today — triggering now"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Trigger MTD sync if missed
+        if: steps.check-mtd.outputs.skip == 'false'
+        run: |
+          gh workflow run "Daily MTD Sync" --repo "$GITHUB_REPOSITORY"
+          echo "🚀 MTD sync triggered"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
