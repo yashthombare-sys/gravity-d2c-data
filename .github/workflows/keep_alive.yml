@@ -2,8 +2,9 @@ name: Daily Sync Trigger (Backup)
 
 on:
   schedule:
-    # 9:00 AM IST = 3:30 AM UTC — runs AFTER both sync crons
-    # If they already ran via their own cron, this does nothing
+    # 9:00 AM IST = 3:30 AM UTC — runs AFTER Amazon sync cron
+    # If Amazon already ran, this does nothing.
+    # MTD sync auto-triggers after Amazon via workflow_run, so we only check Amazon.
     - cron: '30 3 * * *'
   workflow_dispatch: # Allow manual trigger
 
@@ -22,10 +23,10 @@ jobs:
           LAST_RUN=$(gh run list --workflow="Amazon Daily Sync (Last 4 Days)" --limit 1 --json createdAt --jq '.[0].createdAt' --repo "$GITHUB_REPOSITORY" 2>/dev/null || echo "")
           if echo "$LAST_RUN" | grep -q "$TODAY"; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
-            echo "✅ Amazon sync already ran today ($LAST_RUN)"
+            echo "Amazon sync already ran today ($LAST_RUN)"
           else
             echo "skip=false" >> "$GITHUB_OUTPUT"
-            echo "⚠️ Amazon sync has NOT run today — triggering now"
+            echo "Amazon sync has NOT run today — triggering now"
           fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -34,29 +35,6 @@ jobs:
         if: steps.check-amazon.outputs.skip == 'false'
         run: |
           gh workflow run "Amazon Daily Sync (Last 4 Days)" --repo "$GITHUB_REPOSITORY"
-          echo "🚀 Amazon sync triggered"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Check if MTD sync ran today
-        id: check-mtd
-        run: |
-          TODAY=$(date -u +%Y-%m-%d)
-          LAST_RUN=$(gh run list --workflow="Daily MTD Sync" --limit 1 --json createdAt --jq '.[0].createdAt' --repo "$GITHUB_REPOSITORY" 2>/dev/null || echo "")
-          if echo "$LAST_RUN" | grep -q "$TODAY"; then
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-            echo "✅ MTD sync already ran today ($LAST_RUN)"
-          else
-            echo "skip=false" >> "$GITHUB_OUTPUT"
-            echo "⚠️ MTD sync has NOT run today — triggering now"
-          fi
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Trigger MTD sync if missed
-        if: steps.check-mtd.outputs.skip == 'false'
-        run: |
-          gh workflow run "Daily MTD Sync" --repo "$GITHUB_REPOSITORY"
-          echo "🚀 MTD sync triggered"
+          echo "Amazon sync triggered — MTD sync will auto-follow via workflow_run"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

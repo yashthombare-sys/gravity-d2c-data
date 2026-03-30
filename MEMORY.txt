@@ -1,0 +1,84 @@
+# Shiprocket D2C Data — Project Memory
+
+## Project Purpose
+Multi-channel e-commerce MIS (Management Information System) aggregation platform.
+Collects daily order/revenue/expense data from: Shiprocket, Amazon, Flipkart, Firstcry, Instamart, Blinkit.
+Outputs to Google Sheets and interactive HTML dashboards.
+
+## Created By
+Co-founder (imported to this workspace on 2026-03-30).
+Built with Claude Code.
+
+---
+
+## Session: 2026-03-30 — Security Audit & Onboarding
+
+### What was discussed:
+- Imported project from co-founder for the first time
+- Ran full security audit before starting work
+
+### What was found:
+- 53 Python scripts, 3 GitHub Actions workflows, 2 HTML dashboards
+- Channels: Amazon (SP-API), Shiprocket (REST API), Flipkart, Firstcry, Instamart, Blinkit
+- Automation: GitHub Actions daily cron at 6 AM
+- Database: SQLite (master_data.db) for order history
+- Google Sheets integration for live MIS reporting
+
+### Security issues found & fixed:
+1. FIXED — .env file permissions changed from 644 to 600
+2. FIXED — Google service account key permissions changed from 644 to 600
+3. FIXED — .amazon_daily_sheet_id permissions changed from 644 to 600
+4. FIXED — .gitignore updated with missing security patterns
+5. FIXED — Created MEMORY.txt (was missing)
+
+### Security issues requiring user action:
+- .amazon_daily_sheet_id is tracked in git — needs to be removed from tracking (requires git commit)
+
+### Key files:
+- .env — API credentials (Shiprocket, Amazon, Flipkart)
+- shiproket-mis-70c28ae6e7fb.json — Google service account key
+- automation/config.py — Central config with COGS map, product patterns
+- automation/daily_sync.py — Main orchestrator script
+- amazon_daily_mis.py — Amazon SP-API integration (root level)
+- sync_mtd.py — Month-to-date sync (root level)
+
+### Open items:
+- Remove .amazon_daily_sheet_id from git tracking
+- Consider credential rotation (credentials were world-readable before fix)
+
+---
+
+## Session: 2026-03-30 — Fix Daily Dashboard Automation
+
+### Problem:
+Co-founder had to manually sync Amazon data every day because the automation was unreliable.
+
+### Root causes identified:
+1. Amazon SP-API rate limiting — `--last4` mode made ~400 API calls (fetching order items per order)
+2. `sync_mtd.py` exited with code 1 on partial failures, preventing commit of partial-but-valid data
+3. MTD sync ran on fixed 8 AM cron, sometimes before Amazon sync finished
+4. Both workflows shared a concurrency group, causing queuing issues
+
+### Fixes applied:
+1. `amazon_daily_mis.py` — Removed "items" from `--last4` fetch steps. Cuts API calls from ~400 to ~15. Uses OrderTotal + 36% COGS estimate instead. Monthly full sync still fetches items for accuracy.
+2. `amazon_daily_mis.py` — Reduced retry delays from 20 min to 1-2 min (fast enough without items fetch)
+3. `amazon_daily_sync.yml` — Reduced timeout from 90 to 20 minutes
+4. `sync_mtd.py` — Removed sys.exit(1) on partial failures. Dashboard gets updated with available data.
+5. `daily_sync.yml` — Added `workflow_run` trigger so MTD sync fires AFTER Amazon sync completes. Kept cron at 10 AM IST as fallback. Gave it its own concurrency group.
+6. `amazon_daily_sync.yml` — Changed concurrency group from shared to `amazon-sync`
+7. `keep_alive.yml` — Simplified to only check Amazon sync (MTD auto-follows via workflow_run)
+
+### Pipeline flow (after fix):
+6:00 AM IST → Amazon sync (~5-10 min) → auto-triggers MTD sync → dashboard updated
+9:00 AM IST → Backup check: if Amazon didn't run, trigger it (MTD follows automatically)
+10:00 AM IST → Fallback cron for MTD (in case workflow_run didn't fire)
+
+### Key architectural notes:
+- automation/daily_sync.py (SQLite pipeline) is NOT used by any workflow — dead code path
+- There are 3 Google Sheets involved: D2C Daily, Amazon Daily MIS, Daily MIS (product-level)
+- The dashboard.html gets data injected via JS markers (MTD_DATA_START/END, SYNC_DATA_START)
+
+### Open items:
+- Enable GitHub email notifications for workflow failures (repo Settings → Actions → Notifications)
+- Consider a weekly full sync that fetches order items for accurate COGS
+- Dead code cleanup: automation/ pipeline is unused by workflows

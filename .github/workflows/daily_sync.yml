@@ -1,17 +1,21 @@
 name: Daily MTD Sync
 
 on:
+  # Primary trigger: runs AFTER Amazon sync completes (success or failure)
+  workflow_run:
+    workflows: ["Amazon Daily Sync (Last 4 Days)"]
+    types: [completed]
   schedule:
-    # 8:00 AM IST = 2:30 AM UTC (primary trigger)
-    - cron: '30 2 * * *'
-  workflow_dispatch: # Manual trigger + backup via keep_alive.yml
+    # Fallback: 10:00 AM IST = 4:30 AM UTC (in case Amazon sync didn't trigger)
+    - cron: '30 4 * * *'
+  workflow_dispatch: # Manual trigger
 
 permissions:
   contents: write
 
 concurrency:
-  group: data-sync
-  cancel-in-progress: false
+  group: mtd-sync
+  cancel-in-progress: true
 
 jobs:
   sync:
@@ -51,9 +55,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add mtd_daily_data.json dashboard.html
           git diff --staged --quiet || git commit -m "Auto-sync MTD data $(date -u +%Y-%m-%d)"
-          # Pull again in case Amazon sync pushed while we were running
           git pull --rebase origin main
-          # Retry push up to 3 times
           for i in 1 2 3; do
             git push && break
             echo "Push attempt $i failed, pulling and retrying..."

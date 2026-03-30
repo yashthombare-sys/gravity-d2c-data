@@ -12,3 +12,11 @@ jan_orders_raw.json
 feb_orders_raw.json
 secure_458644_reports_*.csv
 BOTH SHIProket & AMAZON DATA/secure_458644_reports_*.csv
+
+# Security patterns
+credentials*.json
+*.pem
+*.key
+.DS_Store
+node_modules/
+.amazon_daily_sheet_id
