@@ -1,0 +1,26 @@
+name: Keep Alive
+
+on:
+  schedule:
+    # 5:30 AM IST = 0:00 AM UTC — runs 30 min before Amazon sync
+    - cron: '0 0 * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Keep alive ping
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          # Update a timestamp file to keep the repo active
+          echo "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > .last_alive
+          git add .last_alive
+          git diff --staged --quiet || git commit -m "keep-alive $(date -u +%Y-%m-%d)"
+          git push
