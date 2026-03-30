@@ -10,13 +10,13 @@ permissions:
   contents: write
 
 concurrency:
-  group: data-sync
+  group: amazon-sync
   cancel-in-progress: false
 
 jobs:
   sync:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 20
 
     steps:
       - name: Checkout repo

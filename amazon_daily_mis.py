@@ -862,7 +862,7 @@ def main():
         # Pushes best available data after all attempts
         end_date = yesterday
         start_date = today - timedelta(days=4)
-        RETRY_DELAYS = [20 * 60, 20 * 60]  # wait times between attempts (seconds)
+        RETRY_DELAYS = [60, 120]  # wait times between attempts (seconds) — short since we skip items now
         MAX_ATTEMPTS = 3
 
         print(f"Cron mode: fetching last 4 days ({start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')})", flush=True)
@@ -927,7 +927,11 @@ def main():
             return still_failed
 
         # ── Run all attempts ──────────────────────────────────
-        failed_steps = ["orders", "items", "fees", "traffic"]  # all steps to run
+        # Skip "items" — fetching order items per-order makes ~300-400 API calls
+        # and is the primary cause of rate-limit failures. Instead we use
+        # OrderTotal for revenue and estimate COGS at 36% (historical average).
+        # The monthly full sync (no --last4 flag) still fetches items for accuracy.
+        failed_steps = ["orders", "fees", "traffic"]
 
         for attempt in range(MAX_ATTEMPTS):
             print(f"\n{'='*60}", flush=True)

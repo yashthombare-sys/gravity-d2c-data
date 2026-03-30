@@ -501,9 +501,11 @@ def main():
     # Inject into dashboard.html
     inject_into_dashboard(output)
 
-    # Exit with error if there were failures (so GitHub Actions marks the run as failed)
+    # Don't exit(1) on partial failures — the dashboard and JSON have already been
+    # updated with whatever data we got. Exiting with error prevents the commit step
+    # from saving the partial data, which is worse than having partial data.
     if errors:
-        sys.exit(1)
+        print("   Partial data saved — dashboard updated with available data")
 
 
 def inject_into_dashboard(data):
