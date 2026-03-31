@@ -522,6 +522,15 @@
     </div>
   </div>
 
+  <!-- Shiprocket Fulfillment & TAT -->
+  <div class="section" id="srSection" style="display:none;">
+    <div class="section-title">Shiprocket Fulfillment & TAT</div>
+    <div class="kpi-row" id="srKpiRow" style="grid-template-columns:repeat(5,1fr);gap:8px;"></div>
+    <div class="charts-grid" style="grid-template-columns:1fr;margin-top:14px;">
+      <div class="chart-card"><h3>Daily Fulfillment Trend</h3><canvas id="srTrendChart" height="260"></canvas></div>
+    </div>
+  </div>
+
   <!-- Daily Table -->
   <div class="section">
     <div class="section-title">Daily Breakdown</div>
@@ -2413,6 +2422,10 @@ function renderMTD() {
     tableHTML += '</tr>';
   });
   tbody.innerHTML = tableHTML;
+
+  // Render Shiprocket fulfillment section
+  renderShiprocket();
+
   } catch(e) { console.error('renderMTD error:', e); document.title = 'ERR: ' + e.message; }
 }
 
@@ -2421,6 +2434,90 @@ window._mtdExpanded = null;
 function toggleMtdKpi(id) {
   window._mtdExpanded = (window._mtdExpanded === id) ? null : id;
   renderMTD();
+}
+
+// ── Shiprocket Fulfillment & TAT ──
+let _srChart = null;
+function renderShiprocket() {
+  try {
+    const sr = (typeof MTD_DATA !== 'undefined' && MTD_DATA.shiprocket) ? MTD_DATA.shiprocket : null;
+    const section = document.getElementById('srSection');
+    if (!sr || Object.keys(sr).length === 0) {
+      if (section) section.style.display = 'none';
+      return;
+    }
+    section.style.display = '';
+
+    const dates = Object.keys(sr).sort();
+    const curMonth = (document.getElementById('mtdDate').value || dates[dates.length-1]).substring(0,7);
+    const monthDates = dates.filter(d => d.startsWith(curMonth)).sort();
+
+    if (monthDates.length === 0) { section.style.display = 'none'; return; }
+
+    // Today = last date with data
+    const todayKey = monthDates[monthDates.length - 1];
+    const todayData = sr[todayKey] || {};
+
+    // MTD totals
+    let mtdNew = 0, mtdNewVal = 0, mtdShipped = 0, mtdShippedVal = 0;
+    let mtdDelivered = 0, mtdDeliveredVal = 0, mtdInTransit = 0, mtdRto = 0;
+    let tatSum = 0, tatDays = 0;
+
+    monthDates.forEach(d => {
+      const day = sr[d];
+      mtdNew += day.new_orders || 0;
+      mtdNewVal += day.new_value || 0;
+      mtdShipped += day.shipped || 0;
+      mtdShippedVal += day.shipped_value || 0;
+      mtdDelivered += day.delivered || 0;
+      mtdDeliveredVal += day.delivered_value || 0;
+      mtdInTransit += day.in_transit || 0;
+      mtdRto += day.rto || 0;
+      if (day.avg_tat_days > 0) { tatSum += day.avg_tat_days; tatDays++; }
+    });
+
+    const monthAvgTat = tatDays > 0 ? (tatSum / tatDays).toFixed(1) : '—';
+    const n = monthDates.length;
+
+    // KPI row
+    const kpiEl = document.getElementById('srKpiRow');
+    let h = '';
+    h += '<div class="kpi"><div class="kpi-label">NEW ORDERS (MTD)</div><div class="kpi-value">' + mtdNew.toLocaleString() + '</div><div class="kpi-per">' + fmt(mtdNewVal) + ' | ' + Math.round(mtdNew/n) + '/day</div></div>';
+    h += '<div class="kpi"><div class="kpi-label">SHIPPED (MTD)</div><div class="kpi-value">' + mtdShipped.toLocaleString() + '</div><div class="kpi-per">' + fmt(mtdShippedVal) + ' | ' + Math.round(mtdShipped/n) + '/day</div></div>';
+    h += '<div class="kpi"><div class="kpi-label">DELIVERED (MTD)</div><div class="kpi-value positive">' + mtdDelivered.toLocaleString() + '</div><div class="kpi-per">' + fmt(mtdDeliveredVal) + ' | ' + (mtdNew>0?(mtdDelivered/mtdNew*100).toFixed(1)+'% rate':'') + '</div></div>';
+    h += '<div class="kpi"><div class="kpi-label">IN TRANSIT</div><div class="kpi-value">' + mtdInTransit.toLocaleString() + '</div><div class="kpi-per">RTO: ' + mtdRto.toLocaleString() + '</div></div>';
+    h += '<div class="kpi"><div class="kpi-label">AVG TAT</div><div class="kpi-value ' + (parseFloat(monthAvgTat)<=5?'positive':'negative') + '">' + monthAvgTat + ' days</div><div class="kpi-per">creation → delivery</div></div>';
+    kpiEl.innerHTML = h;
+
+    // Trend chart
+    const labels = monthDates.map(d => { const p = d.split('-'); return parseInt(p[2]) + '/' + parseInt(p[1]); });
+    const newArr = monthDates.map(d => (sr[d]||{}).new_orders||0);
+    const shipArr = monthDates.map(d => (sr[d]||{}).shipped||0);
+    const delArr = monthDates.map(d => (sr[d]||{}).delivered||0);
+
+    if (_srChart) { _srChart.destroy(); _srChart = null; }
+    const ctx = document.getElementById('srTrendChart').getContext('2d');
+    _srChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [
+          { label: 'New Orders', data: newArr, borderColor: '#fcbb13', backgroundColor: 'rgba(252,187,19,0.08)', borderWidth: 2, tension: 0.3, pointRadius: 3, fill: true },
+          { label: 'Shipped', data: shipArr, borderColor: '#4a90d9', backgroundColor: 'transparent', borderWidth: 2, tension: 0.3, pointRadius: 2, borderDash: [4,2] },
+          { label: 'Delivered', data: delArr, borderColor: '#27ae60', backgroundColor: 'rgba(39,174,96,0.06)', borderWidth: 2, tension: 0.3, pointRadius: 3, fill: true },
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { labels: { color: '#999', font: { size: 11 } } } },
+        scales: {
+          x: { ticks: { color: '#888', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.04)' } },
+          y: { beginAtZero: true, ticks: { color: '#888', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.06)' } }
+        }
+      }
+    });
+
+  } catch(e) { console.error('renderShiprocket error:', e); }
 }
 
 // ── Custom Calendar with Range Selection ──
