@@ -36,7 +36,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install gspread google-auth python-dateutil cryptography
+        run: pip install gspread google-auth python-dateutil cryptography requests
 
       - name: Write Google credentials
         env:
@@ -48,6 +48,12 @@ jobs:
 
       - name: Run MTD sync
         run: python3 sync_mtd.py
+
+      - name: Run Shiprocket fulfillment sync
+        env:
+          SHIPROCKET_EMAIL: ${{ secrets.SHIPROCKET_EMAIL }}
+          SHIPROCKET_PASSWORD: ${{ secrets.SHIPROCKET_PASSWORD }}
+        run: python3 shiprocket_sync.py
 
       - name: Encrypt dashboard for GitHub Pages
         env:
