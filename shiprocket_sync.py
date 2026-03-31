@@ -10,11 +10,13 @@ import os, sys, json, re, requests
 from datetime import datetime, timedelta, date
 from collections import defaultdict
 
+# Force unbuffered output (for GitHub Actions log visibility)
+sys.stdout.reconfigure(line_buffering=True)
+
 # Add automation/ to path for imports
 BASE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(BASE, "automation"))
 
-from shiprocket_fetch import fetch_orders
 from config import classify_status, load_env
 
 API_BASE = "https://apiv2.shiprocket.in/v1/external"
@@ -56,15 +58,67 @@ def build_headers(token):
 
 
 def fetch_all_orders(headers, month_start, today):
-    """Fetch orders from 14 days before month start through today."""
-    lookback = month_start - timedelta(days=14)
-    date_from = lookback.strftime("%Y-%m-%d")
+    """Fetch orders for current month with progress logging."""
+    date_from = month_start.strftime("%Y-%m-%d")
     date_to = today.strftime("%Y-%m-%d")
 
-    print(f"  Fetching orders {date_from} to {date_to}...")
-    orders = fetch_orders(date_from, date_to, headers=headers)
-    print(f"  {len(orders)} orders fetched")
-    return orders
+    print(f"  Fetching orders {date_from} to {date_to}...", flush=True)
+
+    all_orders = []
+    page = 1
+    per_page = 200
+
+    while True:
+        url = f"{API_BASE}/orders?per_page={per_page}&page={page}&from={date_from}&to={date_to}"
+        try:
+            resp = requests.get(url, headers=headers, timeout=20)
+        except requests.exceptions.RequestException as e:
+            print(f"  Network error on page {page}: {e}", flush=True)
+            break
+
+        if resp.status_code == 401:
+            raise PermissionError("Shiprocket token expired/invalid.")
+        if resp.status_code == 503:
+            print(f"  503 on page {page}, retrying...", flush=True)
+            import time; time.sleep(3)
+            continue
+        if resp.status_code != 200:
+            print(f"  API error {resp.status_code} on page {page}", flush=True)
+            break
+
+        data = resp.json()
+
+        # Handle nested response structure
+        if isinstance(data, dict) and "data" in data:
+            orders = data["data"]
+            if isinstance(orders, dict):
+                orders = orders.get("data", orders.get("orders", []))
+            if not isinstance(orders, list):
+                orders = []
+        elif isinstance(data, list):
+            orders = data
+        else:
+            orders = []
+
+        if not orders:
+            break
+
+        all_orders.extend(orders)
+        print(f"  Page {page}: +{len(orders)} orders ({len(all_orders)} total)", flush=True)
+
+        # Pagination check
+        if isinstance(data, dict) and "data" in data and isinstance(data["data"], dict):
+            last_page = data["data"].get("last_page", 0)
+            if last_page and page >= last_page:
+                break
+
+        if len(orders) < per_page:
+            break
+
+        page += 1
+
+    print(f"  {len(all_orders)} orders fetched", flush=True)
+    return all_orders
 
 
 def parse_order_date(order, field="created_at"):
@@ -244,7 +298,7 @@ def build_daily_data(orders, month_start, today):
             "avg_tat_days": avg_tat,
         }
 
-    print(f"  Skipped: {skipped}")
+    print(f"  Skipped: {skipped}", flush=True)
     return result
 
 
