@@ -17,7 +17,7 @@ sys.stdout.reconfigure(line_buffering=True)
 BASE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(BASE, "automation"))
 
-from config import classify_status, load_env
+from config import classify_status, classify_product, is_spare_part, CATS, load_env
 
 API_BASE = "https://apiv2.shiprocket.in/v1/external"
 OUTPUT_FILE = os.path.join(BASE, "mtd_daily_data.json")
@@ -207,18 +207,74 @@ def get_order_value(order):
     return value
 
 
-def build_daily_data(orders, month_start, today):
-    """
-    Aggregate orders into daily fulfillment data.
-    Only includes days within the current month.
-    """
-    daily = defaultdict(lambda: {
+def _empty_bucket():
+    return {
         "new_orders": 0, "new_value": 0.0,
         "shipped": 0, "shipped_value": 0.0,
         "delivered": 0, "delivered_value": 0.0,
         "in_transit": 0, "rto": 0, "cancelled": 0,
         "tat_total_days": 0.0, "tat_count": 0,
-    })
+    }
+
+
+def _add_to_bucket(bucket, status, order_value):
+    bucket["new_orders"] += 1
+    bucket["new_value"] += order_value
+    if status in ("delivered", "in_transit", "rto"):
+        bucket["shipped"] += 1
+        bucket["shipped_value"] += order_value
+    if status == "delivered":
+        bucket["delivered"] += 1
+        bucket["delivered_value"] += order_value
+    elif status == "in_transit":
+        bucket["in_transit"] += 1
+    elif status == "rto":
+        bucket["rto"] += 1
+    elif status == "cancelled":
+        bucket["cancelled"] += 1
+
+
+def _finalize_bucket(d):
+    avg_tat = round(d["tat_total_days"] / d["tat_count"], 1) if d["tat_count"] > 0 else 0
+    return {
+        "new_orders": d["new_orders"],
+        "new_value": round(d["new_value"], 2),
+        "shipped": d["shipped"],
+        "shipped_value": round(d["shipped_value"], 2),
+        "delivered": d["delivered"],
+        "delivered_value": round(d["delivered_value"], 2),
+        "in_transit": d["in_transit"],
+        "rto": d["rto"],
+        "cancelled": d["cancelled"],
+        "avg_tat_days": avg_tat,
+    }
+
+
+def _get_order_product(order):
+    """Identify the primary product in an order using classify_product()."""
+    products = order.get("products", order.get("order_items", []))
+    if products and isinstance(products, list):
+        for p in products:
+            name = p.get("name", p.get("product_name", p.get("sku", "")))
+            classified = classify_product(name)
+            if classified and not is_spare_part(name):
+                return classified
+    # Try channel_order_id or product_name at top level
+    for field in ("product_name", "channel_order_id", "customer_name"):
+        val = order.get(field, "")
+        if val:
+            classified = classify_product(str(val))
+            if classified:
+                return classified
+    return "Other"
+
+
+def build_daily_data(orders, month_start, today):
+    """
+    Aggregate orders into daily fulfillment data with per-product breakdown.
+    Only includes days within the current month.
+    """
+    daily = defaultdict(lambda: {**_empty_bucket(), "products": defaultdict(_empty_bucket)})
 
     month_str = month_start.strftime("%Y-%m")
     skipped = {"reverse": 0, "spare": 0, "no_date": 0}
@@ -235,7 +291,6 @@ def build_daily_data(orders, month_start, today):
             skipped["no_date"] += 1
             continue
 
-        # Only process orders created this month (for new_orders count)
         created_str = created.strftime("%Y-%m-%d")
         created_month = created.strftime("%Y-%m")
 
@@ -246,27 +301,13 @@ def build_daily_data(orders, month_start, today):
 
         order_value = get_order_value(order)
         delivered_date = get_delivered_date(order)
+        product = _get_order_product(order)
 
         # Count as "new order" on its creation date (this month only)
         if created_month == month_str:
             day = daily[created_str]
-            day["new_orders"] += 1
-            day["new_value"] += order_value
-
-            # Shipped = any order that has moved beyond "new" (delivered, in_transit, rto)
-            if status in ("delivered", "in_transit", "rto"):
-                day["shipped"] += 1
-                day["shipped_value"] += order_value
-
-            if status == "delivered":
-                day["delivered"] += 1
-                day["delivered_value"] += order_value
-            elif status == "in_transit":
-                day["in_transit"] += 1
-            elif status == "rto":
-                day["rto"] += 1
-            elif status == "cancelled":
-                day["cancelled"] += 1
+            _add_to_bucket(day, status, order_value)
+            _add_to_bucket(day["products"][product], status, order_value)
 
         # TAT: if delivered this month, compute TAT regardless of creation month
         if status == "delivered" and delivered_date:
@@ -274,29 +315,23 @@ def build_daily_data(orders, month_start, today):
             delivered_month = delivered_date.strftime("%Y-%m")
             if delivered_month == month_str:
                 tat_days = (delivered_date - created).days
-                if 0 <= tat_days <= 30:  # sanity check
-                    # Attribute TAT to the delivery date
+                if 0 <= tat_days <= 30:
                     day = daily[delivered_str]
                     day["tat_total_days"] += tat_days
                     day["tat_count"] += 1
+                    day["products"][product]["tat_total_days"] += tat_days
+                    day["products"][product]["tat_count"] += 1
 
-    # Build final output with avg_tat_days
+    # Build final output
     result = {}
     for dt_str in sorted(daily.keys()):
         d = daily[dt_str]
-        avg_tat = round(d["tat_total_days"] / d["tat_count"], 1) if d["tat_count"] > 0 else 0
-        result[dt_str] = {
-            "new_orders": d["new_orders"],
-            "new_value": round(d["new_value"], 2),
-            "shipped": d["shipped"],
-            "shipped_value": round(d["shipped_value"], 2),
-            "delivered": d["delivered"],
-            "delivered_value": round(d["delivered_value"], 2),
-            "in_transit": d["in_transit"],
-            "rto": d["rto"],
-            "cancelled": d["cancelled"],
-            "avg_tat_days": avg_tat,
-        }
+        entry = _finalize_bucket(d)
+        # Per-product breakdown
+        entry["products"] = {}
+        for pname, pbucket in d["products"].items():
+            entry["products"][pname] = _finalize_bucket(pbucket)
+        result[dt_str] = entry
 
     print(f"  Skipped: {skipped}", flush=True)
     return result

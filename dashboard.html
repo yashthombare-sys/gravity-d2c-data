@@ -566,11 +566,57 @@
 
 <!-- ═══════ FULFILLMENT VIEW ═══════ -->
 <div class="container" id="srView" style="display:none;">
+  <!-- Filters -->
+  <div class="filter-bar">
+    <div class="filter-group" style="position:relative;">
+      <span class="filter-label">Month</span>
+      <select class="filter-select" id="srMonth" onchange="renderShiprocket()"></select>
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">Brand</span>
+      <select class="filter-select" id="srBrand" onchange="onSrBrandChange()">
+        <option value="all">All Brands</option>
+        <option value="clapstore">ClapStore (Busy Board)</option>
+        <option value="sooperbrains">SooperBrains (STEM)</option>
+        <option value="clapcuddle">ClapCuddle (Soft Toy)</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">Category</span>
+      <select class="filter-select" id="srCategory" onchange="onSrCategoryChange()">
+        <option value="all">All Categories</option>
+        <option value="busyboard">Busy Board</option>
+        <option value="stem">STEM</option>
+        <option value="softtoy">Soft Toy</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">Product</span>
+      <select class="filter-select" id="srProduct" onchange="renderShiprocket()">
+        <option value="all">All Products</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <span class="filter-label" style="opacity:0.5" id="srSyncLabel">Last synced: —</span>
+    </div>
+  </div>
+
   <div class="section" id="srSection">
     <div class="section-title">Shiprocket Fulfillment & TAT</div>
     <div class="kpi-row" id="srKpiRow" style="grid-template-columns:repeat(5,1fr);gap:8px;"></div>
     <div class="charts-grid" style="grid-template-columns:1fr;margin-top:14px;">
       <div class="chart-card"><h3>Daily Fulfillment Trend</h3><canvas id="srTrendChart" height="260"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Daily Table -->
+  <div class="section">
+    <div class="section-title">Daily Breakdown</div>
+    <div class="table-wrap">
+      <table><thead><tr>
+        <th>Date</th><th>New Orders</th><th>New Value</th><th>Shipped</th>
+        <th>Delivered</th><th>In Transit</th><th>RTO</th><th>Cancelled</th><th>Avg TAT</th>
+      </tr></thead><tbody id="srTableBody"></tbody></table>
     </div>
   </div>
 </div>
@@ -2662,6 +2708,79 @@ function toggleMtdKpi(id) {
 
 // ── Shiprocket Fulfillment & TAT ──
 let _srChart = null;
+let _srMonthInit = false;
+
+// Brand → category mapping
+const SR_BRAND_CAT = { clapstore: 'busyboard', sooperbrains: 'stem', clapcuddle: 'softtoy' };
+const SR_CAT_BRAND = { busyboard: 'clapstore', stem: 'sooperbrains', softtoy: 'clapcuddle' };
+// Product → category (from CATS in config.py, mirrored in JS)
+const SR_CATS = typeof CATS !== 'undefined' ? CATS : {};
+
+function onSrBrandChange() {
+  const brand = document.getElementById('srBrand').value;
+  const catSel = document.getElementById('srCategory');
+  if (brand !== 'all') catSel.value = SR_BRAND_CAT[brand] || 'all';
+  else catSel.value = 'all';
+  updateSrProductOptions();
+  renderShiprocket();
+}
+
+function onSrCategoryChange() {
+  const cat = document.getElementById('srCategory').value;
+  const brandSel = document.getElementById('srBrand');
+  if (cat !== 'all') brandSel.value = SR_CAT_BRAND[cat] || 'all';
+  else brandSel.value = 'all';
+  updateSrProductOptions();
+  renderShiprocket();
+}
+
+function updateSrProductOptions() {
+  const sr = (typeof MTD_DATA !== 'undefined' && MTD_DATA.shiprocket) ? MTD_DATA.shiprocket : null;
+  if (!sr) return;
+  const cat = document.getElementById('srCategory').value;
+  const sel = document.getElementById('srProduct');
+  const prev = sel.value;
+
+  // Collect all products across all days
+  const prods = new Set();
+  Object.values(sr).forEach(day => {
+    if (day.products) Object.keys(day.products).forEach(p => prods.add(p));
+  });
+
+  let opts = '<option value="all">All Products</option>';
+  const sorted = [...prods].filter(p => {
+    if (cat === 'all') return true;
+    return (SR_CATS[p] || '') === cat;
+  }).sort();
+  sorted.forEach(p => { opts += '<option value="' + p + '">' + p + '</option>'; });
+  sel.innerHTML = opts;
+  if ([...sel.options].some(o => o.value === prev)) sel.value = prev;
+}
+
+function _srGetDayData(dayRaw, product, category) {
+  // If filtering by product, return that product's data
+  if (product !== 'all' && dayRaw.products && dayRaw.products[product]) {
+    return dayRaw.products[product];
+  }
+  // If filtering by category, sum products in that category
+  if (category !== 'all' && dayRaw.products) {
+    const agg = { new_orders:0,new_value:0,shipped:0,shipped_value:0,delivered:0,delivered_value:0,in_transit:0,rto:0,cancelled:0,avg_tat_days:0,_tatSum:0,_tatN:0 };
+    for (const [p, pd] of Object.entries(dayRaw.products)) {
+      if ((SR_CATS[p] || '') === category || (p === 'Other' && category === 'all')) continue;
+      if ((SR_CATS[p] || '') !== category) continue;
+      agg.new_orders += pd.new_orders||0; agg.new_value += pd.new_value||0;
+      agg.shipped += pd.shipped||0; agg.shipped_value += pd.shipped_value||0;
+      agg.delivered += pd.delivered||0; agg.delivered_value += pd.delivered_value||0;
+      agg.in_transit += pd.in_transit||0; agg.rto += pd.rto||0; agg.cancelled += pd.cancelled||0;
+      if (pd.avg_tat_days > 0) { agg._tatSum += pd.avg_tat_days; agg._tatN++; }
+    }
+    agg.avg_tat_days = agg._tatN > 0 ? +(agg._tatSum / agg._tatN).toFixed(1) : 0;
+    return agg;
+  }
+  // No filter — return aggregate
+  return dayRaw;
+}
+
 function renderShiprocket() {
   try {
     const sr = (typeof MTD_DATA !== 'undefined' && MTD_DATA.shiprocket) ? MTD_DATA.shiprocket : null;
@@ -2671,28 +2790,46 @@ function renderShiprocket() {
       return;
     }
 
-    const dates = Object.keys(sr).sort();
-    const mtdDateVal = document.getElementById('mtdDate').value || '';
-    // Use MTD date month if it has shiprocket data, otherwise use latest shiprocket month
-    const mtdMonth = mtdDateVal.substring(0,7);
-    const latestMonth = dates[dates.length-1].substring(0,7);
-    const hasDataForMtdMonth = mtdMonth && dates.some(d => d.startsWith(mtdMonth));
-    const curMonth = hasDataForMtdMonth ? mtdMonth : latestMonth;
-    const monthDates = dates.filter(d => d.startsWith(curMonth)).sort();
+    const allDates = Object.keys(sr).sort();
 
-    if (monthDates.length === 0) { section.innerHTML = '<div class="section-title">Shiprocket Fulfillment & TAT</div><p style="color:var(--muted);text-align:center;padding:40px;">No fulfillment data for this month</p>'; return; }
+    // Populate month selector once
+    if (!_srMonthInit) {
+      const months = [...new Set(allDates.map(d => d.substring(0,7)))].sort();
+      const sel = document.getElementById('srMonth');
+      sel.innerHTML = months.map(m => {
+        const [y, mo] = m.split('-');
+        const label = new Date(y, mo-1).toLocaleString('en', { month: 'short', year: 'numeric' });
+        return '<option value="' + m + '">' + label + '</option>';
+      }).join('');
+      sel.value = months[months.length - 1];
+      _srMonthInit = true;
+      updateSrProductOptions();
+    }
 
-    // Today = last date with data
-    const todayKey = monthDates[monthDates.length - 1];
-    const todayData = sr[todayKey] || {};
+    // Sync label
+    if (MTD_DATA.shiprocket_synced || MTD_DATA.last_synced) {
+      const ts = MTD_DATA.shiprocket_synced || MTD_DATA.last_synced;
+      document.getElementById('srSyncLabel').textContent = 'Last synced: ' + ts.replace('T', ' ');
+    }
 
-    // MTD totals
+    const curMonth = document.getElementById('srMonth').value;
+    const category = document.getElementById('srCategory').value;
+    const product = document.getElementById('srProduct').value;
+    const monthDates = allDates.filter(d => d.startsWith(curMonth)).sort();
+
+    if (monthDates.length === 0) {
+      section.innerHTML = '<div class="section-title">Shiprocket Fulfillment & TAT</div><p style="color:var(--muted);text-align:center;padding:40px;">No fulfillment data for this month</p>';
+      document.getElementById('srTableBody').innerHTML = '';
+      return;
+    }
+
+    // MTD totals (filtered)
     let mtdNew = 0, mtdNewVal = 0, mtdShipped = 0, mtdShippedVal = 0;
-    let mtdDelivered = 0, mtdDeliveredVal = 0, mtdInTransit = 0, mtdRto = 0;
+    let mtdDelivered = 0, mtdDeliveredVal = 0, mtdInTransit = 0, mtdRto = 0, mtdCancelled = 0;
     let tatSum = 0, tatDays = 0;
 
     monthDates.forEach(d => {
-      const day = sr[d];
+      const day = _srGetDayData(sr[d], product, category);
       mtdNew += day.new_orders || 0;
       mtdNewVal += day.new_value || 0;
       mtdShipped += day.shipped || 0;
@@ -2701,6 +2838,7 @@ function renderShiprocket() {
       mtdDeliveredVal += day.delivered_value || 0;
       mtdInTransit += day.in_transit || 0;
       mtdRto += day.rto || 0;
+      mtdCancelled += day.cancelled || 0;
       if (day.avg_tat_days > 0) { tatSum += day.avg_tat_days; tatDays++; }
     });
 
@@ -2717,11 +2855,11 @@ function renderShiprocket() {
     h += '<div class="kpi"><div class="kpi-label">AVG TAT</div><div class="kpi-value ' + (parseFloat(monthAvgTat)<=5?'positive':'negative') + '">' + monthAvgTat + ' days</div><div class="kpi-per">creation → delivery</div></div>';
     kpiEl.innerHTML = h;
 
-    // Trend chart
+    // Trend chart (filtered)
     const labels = monthDates.map(d => { const p = d.split('-'); return parseInt(p[2]) + '/' + parseInt(p[1]); });
-    const newArr = monthDates.map(d => (sr[d]||{}).new_orders||0);
-    const shipArr = monthDates.map(d => (sr[d]||{}).shipped||0);
-    const delArr = monthDates.map(d => (sr[d]||{}).delivered||0);
+    const newArr = monthDates.map(d => _srGetDayData(sr[d], product, category).new_orders || 0);
+    const shipArr = monthDates.map(d => _srGetDayData(sr[d], product, category).shipped || 0);
+    const delArr = monthDates.map(d => _srGetDayData(sr[d], product, category).delivered || 0);
 
     if (_srChart) { _srChart.destroy(); _srChart = null; }
     const ctx = document.getElementById('srTrendChart').getContext('2d');
@@ -2744,6 +2882,27 @@ function renderShiprocket() {
         }
       }
     });
+
+    // Daily Table
+    const tbody = document.getElementById('srTableBody');
+    let tableHTML = '';
+    monthDates.slice().reverse().forEach(dt => {
+      const day = _srGetDayData(sr[dt], product, category);
+      const tatStr = day.avg_tat_days > 0 ? day.avg_tat_days + 'd' : '—';
+      const tatCls = day.avg_tat_days > 0 ? (day.avg_tat_days <= 5 ? 'positive' : 'negative') : '';
+      tableHTML += '<tr>';
+      tableHTML += '<td style="font-weight:600">' + dt.split('-').reverse().join('/') + '</td>';
+      tableHTML += '<td>' + (day.new_orders||0) + '</td>';
+      tableHTML += '<td>' + fmt(day.new_value||0) + '</td>';
+      tableHTML += '<td>' + (day.shipped||0) + '</td>';
+      tableHTML += '<td class="positive">' + (day.delivered||0) + '</td>';
+      tableHTML += '<td>' + (day.in_transit||0) + '</td>';
+      tableHTML += '<td class="negative">' + (day.rto||0) + '</td>';
+      tableHTML += '<td>' + (day.cancelled||0) + '</td>';
+      tableHTML += '<td class="' + tatCls + '">' + tatStr + '</td>';
+      tableHTML += '</tr>';
+    });
+    tbody.innerHTML = tableHTML;
 
   } catch(e) { console.error('renderShiprocket error:', e); }
 }
