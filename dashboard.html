@@ -2672,10 +2672,15 @@ function renderShiprocket() {
     }
 
     const dates = Object.keys(sr).sort();
-    const curMonth = (document.getElementById('mtdDate').value || dates[dates.length-1]).substring(0,7);
+    const mtdDateVal = document.getElementById('mtdDate').value || '';
+    // Use MTD date month if it has shiprocket data, otherwise use latest shiprocket month
+    const mtdMonth = mtdDateVal.substring(0,7);
+    const latestMonth = dates[dates.length-1].substring(0,7);
+    const hasDataForMtdMonth = mtdMonth && dates.some(d => d.startsWith(mtdMonth));
+    const curMonth = hasDataForMtdMonth ? mtdMonth : latestMonth;
     const monthDates = dates.filter(d => d.startsWith(curMonth)).sort();
 
-    if (monthDates.length === 0) { section.style.display = 'none'; return; }
+    if (monthDates.length === 0) { section.innerHTML = '<div class="section-title">Shiprocket Fulfillment & TAT</div><p style="color:var(--muted);text-align:center;padding:40px;">No fulfillment data for this month</p>'; return; }
 
     // Today = last date with data
     const todayKey = monthDates[monthDates.length - 1];
