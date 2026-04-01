@@ -570,7 +570,15 @@
   <div class="filter-bar">
     <div class="filter-group" style="position:relative;">
       <span class="filter-label">Month</span>
-      <select class="filter-select" id="srMonth" onchange="renderShiprocket()"></select>
+      <select class="filter-select" id="srMonth" onchange="onSrMonthChange()"></select>
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">From</span>
+      <input type="date" class="filter-select" id="srDateFrom" onchange="onSrDateChange()" style="min-width:130px;">
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">To</span>
+      <input type="date" class="filter-select" id="srDateTo" onchange="onSrDateChange()" style="min-width:130px;">
     </div>
     <div class="filter-group">
       <span class="filter-label">Brand</span>
@@ -596,9 +604,13 @@
         <option value="all">All Products</option>
       </select>
     </div>
-    <div class="filter-group">
-      <span class="filter-label" style="opacity:0.5" id="srSyncLabel">Last synced: —</span>
-    </div>
+  </div>
+  <!-- Sync Info Bar -->
+  <div id="srSyncBar" style="display:flex;align-items:center;gap:16px;margin-bottom:14px;padding:8px 14px;background:var(--card);border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--muted);flex-wrap:wrap;">
+    <span id="srSyncLabel">Last synced: —</span>
+    <span id="srDataRange" style="opacity:0.7;">Data: —</span>
+    <span id="srNextSync" style="opacity:0.7;">Next sync: ~10:00 AM IST daily</span>
+    <span id="srPendingOrders" style="color:#fcbb13;font-weight:600;display:none;"></span>
   </div>
 
   <div class="section" id="srSection">
@@ -2709,12 +2721,51 @@ function toggleMtdKpi(id) {
 // ── Shiprocket Fulfillment & TAT ──
 let _srChart = null;
 let _srMonthInit = false;
+let _srDateCustom = false; // true if user manually changed From/To
 
 // Brand → category mapping
 const SR_BRAND_CAT = { clapstore: 'busyboard', sooperbrains: 'stem', clapcuddle: 'softtoy' };
 const SR_CAT_BRAND = { busyboard: 'clapstore', stem: 'sooperbrains', softtoy: 'clapcuddle' };
 // Product → category (from CATS in config.py, mirrored in JS)
 const SR_CATS = typeof CATS !== 'undefined' ? CATS : {};
+
+function onSrMonthChange() {
+  // When month dropdown changes, auto-set From/To to that month's range
+  _srDateCustom = false;
+  const m = document.getElementById('srMonth').value;
+  if (m === 'custom') return; // don't change dates
+  const sr = (typeof MTD_DATA !== 'undefined' && MTD_DATA.shiprocket) ? MTD_DATA.shiprocket : null;
+  if (!sr) return;
+  const monthDates = Object.keys(sr).filter(d => d.startsWith(m)).sort();
+  if (monthDates.length > 0) {
+    document.getElementById('srDateFrom').value = monthDates[0];
+    document.getElementById('srDateTo').value = monthDates[monthDates.length - 1];
+  }
+  renderShiprocket();
+}
+
+function onSrDateChange() {
+  // When user manually changes dates, set month to "Custom" if dates span multiple months
+  const from = document.getElementById('srDateFrom').value;
+  const to = document.getElementById('srDateTo').value;
+  if (!from || !to) return;
+  const fromMonth = from.substring(0, 7);
+  const toMonth = to.substring(0, 7);
+  const sel = document.getElementById('srMonth');
+  if (fromMonth === toMonth) {
+    // Single month — sync dropdown
+    if ([...sel.options].some(o => o.value === fromMonth)) sel.value = fromMonth;
+    _srDateCustom = false;
+  } else {
+    // Cross-month — add/select "Custom" option
+    _srDateCustom = true;
+    if (![...sel.options].some(o => o.value === 'custom')) {
+      sel.innerHTML += '<option value="custom">Custom Range</option>';
+    }
+    sel.value = 'custom';
+  }
+  renderShiprocket();
+}
 
 function onSrBrandChange() {
   const brand = document.getElementById('srBrand').value;
@@ -2757,6 +2808,42 @@ function updateSrProductOptions() {
   if ([...sel.options].some(o => o.value === prev)) sel.value = prev;
 }
 
+function updateSrSyncInfo() {
+  const sr = (typeof MTD_DATA !== 'undefined' && MTD_DATA.shiprocket) ? MTD_DATA.shiprocket : null;
+  if (!sr) return;
+
+  // Last synced timestamp
+  const ts = MTD_DATA.shiprocket_synced || MTD_DATA.last_synced || '';
+  if (ts) {
+    const syncDate = new Date(ts.replace(' ', 'T'));
+    const now = new Date();
+    const hoursAgo = Math.round((now - syncDate) / 3600000);
+    let agoStr = '';
+    if (hoursAgo < 1) agoStr = 'just now';
+    else if (hoursAgo < 24) agoStr = hoursAgo + 'h ago';
+    else agoStr = Math.round(hoursAgo / 24) + 'd ago';
+    document.getElementById('srSyncLabel').textContent = 'Last synced: ' + ts.replace('T', ' ') + ' (' + agoStr + ')';
+  }
+
+  // Data range
+  const allDates = Object.keys(sr).sort();
+  if (allDates.length > 0) {
+    const first = allDates[0].split('-').reverse().join('/');
+    const last = allDates[allDates.length - 1].split('-').reverse().join('/');
+    document.getElementById('srDataRange').textContent = 'Data: ' + first + ' to ' + last + ' (' + allDates.length + ' days)';
+  }
+
+  // Pending orders indicator
+  const lastDate = allDates[allDates.length - 1];
+  const today = new Date().toISOString().split('T')[0];
+  if (lastDate < today) {
+    const missing = Math.round((new Date(today) - new Date(lastDate)) / 86400000);
+    const el = document.getElementById('srPendingOrders');
+    el.textContent = missing + ' day' + (missing > 1 ? 's' : '') + ' of orders pending sync';
+    el.style.display = '';
+  }
+}
+
 function _srGetDayData(dayRaw, product, category) {
   // If filtering by product, return that product's data
   if (product !== 'all' && dayRaw.products && dayRaw.products[product]) {
@@ -2791,7 +2878,7 @@ function renderShiprocket() {
 
     const allDates = Object.keys(sr).sort();
 
-    // Populate month selector once
+    // Populate month selector and date inputs once
     if (!_srMonthInit) {
       const months = [...new Set(allDates.map(d => d.substring(0,7)))].sort();
       const sel = document.getElementById('srMonth');
@@ -2801,28 +2888,35 @@ function renderShiprocket() {
         return '<option value="' + m + '">' + label + '</option>';
       }).join('');
       sel.value = months[months.length - 1];
+      // Set date inputs to latest month's range
+      const latestMonth = months[months.length - 1];
+      const latestDates = allDates.filter(d => d.startsWith(latestMonth));
+      document.getElementById('srDateFrom').value = latestDates[0];
+      document.getElementById('srDateTo').value = latestDates[latestDates.length - 1];
+      // Set min/max for date inputs
+      document.getElementById('srDateFrom').min = allDates[0];
+      document.getElementById('srDateFrom').max = allDates[allDates.length - 1];
+      document.getElementById('srDateTo').min = allDates[0];
+      document.getElementById('srDateTo').max = allDates[allDates.length - 1];
       _srMonthInit = true;
       updateSrProductOptions();
+      updateSrSyncInfo();
     }
 
-    // Sync label
-    if (MTD_DATA.shiprocket_synced || MTD_DATA.last_synced) {
-      const ts = MTD_DATA.shiprocket_synced || MTD_DATA.last_synced;
-      document.getElementById('srSyncLabel').textContent = 'Last synced: ' + ts.replace('T', ' ');
-    }
-
-    const curMonth = document.getElementById('srMonth').value;
+    // Get date range from inputs
+    const dateFrom = document.getElementById('srDateFrom').value;
+    const dateTo = document.getElementById('srDateTo').value;
     const category = document.getElementById('srCategory').value;
     const product = document.getElementById('srProduct').value;
-    const monthDates = allDates.filter(d => d.startsWith(curMonth)).sort();
+    const monthDates = allDates.filter(d => d >= dateFrom && d <= dateTo).sort();
 
     if (monthDates.length === 0) {
-      section.innerHTML = '<div class="section-title">Shiprocket Fulfillment & TAT</div><p style="color:var(--muted);text-align:center;padding:40px;">No fulfillment data for this month</p>';
+      section.innerHTML = '<div class="section-title">Shiprocket Fulfillment & TAT</div><p style="color:var(--muted);text-align:center;padding:40px;">No fulfillment data for selected date range</p>';
       document.getElementById('srTableBody').innerHTML = '';
       return;
     }
 
-    // MTD totals (filtered)
+    // Totals for selected range (filtered)
     let mtdNew = 0, mtdNewVal = 0, mtdShipped = 0, mtdShippedVal = 0;
     let mtdDelivered = 0, mtdDeliveredVal = 0, mtdInTransit = 0, mtdRto = 0, mtdCancelled = 0;
     let tatSum = 0, tatDays = 0;
@@ -2843,14 +2937,15 @@ function renderShiprocket() {
 
     const monthAvgTat = tatDays > 0 ? (tatSum / tatDays).toFixed(1) : '—';
     const n = monthDates.length;
+    const rangeLabel = n + ' DAY' + (n > 1 ? 'S' : '');
 
     // KPI row
     const kpiEl = document.getElementById('srKpiRow');
     let h = '';
-    h += '<div class="kpi"><div class="kpi-label">NEW ORDERS (MTD)</div><div class="kpi-value">' + mtdNew.toLocaleString() + '</div><div class="kpi-per">' + fmt(mtdNewVal) + ' | ' + Math.round(mtdNew/n) + '/day</div></div>';
-    h += '<div class="kpi"><div class="kpi-label">SHIPPED (MTD)</div><div class="kpi-value">' + mtdShipped.toLocaleString() + '</div><div class="kpi-per">' + fmt(mtdShippedVal) + ' | ' + Math.round(mtdShipped/n) + '/day</div></div>';
-    h += '<div class="kpi"><div class="kpi-label">DELIVERED (MTD)</div><div class="kpi-value positive">' + mtdDelivered.toLocaleString() + '</div><div class="kpi-per">' + fmt(mtdDeliveredVal) + ' | ' + (mtdNew>0?(mtdDelivered/mtdNew*100).toFixed(1)+'% rate':'') + '</div></div>';
-    h += '<div class="kpi"><div class="kpi-label">IN TRANSIT</div><div class="kpi-value">' + mtdInTransit.toLocaleString() + '</div><div class="kpi-per">RTO: ' + mtdRto.toLocaleString() + '</div></div>';
+    h += '<div class="kpi"><div class="kpi-label">NEW ORDERS (' + rangeLabel + ')</div><div class="kpi-value">' + mtdNew.toLocaleString() + '</div><div class="kpi-per">' + fmt(mtdNewVal) + ' | ' + Math.round(mtdNew/n) + '/day</div></div>';
+    h += '<div class="kpi"><div class="kpi-label">SHIPPED (' + rangeLabel + ')</div><div class="kpi-value">' + mtdShipped.toLocaleString() + '</div><div class="kpi-per">' + fmt(mtdShippedVal) + ' | ' + Math.round(mtdShipped/n) + '/day</div></div>';
+    h += '<div class="kpi"><div class="kpi-label">DELIVERED (' + rangeLabel + ')</div><div class="kpi-value positive">' + mtdDelivered.toLocaleString() + '</div><div class="kpi-per">' + fmt(mtdDeliveredVal) + ' | ' + (mtdNew>0?(mtdDelivered/mtdNew*100).toFixed(1)+'% rate':'') + '</div></div>';
+    h += '<div class="kpi"><div class="kpi-label">IN TRANSIT</div><div class="kpi-value">' + mtdInTransit.toLocaleString() + '</div><div class="kpi-per">RTO: ' + mtdRto.toLocaleString() + ' | Cancelled: ' + mtdCancelled.toLocaleString() + '</div></div>';
     h += '<div class="kpi"><div class="kpi-label">AVG TAT</div><div class="kpi-value ' + (parseFloat(monthAvgTat)<=5?'positive':'negative') + '">' + monthAvgTat + ' days</div><div class="kpi-per">creation → delivery</div></div>';
     kpiEl.innerHTML = h;
 
