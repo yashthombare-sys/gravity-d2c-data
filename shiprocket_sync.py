@@ -6,9 +6,10 @@ inject into mtd_daily_data.json and dashboard.html.
 Usage: python3 shiprocket_sync.py
 """
 
-import os, sys, json, re, requests
+import os, sys, json, re, requests, argparse
 from datetime import datetime, timedelta, date
 from collections import defaultdict
+from calendar import monthrange
 
 # Force unbuffered output (for GitHub Actions log visibility)
 sys.stdout.reconfigure(line_buffering=True)
@@ -386,7 +387,26 @@ def inject_into_dashboard(data):
     print("  Updated MTD_DATA with shiprocket data in dashboard.html")
 
 
+def _print_summary(daily_data, label):
+    total_new = sum(d["new_orders"] for d in daily_data.values())
+    total_delivered = sum(d["delivered"] for d in daily_data.values())
+    total_value = sum(d["new_value"] for d in daily_data.values())
+    tat_days_sum = sum(d["avg_tat_days"] for d in daily_data.values() if d["avg_tat_days"] > 0)
+    tat_day_count = sum(1 for d in daily_data.values() if d["avg_tat_days"] > 0)
+    month_avg_tat = round(tat_days_sum / tat_day_count, 1) if tat_day_count > 0 else 0
+    print(f"\n  Summary ({label}):")
+    print(f"    Days with data: {len(daily_data)}")
+    print(f"    New orders: {total_new} | Value: {total_value:,.0f}")
+    print(f"    Delivered: {total_delivered}")
+    print(f"    Avg TAT: {month_avg_tat} days")
+
+
 def main():
+    parser = argparse.ArgumentParser(description="Shiprocket fulfillment sync")
+    parser.add_argument("--historical", type=int, default=0, metavar="N",
+                        help="Fetch last N months of historical data (e.g. --historical 6)")
+    args = parser.parse_args()
+
     print("\nShiprocket Fulfillment Sync\n")
 
     email, password = get_credentials()
@@ -400,45 +420,67 @@ def main():
 
     headers = build_headers(token)
     today = date.today()
-    month_start = today.replace(day=1)
 
-    # Fetch orders
-    orders = fetch_all_orders(headers, month_start, today)
-    if not orders:
-        print("  No orders found — writing empty data")
-        daily_data = {}
-    else:
-        daily_data = build_daily_data(orders, month_start, today)
-
-    # Summary
-    total_new = sum(d["new_orders"] for d in daily_data.values())
-    total_delivered = sum(d["delivered"] for d in daily_data.values())
-    total_value = sum(d["new_value"] for d in daily_data.values())
-    tat_days_sum = sum(d["avg_tat_days"] * (1 if d["avg_tat_days"] > 0 else 0) for d in daily_data.values())
-    tat_day_count = sum(1 for d in daily_data.values() if d["avg_tat_days"] > 0)
-    month_avg_tat = round(tat_days_sum / tat_day_count, 1) if tat_day_count > 0 else 0
-
-    print(f"\n  Summary ({month_start.strftime('%b %Y')}):")
-    print(f"    Days with data: {len(daily_data)}")
-    print(f"    New orders: {total_new} | Value: {total_value:,.0f}")
-    print(f"    Delivered: {total_delivered}")
-    print(f"    Avg TAT: {month_avg_tat} days")
-
-    # Update mtd_daily_data.json
+    # Load existing data (preserve old months)
     if os.path.exists(OUTPUT_FILE):
         with open(OUTPUT_FILE, "r") as f:
             mtd_json = json.load(f)
     else:
         mtd_json = {}
+    existing_sr = mtd_json.get("shiprocket", {})
 
-    mtd_json["shiprocket"] = daily_data
+    # Build list of months to fetch
+    months_to_fetch = []
+    if args.historical > 0:
+        # Fetch last N months + current month
+        for i in range(args.historical, -1, -1):
+            # Go back i months from today
+            y, m = today.year, today.month - i
+            while m <= 0:
+                m += 12
+                y -= 1
+            months_to_fetch.append(date(y, m, 1))
+        print(f"  Historical mode: fetching {len(months_to_fetch)} months")
+    else:
+        months_to_fetch.append(today.replace(day=1))
+
+    # Fetch and process each month
+    all_daily_data = dict(existing_sr)  # start with existing data
+
+    for month_start in months_to_fetch:
+        # End date: last day of month, or today if current month
+        _, last_day = monthrange(month_start.year, month_start.month)
+        month_end = date(month_start.year, month_start.month, last_day)
+        if month_end > today:
+            month_end = today
+
+        month_label = month_start.strftime("%b %Y")
+        print(f"\n  ── {month_label} ──")
+
+        orders = fetch_all_orders(headers, month_start, month_end)
+        if not orders:
+            print(f"  No orders for {month_label}")
+            continue
+
+        month_data = build_daily_data(orders, month_start, month_end)
+        _print_summary(month_data, month_label)
+
+        # Merge into all_daily_data (overwrite days in this month)
+        all_daily_data.update(month_data)
+
+    # Add sync timestamp
+    mtd_json["shiprocket"] = all_daily_data
+    mtd_json["shiprocket_synced"] = datetime.now().strftime("%Y-%m-%dT%H:%M")
 
     with open(OUTPUT_FILE, "w") as f:
         json.dump(mtd_json, f, indent=2)
-    print(f"\n  Saved shiprocket data to {OUTPUT_FILE}")
+
+    total_days = len(all_daily_data)
+    months_covered = sorted(set(k[:7] for k in all_daily_data.keys()))
+    print(f"\n  Saved {total_days} days ({len(months_covered)} months) to {OUTPUT_FILE}")
 
     # Inject into dashboard.html
-    inject_into_dashboard(daily_data)
+    inject_into_dashboard(all_daily_data)
 
     print("\nDone.\n")
 
