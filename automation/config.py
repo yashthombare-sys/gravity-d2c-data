@@ -117,7 +117,10 @@ DELIVERED_STATUSES = {"DELIVERED"}
 RTO_STATUSES = {"RTO DELIVERED", "RTO IN TRANSIT", "RTO INITIATED", "RTO OFD",
                 "REACHED BACK AT SELLER CITY", "REACHED BACK AT_SELLER_CITY"}
 CANCELLED_STATUSES = {"CANCELED", "CANCELLATION REQUESTED"}
-SKIP_STATUSES = {"SELF FULFILED", "QC FAILED", "RETURN DELIVERED",
+# Pending = truly new, not yet processed/shipped at all
+PENDING_STATUSES = {"NEW", "NEW ORDER"}
+# Skip = returns and QC failures (not counted in fulfillment metrics)
+SKIP_STATUSES = {"QC FAILED", "RETURN DELIVERED",
                  "RETURN IN TRANSIT", "RETURN PENDING", "RETURN CANCELLED"}
 
 SPARE_PARTS_KEYWORDS = [
@@ -135,6 +138,8 @@ def classify_status(status):
         return "rto"
     if s in CANCELLED_STATUSES:
         return "cancelled"
+    if s in PENDING_STATUSES:
+        return "pending"
     if s in SKIP_STATUSES or s.startswith("RETURN"):
         return "skip"
     return "in_transit"

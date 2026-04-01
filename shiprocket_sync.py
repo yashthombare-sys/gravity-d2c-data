@@ -211,6 +211,7 @@ def get_order_value(order):
 def _empty_bucket():
     return {
         "new_orders": 0, "new_value": 0.0,
+        "pending": 0, "pending_value": 0.0,
         "shipped": 0, "shipped_value": 0.0,
         "delivered": 0, "delivered_value": 0.0,
         "in_transit": 0, "rto": 0, "cancelled": 0,
@@ -221,16 +222,20 @@ def _empty_bucket():
 def _add_to_bucket(bucket, status, order_value):
     bucket["new_orders"] += 1
     bucket["new_value"] += order_value
-    if status in ("delivered", "in_transit", "rto"):
+    if status == "pending":
+        # Not yet shipped — awaiting pickup
+        bucket["pending"] += 1
+        bucket["pending_value"] += order_value
+    elif status in ("delivered", "in_transit", "rto"):
         bucket["shipped"] += 1
         bucket["shipped_value"] += order_value
-    if status == "delivered":
-        bucket["delivered"] += 1
-        bucket["delivered_value"] += order_value
-    elif status == "in_transit":
-        bucket["in_transit"] += 1
-    elif status == "rto":
-        bucket["rto"] += 1
+        if status == "delivered":
+            bucket["delivered"] += 1
+            bucket["delivered_value"] += order_value
+        elif status == "in_transit":
+            bucket["in_transit"] += 1
+        elif status == "rto":
+            bucket["rto"] += 1
     elif status == "cancelled":
         bucket["cancelled"] += 1
 
@@ -240,6 +245,8 @@ def _finalize_bucket(d):
     return {
         "new_orders": d["new_orders"],
         "new_value": round(d["new_value"], 2),
+        "pending": d["pending"],
+        "pending_value": round(d["pending_value"], 2),
         "shipped": d["shipped"],
         "shipped_value": round(d["shipped_value"], 2),
         "delivered": d["delivered"],
