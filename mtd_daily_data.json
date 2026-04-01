@@ -2572,16 +2572,16 @@
       "profit": 51964.56
     }
   },
-  "last_synced": "2026-04-01T06:18:44",
+  "last_synced": "2026-04-01T08:47:25",
   "shiprocket": {
     "2026-04-01": {
-      "new_orders": 79,
-      "new_value": 93702.69,
-      "shipped": 78,
-      "shipped_value": 92848.64,
+      "new_orders": 109,
+      "new_value": 131881.34,
+      "shipped": 108,
+      "shipped_value": 131027.29,
       "delivered": 0,
       "delivered_value": 0.0,
-      "in_transit": 78,
+      "in_transit": 108,
       "rto": 0,
       "cancelled": 1,
       "avg_tat_days": 0
