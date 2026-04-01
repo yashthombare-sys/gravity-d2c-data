@@ -2563,25 +2563,25 @@
       "profit": 41546.85
     },
     "2026-03-31": {
-      "revenue": 106194.18,
+      "revenue": 111291.29,
       "orders": 121,
       "ad_spend": 0.0,
       "commissions": 15999.72,
-      "product_expense": 38229.9,
-      "total_expense": 54229.62,
-      "profit": 51964.56
+      "product_expense": 40064.86,
+      "total_expense": 56064.58,
+      "profit": 55226.71
     }
   },
-  "last_synced": "2026-04-01T08:47:25",
+  "last_synced": "2026-04-01T11:52:35",
   "shiprocket": {
     "2026-04-01": {
-      "new_orders": 109,
-      "new_value": 131881.34,
-      "shipped": 108,
-      "shipped_value": 131027.29,
+      "new_orders": 148,
+      "new_value": 183470.14,
+      "shipped": 147,
+      "shipped_value": 182616.09,
       "delivered": 0,
       "delivered_value": 0.0,
-      "in_transit": 108,
+      "in_transit": 147,
       "rto": 0,
       "cancelled": 1,
       "avg_tat_days": 0
