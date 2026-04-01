@@ -579,6 +579,16 @@
       "profit": 28600.0,
       "sessions": 3421,
       "shopify_orders": 127
+    },
+    "2026-03-31": {
+      "revenue": 203765.0,
+      "orders": 191,
+      "ad_spend": 84944.8,
+      "cogs": 89505.0,
+      "total_expense": 174450.0,
+      "profit": 29316.0,
+      "sessions": 4421,
+      "shopify_orders": 132
     }
   },
   "d2c_busyboard": {
@@ -1219,6 +1229,17 @@
       "cogs_logistics": 42.44,
       "sessions": 3421,
       "shopify_orders": 127
+    },
+    "2026-03-31": {
+      "revenue": 156209.0,
+      "orders": 147,
+      "ad_spend": 80034.1,
+      "cogs": 67505.0,
+      "total_expense": 147539.0,
+      "profit": 8670.0,
+      "cogs_logistics": 43.21,
+      "sessions": 4421,
+      "shopify_orders": 132
     }
   },
   "d2c_stem": {
@@ -1738,6 +1759,17 @@
       "cogs_logistics": 54.95,
       "sessions": 0,
       "shopify_orders": 0
+    },
+    "2026-03-31": {
+      "revenue": 28168.0,
+      "orders": 22,
+      "ad_spend": 4910.7,
+      "cogs": 14300.0,
+      "total_expense": 19211.0,
+      "profit": 8958.0,
+      "cogs_logistics": 50.77,
+      "sessions": 0,
+      "shopify_orders": 0
     }
   },
   "d2c_softtoy": {
@@ -2246,6 +2278,17 @@
       "cogs_logistics": 39.93,
       "sessions": 0,
       "shopify_orders": 0
+    },
+    "2026-03-31": {
+      "revenue": 19388.0,
+      "orders": 22,
+      "ad_spend": 0.0,
+      "cogs": 7700.0,
+      "total_expense": 7700.0,
+      "profit": 11688.0,
+      "cogs_logistics": 39.71,
+      "sessions": 0,
+      "shopify_orders": 0
     }
   },
   "amazon": {
@@ -2502,97 +2545,46 @@
       "profit": 33523.35
     },
     "2026-03-29": {
-      "revenue": 94917.45,
+      "revenue": 95816.44,
       "orders": 105,
       "ad_spend": 26718.74,
       "commissions": 13718.53,
-      "product_expense": 34170.28,
-      "total_expense": 74607.55,
-      "profit": 20309.9
+      "product_expense": 34493.92,
+      "total_expense": 74931.19,
+      "profit": 20885.25
     },
     "2026-03-30": {
-      "revenue": 80426.58,
+      "revenue": 92916.51,
       "orders": 104,
       "ad_spend": 0.0,
       "commissions": 17919.72,
-      "product_expense": 28953.57,
-      "total_expense": 46873.29,
-      "profit": 33553.29
-    }
-  },
-  "last_synced": "2026-03-31T12:24:52",
-  "shiprocket": {
-    "2026-03-26": {
-      "new_orders": 145,
-      "new_value": 180155.88,
-      "shipped": 145,
-      "shipped_value": 180155.88,
-      "delivered": 40,
-      "delivered_value": 47228.35,
-      "in_transit": 105,
-      "rto": 0,
-      "cancelled": 0,
-      "avg_tat_days": 0
-    },
-    "2026-03-27": {
-      "new_orders": 130,
-      "new_value": 155547.05,
-      "shipped": 124,
-      "shipped_value": 149168.65,
-      "delivered": 28,
-      "delivered_value": 33244.3,
-      "in_transit": 95,
-      "rto": 1,
-      "cancelled": 6,
-      "avg_tat_days": 0
-    },
-    "2026-03-28": {
-      "new_orders": 125,
-      "new_value": 147765.0,
-      "shipped": 122,
-      "shipped_value": 144367.95,
-      "delivered": 6,
-      "delivered_value": 6049.2,
-      "in_transit": 115,
-      "rto": 1,
-      "cancelled": 3,
-      "avg_tat_days": 1.6
-    },
-    "2026-03-29": {
-      "new_orders": 91,
-      "new_value": 113662.8,
-      "shipped": 90,
-      "shipped_value": 111763.8,
-      "delivered": 10,
-      "delivered_value": 13939.35,
-      "in_transit": 79,
-      "rto": 1,
-      "cancelled": 1,
-      "avg_tat_days": 2.6
-    },
-    "2026-03-30": {
-      "new_orders": 154,
-      "new_value": 179018.25,
-      "shipped": 150,
-      "shipped_value": 174123.25,
-      "delivered": 2,
-      "delivered_value": 3507.2,
-      "in_transit": 147,
-      "rto": 1,
-      "cancelled": 4,
-      "avg_tat_days": 3.6
+      "product_expense": 33449.94,
+      "total_expense": 51369.66,
+      "profit": 41546.85
     },
     "2026-03-31": {
-      "new_orders": 129,
-      "new_value": 141471.6,
-      "shipped": 126,
-      "shipped_value": 138474.6,
+      "revenue": 106194.18,
+      "orders": 121,
+      "ad_spend": 0.0,
+      "commissions": 15999.72,
+      "product_expense": 38229.9,
+      "total_expense": 54229.62,
+      "profit": 51964.56
+    }
+  },
+  "last_synced": "2026-04-01T06:18:44",
+  "shiprocket": {
+    "2026-04-01": {
+      "new_orders": 79,
+      "new_value": 93702.69,
+      "shipped": 78,
+      "shipped_value": 92848.64,
       "delivered": 0,
       "delivered_value": 0.0,
-      "in_transit": 126,
+      "in_transit": 78,
       "rto": 0,
-      "cancelled": 3,
-      "avg_tat_days": 3.6
+      "cancelled": 1,
+      "avg_tat_days": 0
     }
   }
 }
