@@ -58,6 +58,7 @@ jobs:
       - name: Encrypt dashboard for GitHub Pages
         env:
           DASHBOARD_PASSWORD: ${{ secrets.DASHBOARD_PASSWORD }}
+          GH_SYNC_TOKEN: ${{ secrets.GH_SYNC_TOKEN }}
         run: python3 encrypt_dashboard.py
 
       - name: Commit and push updated data

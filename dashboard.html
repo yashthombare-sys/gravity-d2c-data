@@ -148,6 +148,29 @@
   .action-tag.fix { background: rgba(239,68,68,0.12); color: var(--red); }
   .action-tag.optimize { background: rgba(252,187,19,0.12); color: var(--primary); }
 
+  /* Sync Now button */
+  .sync-wrap { display: flex; align-items: center; gap: 10px; }
+  #syncBtn {
+    padding: 8px 18px; border-radius: 8px; border: 1px solid rgba(252,187,19,0.3);
+    background: rgba(252,187,19,0.08); color: var(--primary); font-size: 12px;
+    font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+  #syncBtn:hover { background: rgba(252,187,19,0.15); border-color: var(--primary); }
+  #syncBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+  #syncBtn.syncing { animation: syncPulse 1.5s ease-in-out infinite; }
+  @keyframes syncPulse { 0%,100% { opacity: 0.6; } 50% { opacity: 1; } }
+  #syncStatus {
+    font-size: 11px; color: var(--muted); font-weight: 500; max-width: 260px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  #syncStatus.error { color: var(--red); }
+  #syncStatus.success { color: var(--green); }
+  .data-age-warn {
+    font-size: 10px; color: var(--orange); font-weight: 500;
+    padding: 2px 8px; border-radius: 4px;
+    background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2);
+  }
 
   @media (max-width: 1400px) {
     .kpi-row { grid-template-columns: repeat(5, 1fr); }
@@ -429,6 +452,11 @@
       <button class="vt-btn active" id="vtMTD" onclick="switchView('mtd')">MTD Daily</button>
     </div>
     <div class="period" id="periodLabel">Apr 2025 — Feb 2026</div>
+    <div class="sync-wrap">
+      <span id="dataAgeWarn" class="data-age-warn" style="display:none;"></span>
+      <button id="syncBtn" onclick="triggerSync()">⟳ Sync Now</button>
+      <span id="syncStatus"></span>
+    </div>
   </div>
 </div>
 
@@ -754,6 +782,164 @@ CRED_DATA["Jul 2025"]={"V2":{total_orders:227,shipped:227,delivered:227,rto:0,in
 CRED_DATA["Sep 2025"]={"V1":{total_orders:5,shipped:5,delivered:5,rto:0,in_transit:0,cancelled:0,lost:0,revenue:4695.0,freight:0},"V2":{total_orders:1,shipped:1,delivered:1,rto:0,in_transit:0,cancelled:0,lost:0,revenue:999.0,freight:0},"V3":{total_orders:1,shipped:1,delivered:1,rto:0,in_transit:0,cancelled:0,lost:0,revenue:1530.0,freight:0},"V7":{total_orders:1,shipped:1,delivered:1,rto:0,in_transit:0,cancelled:0,lost:0,revenue:1215.0,freight:0},"V9":{total_orders:3,shipped:3,delivered:3,rto:0,in_transit:0,cancelled:0,lost:0,revenue:4803.0,freight:0}};
 // ── SYNC_DATA_END ──
 
+// ── GitHub Sync Now ──
+const GH_SYNC_TOKEN = '__GH_SYNC_TOKEN__';
+const GH_REPO = 'yashthombare-sys/gravity-d2c-data';
+const GH_WORKFLOW = 'amazon_daily_sync.yml';
+const GH_CHAINED_WORKFLOW = 'Daily MTD Sync';
+let _syncInProgress = false;
+let _syncPollTimer = null;
+
+function setSyncStatus(msg, cls) {
+  const el = document.getElementById('syncStatus');
+  el.textContent = msg;
+  el.className = cls || '';
+}
+
+async function triggerSync() {
+  if (_syncInProgress) { setSyncStatus('Sync already in progress', ''); return; }
+
+  const btn = document.getElementById('syncBtn');
+  _syncInProgress = true;
+  btn.disabled = true;
+  btn.classList.add('syncing');
+  setSyncStatus('Starting sync...', '');
+
+  const dispatchTime = new Date().toISOString();
+
+  try {
+    const resp = await fetch(`https://api.github.com/repos/${GH_REPO}/actions/workflows/${GH_WORKFLOW}/dispatches`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `token ${GH_SYNC_TOKEN}`,
+        'Accept': 'application/vnd.github.v3+json'
+      },
+      body: JSON.stringify({ ref: 'main' })
+    });
+
+    if (!resp.ok) {
+      const errText = await resp.text();
+      throw new Error(`GitHub API ${resp.status}: ${errText}`);
+    }
+
+    setSyncStatus('Amazon sync triggered...', '');
+    pollSyncStatus(dispatchTime);
+
+  } catch (err) {
+    console.error('Sync trigger failed:', err);
+    setSyncStatus(err.message.includes('NetworkError') || err.message.includes('fetch')
+      ? 'Network error — try again' : 'Sync failed — check GitHub Actions', 'error');
+    resetSyncBtn();
+  }
+}
+
+function pollSyncStatus(dispatchTime) {
+  const POLL_INTERVAL = 30000;
+  const TIMEOUT = 15 * 60 * 1000;
+  const startTime = Date.now();
+  let amazonRunId = null;
+  let chainedRunId = null;
+  let amazonDone = false;
+
+  _syncPollTimer = setInterval(async () => {
+    try {
+      if (Date.now() - startTime > TIMEOUT) {
+        clearInterval(_syncPollTimer);
+        setSyncStatus('Sync may still be running — refresh manually in a few minutes', '');
+        resetSyncBtn();
+        return;
+      }
+
+      const resp = await fetch(`https://api.github.com/repos/${GH_REPO}/actions/runs?per_page=10`, {
+        headers: {
+          'Authorization': `token ${GH_SYNC_TOKEN}`,
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      });
+
+      if (!resp.ok) throw new Error('Poll failed');
+      const data = await resp.json();
+      const runs = data.workflow_runs || [];
+
+      if (!amazonRunId) {
+        const amazonRun = runs.find(r =>
+          r.path && r.path.includes('amazon_daily_sync') &&
+          new Date(r.created_at) >= new Date(dispatchTime)
+        );
+        if (amazonRun) {
+          amazonRunId = amazonRun.id;
+          setSyncStatus('Amazon sync running...', '');
+        }
+      }
+
+      if (amazonRunId && !amazonDone) {
+        const amazonRun = runs.find(r => r.id === amazonRunId);
+        if (amazonRun) {
+          if (amazonRun.status === 'completed') {
+            amazonDone = true;
+            if (amazonRun.conclusion !== 'success') {
+              clearInterval(_syncPollTimer);
+              setSyncStatus(`Amazon sync ${amazonRun.conclusion} — check GitHub Actions`, 'error');
+              resetSyncBtn();
+              return;
+            }
+            setSyncStatus('D2C + Fulfillment sync running...', '');
+          } else {
+            setSyncStatus(`Amazon sync ${amazonRun.status}...`, '');
+          }
+        }
+      }
+
+      if (amazonDone && !chainedRunId) {
+        const chainedRun = runs.find(r =>
+          r.name === GH_CHAINED_WORKFLOW &&
+          new Date(r.created_at) >= new Date(dispatchTime)
+        );
+        if (chainedRun) {
+          chainedRunId = chainedRun.id;
+          setSyncStatus('D2C + Fulfillment sync running...', '');
+        }
+      }
+
+      if (chainedRunId) {
+        const chainedRun = runs.find(r => r.id === chainedRunId);
+        if (chainedRun && chainedRun.status === 'completed') {
+          clearInterval(_syncPollTimer);
+          if (chainedRun.conclusion === 'success') {
+            setSyncStatus('Sync complete! Refreshing in 10s...', 'success');
+            setTimeout(() => { location.reload(); }, 10000);
+          } else {
+            setSyncStatus(`Sync ${chainedRun.conclusion} — check GitHub Actions`, 'error');
+          }
+          resetSyncBtn();
+          return;
+        }
+      }
+
+    } catch (err) {
+      console.error('Poll error:', err);
+    }
+  }, POLL_INTERVAL);
+}
+
+function resetSyncBtn() {
+  _syncInProgress = false;
+  const btn = document.getElementById('syncBtn');
+  btn.disabled = false;
+  btn.classList.remove('syncing');
+}
+
+(function checkDataAge() {
+  if (typeof MTD_DATA !== 'undefined' && MTD_DATA.last_synced) {
+    const syncTime = new Date(MTD_DATA.last_synced);
+    const hoursOld = (Date.now() - syncTime.getTime()) / (1000 * 60 * 60);
+    if (hoursOld > 24) {
+      const el = document.getElementById('dataAgeWarn');
+      el.textContent = `Data is ${Math.floor(hoursOld)}h old`;
+      el.style.display = 'inline';
+    }
+  }
+})();
 
 // ── Load ad spend from localStorage ──
 try {

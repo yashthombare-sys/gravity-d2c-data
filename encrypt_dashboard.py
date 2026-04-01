@@ -35,6 +35,14 @@ def main():
     with open(DASHBOARD, "r", encoding="utf-8") as f:
         html = f.read()
 
+    # Inject GitHub sync token if available (kept out of source for push protection)
+    gh_token = os.environ.get("GH_SYNC_TOKEN", "")
+    if gh_token and "__GH_SYNC_TOKEN__" in html:
+        html = html.replace("__GH_SYNC_TOKEN__", gh_token)
+        print("   Injected GH_SYNC_TOKEN into dashboard")
+    elif "__GH_SYNC_TOKEN__" in html and not gh_token:
+        print("   ⚠️  GH_SYNC_TOKEN not set — Sync Now button won't work")
+
     raw_kb = len(html) // 1024
     print(f"   Encrypting dashboard ({raw_kb} KB)...")
 
