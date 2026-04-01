@@ -615,7 +615,12 @@
 
   <div class="section" id="srSection">
     <div class="section-title">Shiprocket Fulfillment & TAT</div>
-    <div class="kpi-row" id="srKpiRow" style="grid-template-columns:repeat(5,1fr);gap:8px;"></div>
+    <!-- Fulfillment Pipeline -->
+    <div id="srPipeline" style="display:flex;align-items:center;justify-content:center;gap:0;margin:12px 0 18px;flex-wrap:wrap;"></div>
+    <!-- KPI Cards -->
+    <div class="kpi-row" id="srKpiRow" style="grid-template-columns:repeat(6,1fr);gap:8px;"></div>
+    <!-- TAT Breakdown -->
+    <div id="srTatBox" style="margin-top:14px;padding:14px 18px;background:var(--card);border:1px solid var(--border);border-radius:10px;"></div>
     <div class="charts-grid" style="grid-template-columns:1fr;margin-top:14px;">
       <div class="chart-card"><h3>Daily Fulfillment Trend</h3><canvas id="srTrendChart" height="260"></canvas></div>
     </div>
@@ -2938,16 +2943,81 @@ function renderShiprocket() {
     const monthAvgTat = tatDays > 0 ? (tatSum / tatDays).toFixed(1) : '—';
     const n = monthDates.length;
     const rangeLabel = n + ' DAY' + (n > 1 ? 'S' : '');
+    const pendingPickup = Math.max(0, mtdNew - mtdShipped - mtdCancelled);
+    const shipRate = mtdNew > 0 ? (mtdShipped / mtdNew * 100).toFixed(1) : '0';
+    const delRate = mtdShipped > 0 ? (mtdDelivered / mtdShipped * 100).toFixed(1) : '0';
 
-    // KPI row
+    // ── Fulfillment Pipeline (visual flow) ──
+    const pipeEl = document.getElementById('srPipeline');
+    const pipeSteps = [
+      { label: 'New Orders', count: mtdNew, color: '#fcbb13' },
+      { label: 'Pending Pickup', count: pendingPickup, color: pendingPickup > 0 ? '#f59e0b' : '#4ade80' },
+      { label: 'In Transit', count: mtdInTransit, color: '#4a90d9' },
+      { label: 'Delivered', count: mtdDelivered, color: '#27ae60' },
+      { label: 'RTO', count: mtdRto, color: '#ef4444' },
+      { label: 'Cancelled', count: mtdCancelled, color: '#6b7280' },
+    ];
+    let pipeHTML = '';
+    pipeSteps.forEach((s, i) => {
+      pipeHTML += '<div style="text-align:center;padding:8px 16px;background:rgba(' +
+        (s.color === '#fcbb13' ? '252,187,19' : s.color === '#f59e0b' ? '245,158,11' : s.color === '#4ade80' ? '74,222,128' : s.color === '#4a90d9' ? '74,144,217' : s.color === '#27ae60' ? '39,174,96' : s.color === '#ef4444' ? '239,68,68' : '107,114,128') +
+        ',0.1);border:1px solid ' + s.color + '33;border-radius:8px;min-width:100px;">' +
+        '<div style="font-size:20px;font-weight:800;color:' + s.color + ';">' + s.count.toLocaleString() + '</div>' +
+        '<div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;">' + s.label + '</div></div>';
+      if (i < pipeSteps.length - 1 && i < 3) {
+        pipeHTML += '<div style="color:var(--muted);font-size:18px;padding:0 4px;">→</div>';
+      } else if (i === 3) {
+        pipeHTML += '<div style="width:16px;"></div>';
+      } else if (i > 3 && i < pipeSteps.length - 1) {
+        pipeHTML += '<div style="width:8px;"></div>';
+      }
+    });
+    pipeEl.innerHTML = pipeHTML;
+
+    // ── KPI Cards ──
     const kpiEl = document.getElementById('srKpiRow');
     let h = '';
     h += '<div class="kpi"><div class="kpi-label">NEW ORDERS (' + rangeLabel + ')</div><div class="kpi-value">' + mtdNew.toLocaleString() + '</div><div class="kpi-per">' + fmt(mtdNewVal) + ' | ' + Math.round(mtdNew/n) + '/day</div></div>';
-    h += '<div class="kpi"><div class="kpi-label">SHIPPED (' + rangeLabel + ')</div><div class="kpi-value">' + mtdShipped.toLocaleString() + '</div><div class="kpi-per">' + fmt(mtdShippedVal) + ' | ' + Math.round(mtdShipped/n) + '/day</div></div>';
-    h += '<div class="kpi"><div class="kpi-label">DELIVERED (' + rangeLabel + ')</div><div class="kpi-value positive">' + mtdDelivered.toLocaleString() + '</div><div class="kpi-per">' + fmt(mtdDeliveredVal) + ' | ' + (mtdNew>0?(mtdDelivered/mtdNew*100).toFixed(1)+'% rate':'') + '</div></div>';
-    h += '<div class="kpi"><div class="kpi-label">IN TRANSIT</div><div class="kpi-value">' + mtdInTransit.toLocaleString() + '</div><div class="kpi-per">RTO: ' + mtdRto.toLocaleString() + ' | Cancelled: ' + mtdCancelled.toLocaleString() + '</div></div>';
-    h += '<div class="kpi"><div class="kpi-label">AVG TAT</div><div class="kpi-value ' + (parseFloat(monthAvgTat)<=5?'positive':'negative') + '">' + monthAvgTat + ' days</div><div class="kpi-per">creation → delivery</div></div>';
+    h += '<div class="kpi"><div class="kpi-label">PENDING PICKUP</div><div class="kpi-value" style="color:' + (pendingPickup > 50 ? '#f59e0b' : pendingPickup > 0 ? '#fcbb13' : '#4ade80') + '">' + pendingPickup.toLocaleString() + '</div><div class="kpi-per">Not yet shipped</div></div>';
+    h += '<div class="kpi"><div class="kpi-label">SHIPPED</div><div class="kpi-value">' + mtdShipped.toLocaleString() + '</div><div class="kpi-per">' + shipRate + '% ship rate | ' + fmt(mtdShippedVal) + '</div></div>';
+    h += '<div class="kpi"><div class="kpi-label">DELIVERED</div><div class="kpi-value positive">' + mtdDelivered.toLocaleString() + '</div><div class="kpi-per">' + delRate + '% of shipped | ' + fmt(mtdDeliveredVal) + '</div></div>';
+    h += '<div class="kpi"><div class="kpi-label">IN TRANSIT</div><div class="kpi-value" style="color:#4a90d9;">' + mtdInTransit.toLocaleString() + '</div><div class="kpi-per">Awaiting delivery</div></div>';
+    h += '<div class="kpi"><div class="kpi-label">RTO / CANCELLED</div><div class="kpi-value negative">' + mtdRto.toLocaleString() + ' / ' + mtdCancelled.toLocaleString() + '</div><div class="kpi-per">' + (mtdNew > 0 ? ((mtdRto + mtdCancelled) / mtdNew * 100).toFixed(1) : '0') + '% loss rate</div></div>';
     kpiEl.innerHTML = h;
+
+    // ── TAT Breakdown ──
+    const tatBox = document.getElementById('srTatBox');
+    if (monthAvgTat !== '—') {
+      const tatVal = parseFloat(monthAvgTat);
+      const tatColor = tatVal <= 3 ? '#4ade80' : tatVal <= 5 ? '#fcbb13' : tatVal <= 7 ? '#f59e0b' : '#ef4444';
+      const tatRating = tatVal <= 3 ? 'Excellent' : tatVal <= 5 ? 'Good' : tatVal <= 7 ? 'Needs Improvement' : 'Slow';
+      // TAT bar visual (0-10 day scale)
+      const tatPct = Math.min(tatVal / 10 * 100, 100);
+      tatBox.innerHTML =
+        '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">' +
+          '<div>' +
+            '<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;">AVG TURNAROUND TIME (Order Placed → Delivered)</div>' +
+            '<div style="display:flex;align-items:baseline;gap:8px;margin-top:4px;">' +
+              '<span style="font-size:28px;font-weight:800;color:' + tatColor + ';">' + monthAvgTat + '</span>' +
+              '<span style="font-size:14px;color:var(--muted);">days</span>' +
+              '<span style="font-size:12px;font-weight:600;color:' + tatColor + ';background:' + tatColor + '18;padding:2px 8px;border-radius:4px;">' + tatRating + '</span>' +
+            '</div>' +
+          '</div>' +
+          '<div style="flex:1;min-width:200px;max-width:400px;">' +
+            '<div style="display:flex;justify-content:space-between;font-size:9px;color:var(--muted);margin-bottom:3px;"><span>0d</span><span>3d</span><span>5d</span><span>7d</span><span>10d+</span></div>' +
+            '<div style="height:10px;background:var(--bg);border-radius:5px;overflow:hidden;position:relative;">' +
+              '<div style="position:absolute;left:0;top:0;height:100%;width:30%;background:linear-gradient(90deg,#4ade80,#fcbb13);opacity:0.2;"></div>' +
+              '<div style="position:absolute;left:30%;top:0;height:100%;width:20%;background:linear-gradient(90deg,#fcbb13,#f59e0b);opacity:0.2;"></div>' +
+              '<div style="position:absolute;left:50%;top:0;height:100%;width:50%;background:linear-gradient(90deg,#f59e0b,#ef4444);opacity:0.2;"></div>' +
+              '<div style="position:absolute;left:' + tatPct + '%;top:-2px;width:3px;height:14px;background:' + tatColor + ';border-radius:2px;box-shadow:0 0 6px ' + tatColor + ';"></div>' +
+            '</div>' +
+            '<div style="font-size:10px;color:var(--muted);margin-top:4px;">Based on ' + tatDays + ' days with delivery data</div>' +
+          '</div>' +
+        '</div>';
+      tatBox.style.display = '';
+    } else {
+      tatBox.style.display = 'none';
+    }
 
     // Trend chart (filtered)
     const labels = monthDates.map(d => { const p = d.split('-'); return parseInt(p[2]) + '/' + parseInt(p[1]); });
