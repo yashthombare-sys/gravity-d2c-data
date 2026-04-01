@@ -2575,37 +2575,49 @@
   "last_synced": "2026-04-01T12:16:55",
   "shiprocket": {
     "2026-04-01": {
-      "new_orders": 151,
-      "new_value": 188606.34,
-      "shipped": 149,
-      "shipped_value": 186453.29,
+      "new_orders": 154,
+      "new_value": 191853.39,
+      "shipped": 152,
+      "shipped_value": 189700.34,
       "delivered": 0,
       "delivered_value": 0.0,
-      "in_transit": 149,
+      "in_transit": 152,
       "rto": 0,
       "cancelled": 2,
       "avg_tat_days": 0,
       "products": {
-        "V6": {
-          "new_orders": 36,
-          "new_value": 35824.0,
-          "shipped": 36,
-          "shipped_value": 35824.0,
+        "Car": {
+          "new_orders": 42,
+          "new_value": 54058.0,
+          "shipped": 41,
+          "shipped_value": 52759.0,
           "delivered": 0,
           "delivered_value": 0.0,
-          "in_transit": 36,
+          "in_transit": 41,
+          "rto": 0,
+          "cancelled": 1,
+          "avg_tat_days": 0
+        },
+        "V2": {
+          "new_orders": 24,
+          "new_value": 24328.64,
+          "shipped": 24,
+          "shipped_value": 24328.64,
+          "delivered": 0,
+          "delivered_value": 0.0,
+          "in_transit": 24,
           "rto": 0,
           "cancelled": 0,
           "avg_tat_days": 0
         },
-        "V2": {
-          "new_orders": 23,
-          "new_value": 23329.64,
-          "shipped": 23,
-          "shipped_value": 23329.64,
+        "V6": {
+          "new_orders": 37,
+          "new_value": 36773.05,
+          "shipped": 37,
+          "shipped_value": 36773.05,
           "delivered": 0,
           "delivered_value": 0.0,
-          "in_transit": 23,
+          "in_transit": 37,
           "rto": 0,
           "cancelled": 0,
           "avg_tat_days": 0
@@ -2620,18 +2632,6 @@
           "in_transit": 17,
           "rto": 0,
           "cancelled": 0,
-          "avg_tat_days": 0
-        },
-        "Car": {
-          "new_orders": 41,
-          "new_value": 52759.0,
-          "shipped": 40,
-          "shipped_value": 51460.0,
-          "delivered": 0,
-          "delivered_value": 0.0,
-          "in_transit": 40,
-          "rto": 0,
-          "cancelled": 1,
           "avg_tat_days": 0
         },
         "V3": {
