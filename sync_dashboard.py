@@ -8,7 +8,7 @@ from each month's tab, then rewrites the inline data in dashboard.html.
 Usage:  python3 sync_dashboard.py
 """
 
-import os, re, json, time
+import os, re, json, time, shutil, subprocess
 import gspread
 from google.oauth2.service_account import Credentials
 
@@ -642,6 +642,16 @@ def update_dashboard(d2c_data, amz_data, amz_ad_map, fk_data, fk_ad_map, fc_data
     frozen_im_data = extract_frozen_channel('IM_DATA', FY24_25_MONTHS, existing_sync)
     frozen_cred_data = extract_frozen_channel('CRED_DATA', FY24_25_MONTHS, existing_sync)
 
+    # Log frozen data extraction counts (helps debug silent failures in CI)
+    print(f"  Frozen D2C: {len(frozen_d2c)}/12 months extracted")
+    print(f"  Frozen AMZ: {len(frozen_amz_data)}/12 months")
+    print(f"  Frozen FK:  {len(frozen_fk_data)}/12 months")
+    print(f"  Frozen FC:  {len(frozen_fc_data)}/12 months")
+    print(f"  Frozen BK:  {len(frozen_bk_data)}/12 months")
+    print(f"  Frozen IM:  {len(frozen_im_data)}/12 months")
+    print(f"  Frozen CRED: {len(frozen_cred_data)}/12 months")
+    print(f"  Frozen ad maps — AMZ:{len(frozen_amz_ad)} FK:{len(frozen_fk_ad)} BK:{len(frozen_bk_ad)} IM:{len(frozen_im_ad)}")
+
     # Build DATA= line (D2C)
     d2c_obj = {}
     for m in months:
@@ -767,19 +777,30 @@ def update_dashboard(d2c_data, amz_data, amz_ad_map, fk_data, fk_ad_map, fc_data
         return False
     new_html = html[:match.start()] + replacement + html[match.end():]
 
-    # ── SAFETY CHECK 1: Verify no data was lost ──
-    # Count total D2C revenue in new data vs existing file
-    import subprocess
-    old_rev_match = re.findall(r'revenue:(\d+(?:\.\d+)?)', html[match.start():match.end()])
+    # ── SAFETY CHECK 1: Verify FY24-25 frozen data preserved ──
+    old_section = html[match.start():match.end()]
+    for m in FY24_25_MONTHS:
+        old_has = f'"{m}":{{' in old_section and old_section.count(f'"{m}":{{') > 0
+        new_has = f'"{m}":{{' in replacement
+        # Check the month has actual product data (not just empty {})
+        old_pat = re.search(rf'"{re.escape(m)}":\{{[^}}]', old_section)
+        new_pat = re.search(rf'"{re.escape(m)}":\{{[^}}]', replacement)
+        if old_pat and not new_pat:
+            print(f"\n❌ SAFETY ABORT: FY24-25 month '{m}' had data but would be wiped!")
+            print("   Frozen data extraction likely failed. Skipping write to protect dashboard.")
+            return False
+
+    # ── SAFETY CHECK 2: Verify total revenue not significantly reduced ──
+    old_rev_match = re.findall(r'revenue:(\d+(?:\.\d+)?)', old_section)
     new_rev_match = re.findall(r'revenue:(\d+(?:\.\d+)?)', replacement)
     old_total = sum(float(r) for r in old_rev_match) if old_rev_match else 0
     new_total = sum(float(r) for r in new_rev_match) if new_rev_match else 0
-    if old_total > 0 and new_total < old_total * 0.5:
-        print(f"\n❌ SAFETY ABORT: New data has significantly less revenue (₹{new_total:,.0f}) than existing (₹{old_total:,.0f})")
+    if old_total > 0 and new_total < old_total * 0.85:
+        print(f"\n❌ SAFETY ABORT: Revenue dropped >15% (₹{new_total:,.0f} vs ₹{old_total:,.0f})")
         print("   This likely means data was lost. Skipping write to protect dashboard.")
         return False
 
-    # ── SAFETY CHECK 2: Validate JS syntax before writing ──
+    # ── SAFETY CHECK 3: Validate JS syntax before writing ──
     # Extract the script block and check with node
     script_start = new_html.find('<script>', new_html.find('<body'))
     script_end = new_html.find('</script>', script_start)
@@ -789,15 +810,31 @@ def update_dashboard(d2c_data, amz_data, amz_ad_map, fk_data, fk_ad_map, fc_data
         try:
             with open(tmp_js, 'w') as f:
                 f.write(js_code)
-            result = subprocess.run(['node', '--check', tmp_js], capture_output=True, text=True)
-            if result.returncode != 0:
-                print(f"\n❌ SAFETY ABORT: JS syntax error detected in generated dashboard!")
-                print(f"   {result.stderr.strip()}")
-                print("   Skipping write to protect dashboard.")
-                return False
+            try:
+                result = subprocess.run(['node', '--check', tmp_js], capture_output=True, text=True)
+                if result.returncode != 0:
+                    print(f"\n❌ SAFETY ABORT: JS syntax error detected in generated dashboard!")
+                    print(f"   {result.stderr.strip()}")
+                    print("   Skipping write to protect dashboard.")
+                    return False
+            except FileNotFoundError:
+                print("  ⚠️ node not found — skipping JS syntax check")
         finally:
             if os.path.exists(tmp_js):
                 os.remove(tmp_js)
+
+    # ── SAFETY CHECK 4: Section size regression ──
+    old_len = len(old_section)
+    new_len = len(replacement)
+    if old_len > 1000 and new_len < old_len * 0.80:
+        print(f"\n❌ SAFETY ABORT: SYNC_DATA section shrank by >20% ({new_len} vs {old_len} chars)")
+        print("   This likely means data was lost. Skipping write.")
+        return False
+
+    # ── Create backup before overwriting ──
+    if os.path.exists(DASHBOARD):
+        shutil.copy2(DASHBOARD, DASHBOARD + ".bak")
+        print(f"  Backup created: dashboard.html.bak")
 
     with open(DASHBOARD, "w") as f:
         f.write(new_html)

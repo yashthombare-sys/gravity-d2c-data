@@ -1,5 +1,6 @@
 .env
 *.json.bak
+*.html.bak
 shiproket-mis-70c28ae6e7fb.json
 __pycache__/
 amazon-daily-sync/

@@ -10,7 +10,7 @@ Sources:
 Usage: python3 sync_mtd.py
 """
 
-import os, json, time, warnings, re, sys, calendar
+import os, json, time, warnings, re, sys, calendar, shutil
 from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
 import gspread
@@ -528,26 +528,44 @@ def main():
 
     # Save JSON
     if os.path.exists(OUTPUT_FILE):
+        # Backup existing file before any writes
+        shutil.copy2(OUTPUT_FILE, OUTPUT_FILE + ".bak")
+        print(f"\n💾 Backup created: {OUTPUT_FILE}.bak")
         with open(OUTPUT_FILE, "r") as f:
             output = json.load(f)
     else:
         output = {}
 
-    output.update({
-        "d2c": dict(sorted(all_d2c.items())),
-        "d2c_busyboard": dict(sorted(all_bb.items())),
-        "d2c_stem": dict(sorted(all_stem.items())),
-        "d2c_softtoy": dict(sorted(all_soft.items())),
-        "amazon": dict(sorted(all_amz.items())),
-        "last_synced": datetime.now().strftime("%Y-%m-%dT%H:%M:%S"),
-    })
+    # Merge-not-replace: only overwrite a key if new data is non-empty.
+    # For non-empty new data, merge into existing (new dates overwrite, old dates preserved).
+    merge_keys = {
+        "d2c": all_d2c,
+        "d2c_busyboard": all_bb,
+        "d2c_stem": all_stem,
+        "d2c_softtoy": all_soft,
+        "amazon": all_amz,
+    }
+    for key, new_data in merge_keys.items():
+        existing = output.get(key, {})
+        before_count = len(existing)
+        if new_data:
+            existing.update(new_data)
+            output[key] = dict(sorted(existing.items()))
+        # else: keep existing data untouched (don't overwrite with empty)
+        after_count = len(output.get(key, {}))
+        print(f"  📊 {key}: {before_count} dates before → {after_count} dates after"
+              + (" (kept existing, new data was empty)" if not new_data and before_count > 0 else ""))
+
+    output["last_synced"] = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 
     # Fulfillment: merge with existing shiprocket data (preserve historical months)
     if all_fulfillment:
         existing_sr = output.get("shiprocket", {})
+        sr_before = len(existing_sr)
         existing_sr.update(all_fulfillment)  # current month overwrites, old months preserved
         output["shiprocket"] = dict(sorted(existing_sr.items()))
         output["shiprocket_synced"] = datetime.now().strftime("%Y-%m-%dT%H:%M")
+        print(f"  📊 shiprocket: {sr_before} dates before → {len(output['shiprocket'])} dates after")
 
     with open(OUTPUT_FILE, "w") as f:
         json.dump(output, f, indent=2)

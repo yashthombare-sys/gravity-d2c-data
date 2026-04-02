@@ -6,7 +6,7 @@ inject into mtd_daily_data.json and dashboard.html.
 Usage: python3 shiprocket_sync.py
 """
 
-import os, sys, json, re, requests, argparse
+import os, sys, json, re, requests, argparse, shutil
 from datetime import datetime, timedelta, date
 from collections import defaultdict
 from calendar import monthrange
@@ -487,9 +487,22 @@ def main():
     if sheet_only:
         print(f"\n  Merged {sheet_only} dates from Fulfillment sheet (not covered by API)")
 
+    # Safety check: prevent data loss if new data has far fewer dates than existing
+    existing_count = len(sheet_sr)
+    new_count = len(all_daily_data)
+    if existing_count > 10 and new_count < existing_count * 0.8:
+        print(f"\n  WARNING: Shiprocket dates reduced from {existing_count} to {new_count}")
+        print("   Keeping existing data to prevent loss.")
+        all_daily_data = sheet_sr  # fallback to sheet data entirely
+
     # Add sync timestamp
     mtd_json["shiprocket"] = all_daily_data
     mtd_json["shiprocket_synced"] = datetime.now().strftime("%Y-%m-%dT%H:%M")
+
+    # Create backup before writing
+    if os.path.exists(OUTPUT_FILE):
+        shutil.copy2(OUTPUT_FILE, OUTPUT_FILE + ".bak")
+        print(f"  Backup saved to {OUTPUT_FILE}.bak")
 
     with open(OUTPUT_FILE, "w") as f:
         json.dump(mtd_json, f, indent=2)
