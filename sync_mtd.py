@@ -462,15 +462,21 @@ def main():
             "shopify_orders": int(bb.get("shopify_orders", 0) + st.get("shopify_orders", 0) + sf.get("shopify_orders", 0)),
         }
 
-    # Save JSON
-    output = {
+    # Save JSON — preserve existing keys (e.g. shiprocket data from shiprocket_sync.py)
+    if os.path.exists(OUTPUT_FILE):
+        with open(OUTPUT_FILE, "r") as f:
+            output = json.load(f)
+    else:
+        output = {}
+
+    output.update({
         "d2c": dict(sorted(all_d2c.items())),
         "d2c_busyboard": dict(sorted(all_bb.items())),
         "d2c_stem": dict(sorted(all_stem.items())),
         "d2c_softtoy": dict(sorted(all_soft.items())),
         "amazon": dict(sorted(all_amz.items())),
         "last_synced": datetime.now().strftime("%Y-%m-%dT%H:%M:%S"),
-    }
+    })
 
     with open(OUTPUT_FILE, "w") as f:
         json.dump(output, f, indent=2)
