@@ -12,7 +12,7 @@ import os, re, json, time
 import gspread
 from google.oauth2.service_account import Credentials
 
-BASE = "/Users/yashthombare/Desktop/Gravity/Shiprocket D2C data"
+BASE = os.path.dirname(os.path.abspath(__file__))
 SHEET_URL = "https://docs.google.com/spreadsheets/d/1-aln640f4OxRmoS9R5EBvnQACp6edzxrMQDU6sgd3Lc/"
 CREDS_FILE = os.path.join(BASE, "shiproket-mis-70c28ae6e7fb.json")
 DASHBOARD = os.path.join(BASE, "dashboard.html")
@@ -31,6 +31,7 @@ MONTHS = {
     "Jan 2026": "January 2026 MIS",
     "Feb 2026": "February 2026 MIS",
     "Mar 2026": "March 2026 MIS",
+    "Apr 2026": "April 2026 MIS",
 }
 
 # FY 2024-25 months — frozen in dashboard, no longer fetched
@@ -795,8 +796,10 @@ def verify_password():
 
 
 def main():
-    if not verify_password():
-        return
+    # Skip password check in CI (GitHub Actions sets GITHUB_ACTIONS=true)
+    if not os.environ.get("GITHUB_ACTIONS"):
+        if not verify_password():
+            return
 
     scopes = [
         "https://www.googleapis.com/auth/spreadsheets.readonly",

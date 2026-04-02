@@ -434,7 +434,9 @@ def main():
             mtd_json = json.load(f)
     else:
         mtd_json = {}
-    existing_sr = mtd_json.get("shiprocket", {})
+    # Save sheet-sourced fulfillment data (written by sync_mtd.py from Fulfillment tab)
+    # This serves as fallback if the Shiprocket API doesn't cover certain dates
+    sheet_sr = dict(mtd_json.get("shiprocket", {}))
 
     # Build list of months to fetch
     months_to_fetch = []
@@ -451,8 +453,8 @@ def main():
     else:
         months_to_fetch.append(today.replace(day=1))
 
-    # Fetch and process each month
-    all_daily_data = dict(existing_sr)  # start with existing data
+    # Fetch and process each month — API data only
+    all_daily_data = {}
 
     for month_start in months_to_fetch:
         # End date: last day of month, or today if current month
@@ -474,6 +476,16 @@ def main():
 
         # Merge into all_daily_data (overwrite days in this month)
         all_daily_data.update(month_data)
+
+    # Merge: API data takes priority, sheet data (from sync_mtd.py) fills gaps
+    # This gives dual-source reliability — if API misses dates, sheet data survives
+    sheet_only = 0
+    for date_str, sheet_day in sheet_sr.items():
+        if date_str not in all_daily_data:
+            all_daily_data[date_str] = sheet_day
+            sheet_only += 1
+    if sheet_only:
+        print(f"\n  Merged {sheet_only} dates from Fulfillment sheet (not covered by API)")
 
     # Add sync timestamp
     mtd_json["shiprocket"] = all_daily_data

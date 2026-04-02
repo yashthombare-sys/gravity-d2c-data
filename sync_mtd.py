@@ -384,6 +384,61 @@ def read_amazon_daily(sh, month_key, month_tabs):
     return result
 
 
+def read_fulfillment_tab(sh):
+    """Read the Fulfillment tab from the D2C sheet (written by Apps Script syncFulfillmentData).
+    Returns dict keyed by date string with fulfillment metrics + per-product breakdown."""
+    try:
+        ws = sh.worksheet("Fulfillment")
+    except gspread.exceptions.WorksheetNotFound:
+        print("  Fulfillment tab not found in D2C sheet")
+        return {}
+
+    data = api_call_with_retry(lambda: ws.get_all_values())
+    if not data or len(data) < 2:
+        print("  Fulfillment tab is empty")
+        return {}
+
+    result = {}
+    for row in data[1:]:  # skip header
+        if len(row) < 14:
+            continue
+        date_str = parse_date(row[0])
+        if not date_str:
+            continue
+
+        new_orders = int(safe_float(row[1]))
+        new_value = safe_float(row[2])
+        if new_orders == 0 and new_value == 0:
+            continue
+
+        # Parse products JSON (column N)
+        products = {}
+        if len(row) > 13 and row[13]:
+            try:
+                products = json.loads(row[13])
+            except (json.JSONDecodeError, TypeError):
+                pass
+
+        result[date_str] = {
+            "new_orders": new_orders,
+            "new_value": round(new_value, 2),
+            "pending": int(safe_float(row[3])),
+            "pending_value": round(safe_float(row[4]), 2),
+            "shipped": int(safe_float(row[5])),
+            "shipped_value": round(safe_float(row[6]), 2),
+            "delivered": int(safe_float(row[7])),
+            "delivered_value": round(safe_float(row[8]), 2),
+            "in_transit": int(safe_float(row[9])),
+            "rto": int(safe_float(row[10])),
+            "cancelled": int(safe_float(row[11])),
+            "avg_tat_days": safe_float(row[12]),
+            "products": products,
+        }
+
+    print(f"  Fulfillment: {len(result)} days loaded from sheet")
+    return result
+
+
 def main():
     scopes = [
         "https://www.googleapis.com/auth/spreadsheets.readonly",
@@ -462,7 +517,16 @@ def main():
             "shopify_orders": int(bb.get("shopify_orders", 0) + st.get("shopify_orders", 0) + sf.get("shopify_orders", 0)),
         }
 
-    # Save JSON — preserve existing keys (e.g. shiprocket data from shiprocket_sync.py)
+    # Read Fulfillment tab (written by Apps Script syncFulfillmentData)
+    all_fulfillment = {}
+    try:
+        all_fulfillment = read_fulfillment_tab(d2c_sh)
+    except Exception as e:
+        msg = f"Fulfillment: {e}"
+        errors.append(msg)
+        print(f"  Fulfillment error: {e}")
+
+    # Save JSON
     if os.path.exists(OUTPUT_FILE):
         with open(OUTPUT_FILE, "r") as f:
             output = json.load(f)
@@ -477,6 +541,11 @@ def main():
         "amazon": dict(sorted(all_amz.items())),
         "last_synced": datetime.now().strftime("%Y-%m-%dT%H:%M:%S"),
     })
+
+    # Fulfillment: replace shiprocket data from sheet instead of API
+    if all_fulfillment:
+        output["shiprocket"] = dict(sorted(all_fulfillment.items()))
+        output["shiprocket_synced"] = datetime.now().strftime("%Y-%m-%dT%H:%M")
 
     with open(OUTPUT_FILE, "w") as f:
         json.dump(output, f, indent=2)
@@ -494,6 +563,10 @@ def main():
     print(f"     STEM:       ₹{stem_total/100000:,.2f}L")
     print(f"     Soft Toy:   ₹{soft_total/100000:,.2f}L")
     print(f"   Amazon: {len(all_amz)} days | ₹{amz_total/100000:,.2f}L")
+    if all_fulfillment:
+        ff_orders = sum(v["new_orders"] for v in all_fulfillment.values())
+        ff_delivered = sum(v["delivered"] for v in all_fulfillment.values())
+        print(f"   Fulfillment: {len(all_fulfillment)} days | {ff_orders} orders | {ff_delivered} delivered")
     print(f"   Grand Total: ₹{(d2c_total+amz_total)/100000:,.2f}L")
 
     # Report errors

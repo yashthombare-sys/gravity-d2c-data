@@ -591,44 +591,55 @@ def push_to_sheet(daily_data, month_label):
                 except (ValueError, TypeError):
                     pass
 
-        total_expense = cogs + commissions + ad_spend
-        profit = revenue - total_expense
-        profit_pct = (profit / revenue * 100) if revenue > 0 else 0
-        comm_pct = (commissions / revenue * 100) if revenue > 0 else 0
-        mktg_pct = (ad_spend / revenue * 100) if revenue > 0 else 0
-
         row = [
             date_str,
             round(revenue, 2),
-            round(total_expense, 2),
+            None,  # C: Total Expense — formula placeholder
             round(cogs, 2),
             round(ad_spend, 2),
             round(commissions, 2),
             orders,
-            round(profit, 2),
-            round(profit_pct, 2),
-            round(comm_pct, 2),
-            round(mktg_pct, 2),
+            None,  # H: Profit — formula placeholder
+            None,  # I: Profit % — formula placeholder
+            None,  # J: Commissions % — formula placeholder
+            None,  # K: Marketing % — formula placeholder
             sessions,
             round(conversion_pct, 2),
         ]
 
         if date_str in existing_date_rows:
             row_idx, _ = existing_date_rows[date_str]
+            # Fill formula columns with row-specific formulas
+            row[2] = f'=D{row_idx}+E{row_idx}+F{row_idx}'
+            row[7] = f'=B{row_idx}-C{row_idx}'
+            row[8] = f'=IF(B{row_idx}>0,H{row_idx}/B{row_idx}*100,0)'
+            row[9] = f'=IF(B{row_idx}>0,F{row_idx}/B{row_idx}*100,0)'
+            row[10] = f'=IF(B{row_idx}>0,E{row_idx}/B{row_idx}*100,0)'
             batch_updates.append((f"A{row_idx}:M{row_idx}", [row]))
         else:
             rows_to_append.append(row)
 
+    # Fill formulas for appended rows (row numbers known after loop)
+    for i, row in enumerate(rows_to_append):
+        rn = next_row + i
+        row[2] = f'=D{rn}+E{rn}+F{rn}'
+        row[7] = f'=B{rn}-C{rn}'
+        row[8] = f'=IF(B{rn}>0,H{rn}/B{rn}*100,0)'
+        row[9] = f'=IF(B{rn}>0,F{rn}/B{rn}*100,0)'
+        row[10] = f'=IF(B{rn}>0,E{rn}/B{rn}*100,0)'
+
     # Batch update existing rows (single batch call instead of one-by-one)
     if batch_updates:
         gsheet_retry(lambda: ws.batch_update(
-            [{"range": r, "values": v} for r, v in batch_updates]
+            [{"range": r, "values": v} for r, v in batch_updates],
+            value_input_option='USER_ENTERED',
         ))
 
     # Batch append new rows
     if rows_to_append:
         cell_range = f"A{next_row}:M{next_row + len(rows_to_append) - 1}"
-        gsheet_retry(lambda: ws.update(values=rows_to_append, range_name=cell_range))
+        gsheet_retry(lambda: ws.update(values=rows_to_append, range_name=cell_range,
+                                       value_input_option='USER_ENTERED'))
 
     # Apply formatting
     end_row = next_row + len(rows_to_append) - 1

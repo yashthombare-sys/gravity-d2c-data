@@ -46,6 +46,9 @@ jobs:
       - name: Verify credentials file
         run: python3 -c "import json; json.load(open('shiproket-mis-70c28ae6e7fb.json')); print('Credentials JSON is valid')"
 
+      - name: Run Monthly MIS sync
+        run: python3 sync_dashboard.py
+
       - name: Run MTD sync
         run: python3 sync_mtd.py
 
