@@ -542,9 +542,11 @@ def main():
         "last_synced": datetime.now().strftime("%Y-%m-%dT%H:%M:%S"),
     })
 
-    # Fulfillment: replace shiprocket data from sheet instead of API
+    # Fulfillment: merge with existing shiprocket data (preserve historical months)
     if all_fulfillment:
-        output["shiprocket"] = dict(sorted(all_fulfillment.items()))
+        existing_sr = output.get("shiprocket", {})
+        existing_sr.update(all_fulfillment)  # current month overwrites, old months preserved
+        output["shiprocket"] = dict(sorted(existing_sr.items()))
         output["shiprocket_synced"] = datetime.now().strftime("%Y-%m-%dT%H:%M")
 
     with open(OUTPUT_FILE, "w") as f:
