@@ -28,7 +28,7 @@
   {
     "date": "2026-03-31",
     "revenue": 117628.24,
-    "orders": 121,
+    "orders": 120,
     "cogs": 42346.17,
     "fees_commission": 2946.56,
     "fees_fba": 9107.24,
@@ -36,6 +36,6 @@
     "fees_total": 15999.72,
     "ad_spend": 0,
     "sessions": 2662,
-    "conversion_pct": 4.73
+    "conversion_pct": 4.7
   }
 ]
