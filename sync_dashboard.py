@@ -585,7 +585,7 @@ def update_dashboard(d2c_data, amz_data, amz_ad_map, fk_data, fk_ad_map, fc_data
     existing_sync = sync_match.group(1) if sync_match else ""
 
     def extract_frozen(var_pattern, frozen_months, existing_text):
-        """Extract FY24-25 month values from existing SYNC_DATA JS."""
+        """Extract FY24-25 month values from existing SYNC_DATA JS (flat objects only)."""
         result = {}
         match = re.search(var_pattern + r'\{([^}]*)\}', existing_text)
         if match:
@@ -595,8 +595,30 @@ def update_dashboard(d2c_data, amz_data, amz_ad_map, fk_data, fk_ad_map, fc_data
                     result[m] = val_match.group(1)
         return result
 
-    # Extract frozen FY24-25 D2C data
-    frozen_d2c = extract_frozen(r'DATA=\{', FY24_25_MONTHS, existing_sync)
+    def extract_frozen_d2c(existing_text, frozen_months):
+        """Extract FY24-25 D2C data from DATA={...} using brace balancing (handles nested objects)."""
+        result = {}
+        data_match = re.search(r'DATA=(\{.*\});', existing_text)
+        if not data_match:
+            return result
+        data_str = data_match.group(1)
+        for m in frozen_months:
+            key = f'"{m}":'
+            start = data_str.find(key)
+            if start == -1:
+                continue
+            val_start = start + len(key)
+            depth = 0
+            for i in range(val_start, len(data_str)):
+                if data_str[i] == '{': depth += 1
+                elif data_str[i] == '}': depth -= 1
+                if depth == 0:
+                    result[m] = data_str[val_start:i+1]
+                    break
+        return result
+
+    # Extract frozen FY24-25 D2C data (needs brace balancing for nested product objects)
+    frozen_d2c = extract_frozen_d2c(existing_sync, FY24_25_MONTHS)
     frozen_amz_ad = extract_frozen(r'AMZ_AD_MAP=\{', FY24_25_MONTHS, existing_sync)
     frozen_fk_ad = extract_frozen(r'FK_AD_MAP=\{', FY24_25_MONTHS, existing_sync)
     frozen_bk_ad = extract_frozen(r'BK_AD_MAP=\{', FY24_25_MONTHS, existing_sync)
