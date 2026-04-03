@@ -1,9 +1,9 @@
 [
   {
     "date": "2026-04-01",
-    "revenue": 105486.37,
+    "revenue": 107385.37,
     "orders": 107,
-    "cogs": 37975.09,
+    "cogs": 38658.73,
     "fees_commission": 4428.81,
     "fees_fba": 9241.76,
     "fees_closing": 3883.38,
@@ -11,5 +11,18 @@
     "ad_spend": 0,
     "sessions": 2679,
     "conversion_pct": 3.88
+  },
+  {
+    "date": "2026-04-02",
+    "revenue": 102917.16,
+    "orders": 133,
+    "cogs": 37050.18,
+    "fees_commission": 2590.17,
+    "fees_fba": 10054.8,
+    "fees_closing": 4035.6,
+    "fees_total": 16680.57,
+    "ad_spend": 0,
+    "sessions": 0,
+    "conversion_pct": 0
   }
 ]
