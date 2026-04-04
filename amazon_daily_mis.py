@@ -938,10 +938,9 @@ def main():
             return still_failed
 
         # ── Run all attempts ──────────────────────────────────
-        # Skip "items" — fetching order items per-order makes ~300-400 API calls
-        # and is the primary cause of rate-limit failures. Instead we use
-        # OrderTotal for revenue and estimate COGS at 36% (historical average).
-        # The monthly full sync (no --last4 flag) still fetches items for accuracy.
+        # Skip "items" initially — fetching order items per-order makes ~300-400 API calls.
+        # After orders are fetched, we selectively fetch items ONLY for orders with
+        # missing/zero OrderTotal (usually just a handful).
         failed_steps = ["orders", "fees", "traffic"]
 
         for attempt in range(MAX_ATTEMPTS):
@@ -972,6 +971,24 @@ def main():
                 f"Orders fetch failed on all {MAX_ATTEMPTS} attempts. Cannot push any data.\n"
                 f"  This is likely a persistent Amazon SP-API issue."
             )
+
+        # ── Fetch items for orders with missing/zero OrderTotal ──
+        # Some orders (Easy Ship pending, replacements) have empty OrderTotal in SP-API.
+        # We fetch items ONLY for those to get accurate revenue without 300+ API calls.
+        if non_cancelled:
+            missing_total_orders = [
+                o["AmazonOrderId"] for o in non_cancelled
+                if not o.get("OrderTotal") or float(o.get("OrderTotal", {}).get("Amount", 0)) == 0
+            ]
+            if missing_total_orders:
+                print(f"\n  {len(missing_total_orders)} orders have missing/zero OrderTotal — fetching items for accurate revenue...", flush=True)
+                try:
+                    items_by_order, access_token = fetch_order_items_batch(missing_total_orders, access_token)
+                    print(f"  ✅ Items fetched for {len(items_by_order)} orders with missing OrderTotal", flush=True)
+                except Exception as e:
+                    print(f"  ⚠️ Items fetch failed: {e} — these orders will show ₹0 revenue", flush=True)
+            else:
+                print(f"\n  All orders have OrderTotal — no item fetch needed", flush=True)
 
         # ── BUILD & PUSH with best available data ──────────────
         print(f"\n  Building daily data and pushing...", flush=True)
