@@ -244,8 +244,12 @@ def fetch_all_orders(date_from, date_to, access_token):
     Returns list of order dicts (without individual items — uses OrderTotal).
     """
     headers = {"x-amz-access-token": access_token, "Content-Type": "application/json"}
-    created_after = f"{date_from}T00:00:00Z"
-    created_before = f"{date_to}T23:59:59Z"
+    # Convert IST boundaries to UTC: IST 00:00 = UTC 18:30 previous day
+    # This ensures orders placed midnight-5:30 AM IST are included
+    ist_start = datetime.strptime(date_from, "%Y-%m-%d").replace(tzinfo=IST)
+    ist_end = datetime.strptime(date_to, "%Y-%m-%d").replace(hour=23, minute=59, second=59, tzinfo=IST)
+    created_after = ist_start.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    created_before = ist_end.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
     all_orders = []
     next_token = None
