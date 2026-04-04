@@ -986,8 +986,8 @@ def main():
 
         # ── Run all attempts ──────────────────────────────────
         # Use Sales & Traffic Report for revenue/orders/COGS (1 API call, matches Seller Central).
-        # Skip individual order+item fetches (500+ API calls). Only fetch fees separately.
-        failed_steps = ["fees", "traffic"]
+        # Also fetch orders (without items) as fallback for yesterday — report has ~1 day delay.
+        failed_steps = ["orders", "fees", "traffic"]
 
         for attempt in range(MAX_ATTEMPTS):
             print(f"\n{'='*60}", flush=True)
@@ -1011,18 +1011,27 @@ def main():
                 print(f"  Waiting {delay // 60} minutes before attempt {attempt + 2}...", flush=True)
                 time.sleep(delay)
 
-        # ── If report still failed after all attempts, we can't do anything ──
-        if daily_traffic is None:
+        # ── If both report and orders failed, we can't do anything ──
+        if daily_traffic is None and orders is None:
             raise RuntimeError(
-                f"Sales & Traffic report failed on all {MAX_ATTEMPTS} attempts. Cannot push any data.\n"
+                f"Both report and orders failed on all {MAX_ATTEMPTS} attempts. Cannot push any data.\n"
                 f"  This is likely a persistent Amazon SP-API issue."
             )
 
-        # ── BUILD & PUSH with report data ──────────────
-        print(f"\n  Building daily data from Sales & Traffic report...", flush=True)
+        # ── BUILD & PUSH: report data primary, order data as fallback ──
+        # Report matches Seller Central exactly but has ~1 day delay.
+        # Orders (OrderTotal) fill in yesterday's data as an estimate.
+        print(f"\n  Building daily data (report primary, orders fallback)...", flush=True)
 
         if daily_fees is None:
             daily_fees = {}
+        if daily_traffic is None:
+            daily_traffic = {}
+
+        # Build order-based fallback (no items = uses OrderTotal + 36% COGS estimate)
+        daily_orders = {}
+        if orders is not None:
+            daily_orders = aggregate_orders_by_day(orders, {})
 
         from collections import defaultdict as dd
         months = dd(list)
@@ -1031,28 +1040,44 @@ def main():
             ds = current.strftime("%Y-%m-%d")
             month_label = current.strftime("%B %Y")
 
-            report_day = daily_traffic.get(ds, {"revenue": 0, "orders": 0, "cogs": 0, "sessions": 0, "conversion_pct": 0})
-            fee_data = daily_fees.get(ds, {"commission": 0, "fba_fee": 0, "closing_fee": 0, "total": 0})
+            # Use report data if available (exact match), otherwise fall back to order data
+            report_day = daily_traffic.get(ds)
+            if report_day and report_day.get("revenue", 0) > 0:
+                revenue = report_day["revenue"]
+                order_count = report_day.get("orders", 0)
+                cogs = report_day.get("cogs", 0)
+                sessions = report_day.get("sessions", 0)
+                conv = report_day.get("conversion_pct", 0)
+                source = "report"
+            else:
+                order_day = daily_orders.get(ds, {"revenue": 0, "orders": 0, "cogs": 0})
+                revenue = order_day["revenue"]
+                order_count = order_day["orders"]
+                cogs = order_day["cogs"]
+                sessions = 0
+                conv = 0
+                source = "orders"
 
-            if fee_data["total"] == 0 and report_day.get("revenue", 0) > 0:
-                estimated = round(report_day["revenue"] * 0.15, 2)
+            fee_data = daily_fees.get(ds, {"commission": 0, "fba_fee": 0, "closing_fee": 0, "total": 0})
+            if fee_data["total"] == 0 and revenue > 0:
+                estimated = round(revenue * 0.15, 2)
                 fee_data = {"commission": estimated, "fba_fee": 0, "closing_fee": 0, "total": estimated}
 
             months[month_label].append({
                 "date": ds,
-                "revenue": report_day.get("revenue", 0),
-                "orders": report_day.get("orders", 0),
-                "cogs": report_day.get("cogs", 0),
+                "revenue": revenue,
+                "orders": order_count,
+                "cogs": cogs,
                 "fees_commission": fee_data["commission"],
                 "fees_fba": fee_data["fba_fee"],
                 "fees_closing": fee_data["closing_fee"],
                 "fees_total": fee_data["total"],
                 "ad_spend": 0,
-                "sessions": report_day.get("sessions", 0),
-                "conversion_pct": report_day.get("conversion_pct", 0),
+                "sessions": sessions,
+                "conversion_pct": conv,
             })
 
-            print(f"  {ds}: ₹{report_day.get('revenue',0):>10,.2f} rev | {report_day.get('orders',0):>4} orders", flush=True)
+            print(f"  {ds}: ₹{revenue:>10,.2f} rev | {order_count:>4} orders [{source}]", flush=True)
             current += timedelta(days=1)
 
         for month_label, day_data in months.items():
