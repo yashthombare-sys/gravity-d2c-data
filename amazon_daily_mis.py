@@ -222,18 +222,52 @@ def fetch_traffic_report(date_from, date_to, access_token):
     import json as _json
     report_data = _json.loads(report_text)
 
-    # Extract daily traffic totals
+    # Calculate COGS from per-SKU data
+    total_cogs = 0
+    total_sku_units = 0
+    for sku_entry in report_data.get("salesAndTrafficByAsin", []):
+        sku = sku_entry.get("sku", "")
+        product = AMAZON_SKU_MAP.get(sku)
+        if not product:
+            from config import classify_product
+            product = classify_product(sku)
+        sku_units = sku_entry.get("salesByAsin", {}).get("unitsOrdered", 0)
+        if product and product in COGS_MAP and sku_units > 0:
+            total_cogs += COGS_MAP[product] * sku_units
+            total_sku_units += sku_units
+
+    # Extract daily sales + traffic totals
     result = {}
+    total_report_units = 0
     for day_data in report_data.get("salesAndTrafficByDate", []):
         date_str = day_data.get("date", "")
         traffic = day_data.get("trafficByDate", {})
+        sales = day_data.get("salesByDate", {})
         sessions = traffic.get("sessions", 0)
         conversion = traffic.get("unitSessionPercentage", 0)
+        revenue = float(sales.get("orderedProductSales", {}).get("amount", 0))
+        units = sales.get("unitsOrdered", 0)
+        order_items = sales.get("totalOrderItems", 0)
+        total_report_units += units
         result[date_str] = {
             "sessions": sessions,
             "conversion_pct": round(conversion, 2),
+            "revenue": round(revenue, 2),
+            "orders": order_items,
+            "units": units,
         }
-        print(f"    {date_str}: {sessions} sessions, {conversion:.2f}% conversion", flush=True)
+        print(f"    {date_str}: ₹{revenue:,.2f} rev | {order_items} orders | {sessions} sessions", flush=True)
+
+    # Distribute COGS proportionally across days by units
+    for date_str, day in result.items():
+        if total_report_units > 0 and total_cogs > 0:
+            proportion = day["units"] / total_report_units if total_report_units else 0
+            day["cogs"] = round(total_cogs * proportion, 2)
+        else:
+            day["cogs"] = round(day["revenue"] * 0.36, 2)
+
+    if total_sku_units > 0:
+        print(f"    COGS: ₹{total_cogs:,.0f} from {total_sku_units} SKU-mapped units", flush=True)
 
     return result
 
@@ -929,7 +963,7 @@ def main():
                     print(f"  ❌ Order items failed: {e}", flush=True)
                     still_failed.append("items")
 
-            if orders is not None and "fees" in failed:
+            if "fees" in failed:
                 print(f"\n  Fetching fees...", flush=True)
                 try:
                     daily_fees = fetch_all_fees(date_from, date_to, access_token)
@@ -938,8 +972,8 @@ def main():
                     print(f"  ❌ Fees failed: {e}", flush=True)
                     still_failed.append("fees")
 
-            if orders is not None and "traffic" in failed:
-                print(f"\n  Fetching traffic...", flush=True)
+            if "traffic" in failed:
+                print(f"\n  Fetching Sales & Traffic report...", flush=True)
                 try:
                     access_token = get_access_token()
                     daily_traffic = fetch_traffic_report(date_from, date_to, access_token)
@@ -951,9 +985,9 @@ def main():
             return still_failed
 
         # ── Run all attempts ──────────────────────────────────
-        # Fetch items for ALL orders to get accurate ItemPrice-based revenue
-        # matching Seller Central's "Ordered Product Sales". ~500 orders × 0.5s ≈ 4 min.
-        failed_steps = ["orders", "items", "fees", "traffic"]
+        # Use Sales & Traffic Report for revenue/orders/COGS (1 API call, matches Seller Central).
+        # Skip individual order+item fetches (500+ API calls). Only fetch fees separately.
+        failed_steps = ["fees", "traffic"]
 
         for attempt in range(MAX_ATTEMPTS):
             print(f"\n{'='*60}", flush=True)
@@ -977,22 +1011,18 @@ def main():
                 print(f"  Waiting {delay // 60} minutes before attempt {attempt + 2}...", flush=True)
                 time.sleep(delay)
 
-        # ── If orders still failed after all attempts, we can't do anything ──
-        if orders is None:
+        # ── If report still failed after all attempts, we can't do anything ──
+        if daily_traffic is None:
             raise RuntimeError(
-                f"Orders fetch failed on all {MAX_ATTEMPTS} attempts. Cannot push any data.\n"
+                f"Sales & Traffic report failed on all {MAX_ATTEMPTS} attempts. Cannot push any data.\n"
                 f"  This is likely a persistent Amazon SP-API issue."
             )
 
-        # ── BUILD & PUSH with best available data ──────────────
-        print(f"\n  Building daily data and pushing...", flush=True)
+        # ── BUILD & PUSH with report data ──────────────
+        print(f"\n  Building daily data from Sales & Traffic report...", flush=True)
 
-        # Use whatever we got (None → empty fallback)
-        daily_orders = aggregate_orders_by_day(orders, items_by_order or {})
         if daily_fees is None:
             daily_fees = {}
-        if daily_traffic is None:
-            daily_traffic = {}
 
         from collections import defaultdict as dd
         months = dd(list)
@@ -1001,29 +1031,28 @@ def main():
             ds = current.strftime("%Y-%m-%d")
             month_label = current.strftime("%B %Y")
 
-            order_data = daily_orders.get(ds, {"revenue": 0, "orders": 0, "cogs": 0})
+            report_day = daily_traffic.get(ds, {"revenue": 0, "orders": 0, "cogs": 0, "sessions": 0, "conversion_pct": 0})
             fee_data = daily_fees.get(ds, {"commission": 0, "fba_fee": 0, "closing_fee": 0, "total": 0})
-            traffic_data = daily_traffic.get(ds, {"sessions": 0, "conversion_pct": 0})
 
-            if fee_data["total"] == 0 and order_data["revenue"] > 0:
-                estimated = round(order_data["revenue"] * 0.15, 2)
+            if fee_data["total"] == 0 and report_day.get("revenue", 0) > 0:
+                estimated = round(report_day["revenue"] * 0.15, 2)
                 fee_data = {"commission": estimated, "fba_fee": 0, "closing_fee": 0, "total": estimated}
 
             months[month_label].append({
                 "date": ds,
-                "revenue": order_data["revenue"],
-                "orders": order_data["orders"],
-                "cogs": order_data["cogs"],
+                "revenue": report_day.get("revenue", 0),
+                "orders": report_day.get("orders", 0),
+                "cogs": report_day.get("cogs", 0),
                 "fees_commission": fee_data["commission"],
                 "fees_fba": fee_data["fba_fee"],
                 "fees_closing": fee_data["closing_fee"],
                 "fees_total": fee_data["total"],
                 "ad_spend": 0,
-                "sessions": traffic_data.get("sessions", 0),
-                "conversion_pct": traffic_data.get("conversion_pct", 0),
+                "sessions": report_day.get("sessions", 0),
+                "conversion_pct": report_day.get("conversion_pct", 0),
             })
 
-            print(f"  {ds}: ₹{order_data['revenue']:>10,.2f} rev | {order_data['orders']:>4} orders", flush=True)
+            print(f"  {ds}: ₹{report_day.get('revenue',0):>10,.2f} rev | {report_day.get('orders',0):>4} orders", flush=True)
             current += timedelta(days=1)
 
         for month_label, day_data in months.items():
@@ -1032,12 +1061,10 @@ def main():
 
         if failed_steps:
             print(f"\n⚠️  Completed with {len(failed_steps)} step(s) still failed after {MAX_ATTEMPTS} attempts: {', '.join(failed_steps)}", flush=True)
-            if "items" in failed_steps:
-                print(f"  → COGS estimated at 36% (order items unavailable)", flush=True)
             if "fees" in failed_steps:
                 print(f"  → Commissions estimated at 15% (fees API unavailable)", flush=True)
             if "traffic" in failed_steps:
-                print(f"  → Sessions = 0 (traffic report unavailable)", flush=True)
+                print(f"  → Revenue/sessions = 0 (report unavailable)", flush=True)
             print(f"  Data pushed with estimates. Will correct on next successful run.", flush=True)
         else:
             print(f"\n✅ Done! All data fetched successfully.", flush=True)
