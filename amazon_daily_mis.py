@@ -15,8 +15,11 @@ import sys, os, json, time
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "automation"))
 
 import requests
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from collections import defaultdict
+
+# IST timezone (UTC+5:30) — Seller Central uses IST dates
+IST = timezone(timedelta(hours=5, minutes=30))
 from config import load_env, AMAZON_SKU_MAP, COGS_MAP
 
 import gspread
@@ -409,9 +412,15 @@ def aggregate_orders_by_day(orders, items_by_order=None):
         if status in ("Canceled", "Cancelled"):
             continue
 
-        purchase_date = order.get("PurchaseDate", "")[:10]
-        if not purchase_date:
+        # Convert PurchaseDate from UTC to IST to match Seller Central's date attribution
+        raw_date = order.get("PurchaseDate", "")
+        if not raw_date:
             continue
+        try:
+            utc_dt = datetime.fromisoformat(raw_date.replace("Z", "+00:00"))
+            purchase_date = utc_dt.astimezone(IST).strftime("%Y-%m-%d")
+        except (ValueError, TypeError):
+            purchase_date = raw_date[:10]
 
         order_id = order.get("AmazonOrderId", "")
         items = (items_by_order or {}).get(order_id, [])
