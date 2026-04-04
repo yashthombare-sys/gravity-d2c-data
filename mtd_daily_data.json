@@ -2692,31 +2692,31 @@
       "profit": 17928.85
     },
     "2026-03-31": {
-      "revenue": 122180.51,
+      "revenue": 123504.06,
       "orders": 125,
       "ad_spend": 23541.0,
       "commissions": 15999.72,
-      "product_expense": 40903.0,
-      "total_expense": 80443.72,
-      "profit": 41736.79
+      "product_expense": 54421.39,
+      "total_expense": 93962.11,
+      "profit": 29541.95
     },
     "2026-04-01": {
-      "revenue": 105179.11,
-      "orders": 104,
+      "revenue": 110740.61,
+      "orders": 103,
       "ad_spend": 25938.76,
       "commissions": 17553.95,
-      "product_expense": 34299.0,
-      "total_expense": 77791.71,
-      "profit": 27387.4
+      "product_expense": 45278.59,
+      "total_expense": 88771.3,
+      "profit": 21969.31
     },
     "2026-04-02": {
-      "revenue": 112548.21,
-      "orders": 124,
+      "revenue": 118030.16,
+      "orders": 123,
       "ad_spend": 25687.42,
       "commissions": 16680.57,
-      "product_expense": 37383.0,
-      "total_expense": 79750.99,
-      "profit": 32797.22
+      "product_expense": 53986.02,
+      "total_expense": 96354.01,
+      "profit": 21676.15
     },
     "2026-04-03": {
       "revenue": 102289.85,
@@ -2728,7 +2728,7 @@
       "profit": 27429.14
     }
   },
-  "last_synced": "2026-04-04T08:15:37",
+  "last_synced": "2026-04-04T08:20:06",
   "shiprocket": {
     "2026-04-01": {
       "new_orders": 206,
@@ -3395,10 +3395,10 @@
       }
     },
     "2026-04-04": {
-      "new_orders": 82,
-      "new_value": 97929.37,
-      "pending": 57,
-      "pending_value": 65607.8,
+      "new_orders": 83,
+      "new_value": 98928.37,
+      "pending": 58,
+      "pending_value": 66606.8,
       "shipped": 23,
       "shipped_value": 27173.57,
       "delivered": 0,
@@ -3408,11 +3408,11 @@
       "cancelled": 2,
       "avg_tat_days": 2.4,
       "products": {
-        "V6-V1 Combo": {
-          "new_orders": 2,
-          "new_value": 2498.0,
-          "pending": 2,
-          "pending_value": 2498.0,
+        "V6": {
+          "new_orders": 19,
+          "new_value": 18331.65,
+          "pending": 19,
+          "pending_value": 18331.65,
           "shipped": 0,
           "shipped_value": 0.0,
           "delivered": 0,
@@ -3422,11 +3422,11 @@
           "cancelled": 0,
           "avg_tat_days": 0
         },
-        "V6": {
-          "new_orders": 18,
-          "new_value": 17332.65,
-          "pending": 18,
-          "pending_value": 17332.65,
+        "V6-V1 Combo": {
+          "new_orders": 2,
+          "new_value": 2498.0,
+          "pending": 2,
+          "pending_value": 2498.0,
           "shipped": 0,
           "shipped_value": 0.0,
           "delivered": 0,
@@ -89309,5 +89309,5 @@
       }
     }
   },
-  "shiprocket_synced": "2026-04-04T08:16"
+  "shiprocket_synced": "2026-04-04T08:20"
 }
