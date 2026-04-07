@@ -569,16 +569,33 @@
   <!-- Filters -->
   <div class="filter-bar">
     <div class="filter-group" style="position:relative;">
-      <span class="filter-label">Month</span>
-      <select class="filter-select" id="srMonth" onchange="onSrMonthChange()"></select>
-    </div>
-    <div class="filter-group">
-      <span class="filter-label">From</span>
-      <input type="date" class="filter-select" id="srDateFrom" onchange="onSrDateChange()" style="min-width:130px;">
-    </div>
-    <div class="filter-group">
-      <span class="filter-label">To</span>
-      <input type="date" class="filter-select" id="srDateTo" onchange="onSrDateChange()" style="min-width:130px;">
+      <span class="filter-label">Select Date</span>
+      <button class="filter-select" id="srDateBtn" onclick="toggleSrCalendar()" style="cursor:pointer;min-width:140px;text-align:left;">—</button>
+      <input type="hidden" id="srDateFrom">
+      <input type="hidden" id="srDateTo">
+      <div class="cal-popup" id="srCalPopup">
+        <div class="cal-presets">
+          <button class="cal-preset" onclick="srCalPreset('yesterday')">Yesterday</button>
+          <button class="cal-preset" onclick="srCalPreset('3d')">Last 3 Days</button>
+          <button class="cal-preset" onclick="srCalPreset('7d')">Last 7 Days</button>
+          <button class="cal-preset" onclick="srCalPreset('30d')">Last 30 Days</button>
+        </div>
+        <div class="cal-divider"></div>
+        <div class="cal-header">
+          <span class="cal-arrow" onclick="srCalNav(-1)">&larr;</span>
+          <span class="cal-month" id="srCalMonthLabel">—</span>
+          <span class="cal-arrow" onclick="srCalNav(1)">&rarr;</span>
+        </div>
+        <div class="cal-grid">
+          <span class="cal-dow">Su</span><span class="cal-dow">Mo</span><span class="cal-dow">Tu</span><span class="cal-dow">We</span><span class="cal-dow">Th</span><span class="cal-dow">Fr</span><span class="cal-dow">Sa</span>
+        </div>
+        <div class="cal-grid" id="srCalDays"></div>
+        <div class="cal-footer">
+          <span id="srCalRangeLabel" style="font-size:12px;color:#888;flex:1;"></span>
+          <button class="cal-btn" onclick="closeSrCalendar()">Cancel</button>
+          <button class="cal-btn cal-apply" onclick="applySrCalendar()">Apply</button>
+        </div>
+      </div>
     </div>
     <div class="filter-group">
       <span class="filter-label">Brand</span>
@@ -613,14 +630,34 @@
     <span id="srPendingOrders" style="color:#fcbb13;font-weight:600;display:none;"></span>
   </div>
 
+  <!-- TAT Overview Cards (top) -->
+  <div id="srTatOverview" style="display:none;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+    <div id="srTatDeliverCard" style="padding:18px 22px;background:var(--card);border:1px solid var(--border);border-radius:10px;">
+      <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;">ORDER PLACED → DELIVERED</div>
+      <div style="display:flex;align-items:baseline;gap:8px;margin-top:6px;">
+        <span id="srTatDeliverVal" style="font-size:32px;font-weight:800;">—</span>
+        <span style="font-size:14px;color:var(--muted);">days</span>
+        <span id="srTatDeliverBadge" style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;"></span>
+      </div>
+      <div id="srTatDeliverSub" style="font-size:11px;color:var(--muted);margin-top:4px;"></div>
+    </div>
+    <div id="srTatShipCard" style="padding:18px 22px;background:var(--card);border:1px solid var(--border);border-radius:10px;">
+      <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;">ORDER PLACED → SHIPPED</div>
+      <div style="display:flex;align-items:baseline;gap:8px;margin-top:6px;">
+        <span id="srTatShipVal" style="font-size:32px;font-weight:800;">—</span>
+        <span style="font-size:14px;color:var(--muted);">days</span>
+        <span id="srTatShipBadge" style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;"></span>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px;">Target: ≤ 2 days</div>
+    </div>
+  </div>
+
   <div class="section" id="srSection">
     <div class="section-title">Shiprocket Fulfillment & TAT</div>
     <!-- Fulfillment Pipeline -->
     <div id="srPipeline" style="display:flex;align-items:center;justify-content:center;gap:0;margin:12px 0 18px;flex-wrap:wrap;"></div>
     <!-- KPI Cards -->
-    <div class="kpi-row" id="srKpiRow" style="grid-template-columns:repeat(6,1fr);gap:8px;"></div>
-    <!-- TAT Breakdown -->
-    <div id="srTatBox" style="margin-top:14px;padding:14px 18px;background:var(--card);border:1px solid var(--border);border-radius:10px;"></div>
+    <div class="kpi-row" id="srKpiRow" style="grid-template-columns:repeat(2,1fr);gap:8px;"></div>
     <div class="charts-grid" style="grid-template-columns:1fr;margin-top:14px;">
       <div class="chart-card"><h3>Daily Fulfillment Trend</h3><canvas id="srTrendChart" height="260"></canvas></div>
     </div>
@@ -631,8 +668,8 @@
     <div class="section-title">Daily Breakdown</div>
     <div class="table-wrap">
       <table><thead><tr>
-        <th>Date</th><th>New Orders</th><th>New Value</th><th>Shipped</th>
-        <th>Delivered</th><th>In Transit</th><th>RTO</th><th>Cancelled</th><th>Avg TAT</th>
+        <th>Date</th><th>Total Orders</th><th>Unshipped</th><th>New Value</th><th>Shipped</th>
+        <th>Delivered</th><th>In Transit</th><th>RTO</th><th>Cancelled</th><th>Ship Days</th><th>Deliver Days</th><th>Avg TAT</th>
       </tr></thead><tbody id="srTableBody"></tbody></table>
     </div>
   </div>
@@ -2726,7 +2763,6 @@ function toggleMtdKpi(id) {
 // ── Shiprocket Fulfillment & TAT ──
 let _srChart = null;
 let _srMonthInit = false;
-let _srDateCustom = false; // true if user manually changed From/To
 
 // Brand → category mapping
 const SR_BRAND_CAT = { clapstore: 'busyboard', sooperbrains: 'stem', clapcuddle: 'softtoy' };
@@ -2734,42 +2770,143 @@ const SR_CAT_BRAND = { busyboard: 'clapstore', stem: 'sooperbrains', softtoy: 'c
 // Product → category (from CATS in config.py, mirrored in JS)
 const SR_CATS = typeof CATS !== 'undefined' ? CATS : {};
 
-function onSrMonthChange() {
-  // When month dropdown changes, auto-set From/To to that month's range
-  _srDateCustom = false;
-  const m = document.getElementById('srMonth').value;
-  if (m === 'custom') return; // don't change dates
-  const sr = (typeof MTD_DATA !== 'undefined' && MTD_DATA.shiprocket) ? MTD_DATA.shiprocket : null;
-  if (!sr) return;
-  const monthDates = Object.keys(sr).filter(d => d.startsWith(m)).sort();
-  if (monthDates.length > 0) {
-    document.getElementById('srDateFrom').value = monthDates[0];
-    document.getElementById('srDateTo').value = monthDates[monthDates.length - 1];
+// ── SR Calendar (independent from MTD calendar) ──
+let srCalYear, srCalMonth, srCalStart = null, srCalEnd = null;
+
+function updateSrDateBtn() {
+  const btn = document.getElementById('srDateBtn');
+  if (!srCalStart) { btn.textContent = '—'; return; }
+  if (srCalStart === srCalEnd) {
+    const d = new Date(srCalStart + 'T00:00:00');
+    btn.textContent = d.toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'});
+  } else {
+    btn.textContent = fmtDateShort(srCalStart) + ' — ' + fmtDateShort(srCalEnd);
   }
+}
+
+function toggleSrCalendar() {
+  const popup = document.getElementById('srCalPopup');
+  if (popup.classList.contains('open')) { closeSrCalendar(); return; }
+  if (srCalStart) {
+    const d = new Date(srCalStart + 'T00:00:00');
+    srCalYear = d.getFullYear();
+    srCalMonth = d.getMonth();
+  }
+  renderSrCalDays();
+  popup.classList.add('open');
+}
+
+function closeSrCalendar() {
+  document.getElementById('srCalPopup').classList.remove('open');
+}
+
+function srCalNav(dir) {
+  srCalMonth += dir;
+  if (srCalMonth > 11) { srCalMonth = 0; srCalYear++; }
+  if (srCalMonth < 0) { srCalMonth = 11; srCalYear--; }
+  renderSrCalDays();
+}
+
+function srCalSelectDay(dateStr) {
+  if (!srCalStart || (srCalStart && srCalEnd && srCalStart !== srCalEnd)) {
+    srCalStart = dateStr;
+    srCalEnd = dateStr;
+  } else if (srCalStart === srCalEnd) {
+    if (dateStr < srCalStart) {
+      srCalEnd = srCalStart;
+      srCalStart = dateStr;
+    } else {
+      srCalEnd = dateStr;
+    }
+  }
+  renderSrCalDays();
+}
+
+function srCalPreset(preset) {
+  const today = new Date();
+  const yesterday = new Date(today); yesterday.setDate(today.getDate() - 1);
+  const ys = yesterday.toISOString().split('T')[0];
+
+  if (preset === 'yesterday') {
+    srCalStart = ys; srCalEnd = ys;
+  } else if (preset === '3d') {
+    const d = new Date(today); d.setDate(today.getDate() - 3);
+    srCalStart = d.toISOString().split('T')[0]; srCalEnd = ys;
+  } else if (preset === '7d') {
+    const d = new Date(today); d.setDate(today.getDate() - 7);
+    srCalStart = d.toISOString().split('T')[0]; srCalEnd = ys;
+  } else if (preset === '30d') {
+    const d = new Date(today); d.setDate(today.getDate() - 30);
+    srCalStart = d.toISOString().split('T')[0]; srCalEnd = ys;
+  }
+
+  const sd = new Date(srCalStart + 'T00:00:00');
+  srCalYear = sd.getFullYear();
+  srCalMonth = sd.getMonth();
+  renderSrCalDays();
+
+  document.querySelectorAll('#srCalPopup .cal-preset').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+
+  applySrCalendar();
+}
+
+function applySrCalendar() {
+  document.getElementById('srDateFrom').value = srCalStart;
+  document.getElementById('srDateTo').value = srCalEnd;
+  updateSrDateBtn();
+  closeSrCalendar();
   renderShiprocket();
 }
 
-function onSrDateChange() {
-  // When user manually changes dates, set month to "Custom" if dates span multiple months
-  const from = document.getElementById('srDateFrom').value;
-  const to = document.getElementById('srDateTo').value;
-  if (!from || !to) return;
-  const fromMonth = from.substring(0, 7);
-  const toMonth = to.substring(0, 7);
-  const sel = document.getElementById('srMonth');
-  if (fromMonth === toMonth) {
-    // Single month — sync dropdown
-    if ([...sel.options].some(o => o.value === fromMonth)) sel.value = fromMonth;
-    _srDateCustom = false;
-  } else {
-    // Cross-month — add/select "Custom" option
-    _srDateCustom = true;
-    if (![...sel.options].some(o => o.value === 'custom')) {
-      sel.innerHTML += '<option value="custom">Custom Range</option>';
-    }
-    sel.value = 'custom';
+function renderSrCalDays() {
+  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('srCalMonthLabel').textContent = monthNames[srCalMonth] + ' ' + srCalYear;
+
+  const today = new Date();
+  const todayStr = today.toISOString().split('T')[0];
+  const firstDay = new Date(srCalYear, srCalMonth, 1).getDay();
+  const daysInMonth = new Date(srCalYear, srCalMonth + 1, 0).getDate();
+
+  const dataDates = new Set();
+  if (typeof MTD_DATA !== 'undefined' && MTD_DATA.shiprocket) {
+    Object.keys(MTD_DATA.shiprocket).forEach(d => dataDates.add(d));
   }
-  renderShiprocket();
+
+  let html = '';
+  for (let i = 0; i < firstDay; i++) {
+    html += '<span class="cal-day cal-empty"></span>';
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = srCalYear + '-' + String(srCalMonth+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    const isFuture = new Date(dateStr + 'T00:00:00') > today;
+    const isToday = dateStr === todayStr;
+    const isStart = dateStr === srCalStart;
+    const isEnd = dateStr === srCalEnd;
+    const inRange = srCalStart && srCalEnd && dateStr >= srCalStart && dateStr <= srCalEnd;
+    const hasData = dataDates.has(dateStr);
+
+    let cls = 'cal-day';
+    if (isStart || isEnd) cls += ' cal-selected';
+    else if (inRange) cls += ' cal-in-range';
+    else if (isToday) cls += ' cal-today';
+    else if (isFuture) cls += ' cal-disabled';
+    else if (hasData) cls += ' cal-has-data';
+
+    if (isFuture && !isToday) {
+      html += '<span class="' + cls + '">' + d + '</span>';
+    } else {
+      html += '<span class="' + cls + '" onclick="srCalSelectDay(\'' + dateStr + '\')">' + d + '</span>';
+    }
+  }
+  document.getElementById('srCalDays').innerHTML = html;
+
+  const rangeLabel = document.getElementById('srCalRangeLabel');
+  if (srCalStart === srCalEnd) {
+    rangeLabel.textContent = fmtDateShort(srCalStart);
+  } else {
+    rangeLabel.textContent = fmtDateShort(srCalStart) + ' → ' + fmtDateShort(srCalEnd);
+  }
 }
 
 function onSrBrandChange() {
@@ -2856,7 +2993,7 @@ function _srGetDayData(dayRaw, product, category) {
   }
   // If filtering by category, sum products in that category
   if (category !== 'all' && dayRaw.products) {
-    const agg = { new_orders:0,new_value:0,shipped:0,shipped_value:0,delivered:0,delivered_value:0,in_transit:0,rto:0,cancelled:0,avg_tat_days:0,_tatSum:0,_tatN:0 };
+    const agg = { new_orders:0,new_value:0,shipped:0,shipped_value:0,delivered:0,delivered_value:0,in_transit:0,rto:0,cancelled:0,avg_tat_days:0,avg_ship_days:0,avg_deliver_days:0,_tatSum:0,_tatN:0,_shipSum:0,_shipN:0,_delSum:0,_delN:0 };
     for (const [p, pd] of Object.entries(dayRaw.products)) {
       if ((SR_CATS[p] || '') !== category) continue;
       agg.new_orders += pd.new_orders||0; agg.new_value += pd.new_value||0;
@@ -2864,8 +3001,12 @@ function _srGetDayData(dayRaw, product, category) {
       agg.delivered += pd.delivered||0; agg.delivered_value += pd.delivered_value||0;
       agg.in_transit += pd.in_transit||0; agg.rto += pd.rto||0; agg.cancelled += pd.cancelled||0;
       if (pd.avg_tat_days > 0) { agg._tatSum += pd.avg_tat_days; agg._tatN++; }
+      if (pd.avg_ship_days > 0) { agg._shipSum += pd.avg_ship_days; agg._shipN++; }
+      if (pd.avg_deliver_days > 0) { agg._delSum += pd.avg_deliver_days; agg._delN++; }
     }
     agg.avg_tat_days = agg._tatN > 0 ? +(agg._tatSum / agg._tatN).toFixed(1) : 0;
+    agg.avg_ship_days = agg._shipN > 0 ? +(agg._shipSum / agg._shipN).toFixed(1) : 0;
+    agg.avg_deliver_days = agg._delN > 0 ? +(agg._delSum / agg._delN).toFixed(1) : 0;
     return agg;
   }
   // No filter — return aggregate
@@ -2878,31 +3019,24 @@ function renderShiprocket() {
     const section = document.getElementById('srSection');
     if (!sr || Object.keys(sr).length === 0) {
       if (section) section.innerHTML = '<div class="section-title">Shiprocket Fulfillment & TAT</div><p style="color:var(--muted);text-align:center;padding:40px;">No fulfillment data available</p>';
+      const ov = document.getElementById('srTatOverview'); if (ov) ov.style.display = 'none';
       return;
     }
 
     const allDates = Object.keys(sr).sort();
 
-    // Populate month selector and date inputs once
+    // Initialize SR calendar with latest month's range (once)
     if (!_srMonthInit) {
-      const months = [...new Set(allDates.map(d => d.substring(0,7)))].sort();
-      const sel = document.getElementById('srMonth');
-      sel.innerHTML = months.map(m => {
-        const [y, mo] = m.split('-');
-        const label = new Date(y, mo-1).toLocaleString('en', { month: 'short', year: 'numeric' });
-        return '<option value="' + m + '">' + label + '</option>';
-      }).join('');
-      sel.value = months[months.length - 1];
-      // Set date inputs to latest month's range
-      const latestMonth = months[months.length - 1];
+      const latestMonth = [...new Set(allDates.map(d => d.substring(0,7)))].sort().pop();
       const latestDates = allDates.filter(d => d.startsWith(latestMonth));
-      document.getElementById('srDateFrom').value = latestDates[0];
-      document.getElementById('srDateTo').value = latestDates[latestDates.length - 1];
-      // Set min/max for date inputs
-      document.getElementById('srDateFrom').min = allDates[0];
-      document.getElementById('srDateFrom').max = allDates[allDates.length - 1];
-      document.getElementById('srDateTo').min = allDates[0];
-      document.getElementById('srDateTo').max = allDates[allDates.length - 1];
+      srCalStart = latestDates[0];
+      srCalEnd = latestDates[latestDates.length - 1];
+      const sd = new Date(srCalStart + 'T00:00:00');
+      srCalYear = sd.getFullYear();
+      srCalMonth = sd.getMonth();
+      document.getElementById('srDateFrom').value = srCalStart;
+      document.getElementById('srDateTo').value = srCalEnd;
+      updateSrDateBtn();
       _srMonthInit = true;
       updateSrProductOptions();
       updateSrSyncInfo();
@@ -2918,6 +3052,7 @@ function renderShiprocket() {
     if (monthDates.length === 0) {
       section.innerHTML = '<div class="section-title">Shiprocket Fulfillment & TAT</div><p style="color:var(--muted);text-align:center;padding:40px;">No fulfillment data for selected date range</p>';
       document.getElementById('srTableBody').innerHTML = '';
+      const ov = document.getElementById('srTatOverview'); if (ov) ov.style.display = 'none';
       return;
     }
 
@@ -2925,6 +3060,8 @@ function renderShiprocket() {
     let mtdNew = 0, mtdNewVal = 0, mtdShipped = 0, mtdShippedVal = 0;
     let mtdDelivered = 0, mtdDeliveredVal = 0, mtdInTransit = 0, mtdRto = 0, mtdCancelled = 0;
     let tatSum = 0, tatDays = 0;
+    let shipTatSum = 0, shipTatDays = 0;
+    let delTatSum = 0, delTatDays = 0;
 
     monthDates.forEach(d => {
       const day = _srGetDayData(sr[d], product, category);
@@ -2938,6 +3075,8 @@ function renderShiprocket() {
       mtdRto += day.rto || 0;
       mtdCancelled += day.cancelled || 0;
       if (day.avg_tat_days > 0) { tatSum += day.avg_tat_days; tatDays++; }
+      if (day.avg_ship_days > 0) { shipTatSum += day.avg_ship_days; shipTatDays++; }
+      if (day.avg_deliver_days > 0) { delTatSum += day.avg_deliver_days; delTatDays++; }
     });
 
     const monthAvgTat = tatDays > 0 ? (tatSum / tatDays).toFixed(1) : '—';
@@ -2950,8 +3089,8 @@ function renderShiprocket() {
     // ── Fulfillment Pipeline (visual flow) ──
     const pipeEl = document.getElementById('srPipeline');
     const pipeSteps = [
-      { label: 'New Orders', count: mtdNew, color: '#fcbb13' },
-      { label: 'Pending Pickup', count: pendingPickup, color: pendingPickup > 0 ? '#f59e0b' : '#4ade80' },
+      { label: 'Total Orders', count: mtdNew, color: '#fcbb13' },
+      { label: 'Unshipped', count: pendingPickup, color: pendingPickup > 0 ? '#f59e0b' : '#4ade80' },
       { label: 'In Transit', count: mtdInTransit, color: '#4a90d9' },
       { label: 'Delivered', count: mtdDelivered, color: '#27ae60' },
       { label: 'RTO', count: mtdRto, color: '#ef4444' },
@@ -2974,49 +3113,60 @@ function renderShiprocket() {
     });
     pipeEl.innerHTML = pipeHTML;
 
-    // ── KPI Cards ──
+    // ── KPI Cards (Total Orders + Pending Pickup only) ──
     const kpiEl = document.getElementById('srKpiRow');
     let h = '';
-    h += '<div class="kpi"><div class="kpi-label">NEW ORDERS (' + rangeLabel + ')</div><div class="kpi-value">' + mtdNew.toLocaleString() + '</div><div class="kpi-per">' + fmt(mtdNewVal) + ' | ' + Math.round(mtdNew/n) + '/day</div></div>';
-    h += '<div class="kpi"><div class="kpi-label">PENDING PICKUP</div><div class="kpi-value" style="color:' + (pendingPickup > 50 ? '#f59e0b' : pendingPickup > 0 ? '#fcbb13' : '#4ade80') + '">' + pendingPickup.toLocaleString() + '</div><div class="kpi-per">Not yet shipped</div></div>';
-    h += '<div class="kpi"><div class="kpi-label">SHIPPED</div><div class="kpi-value">' + mtdShipped.toLocaleString() + '</div><div class="kpi-per">' + shipRate + '% ship rate | ' + fmt(mtdShippedVal) + '</div></div>';
-    h += '<div class="kpi"><div class="kpi-label">DELIVERED</div><div class="kpi-value positive">' + mtdDelivered.toLocaleString() + '</div><div class="kpi-per">' + delRate + '% of shipped | ' + fmt(mtdDeliveredVal) + '</div></div>';
-    h += '<div class="kpi"><div class="kpi-label">IN TRANSIT</div><div class="kpi-value" style="color:#4a90d9;">' + mtdInTransit.toLocaleString() + '</div><div class="kpi-per">Awaiting delivery</div></div>';
-    h += '<div class="kpi"><div class="kpi-label">RTO / CANCELLED</div><div class="kpi-value negative">' + mtdRto.toLocaleString() + ' / ' + mtdCancelled.toLocaleString() + '</div><div class="kpi-per">' + (mtdNew > 0 ? ((mtdRto + mtdCancelled) / mtdNew * 100).toFixed(1) : '0') + '% loss rate</div></div>';
+    h += '<div class="kpi"><div class="kpi-label">TOTAL ORDERS (' + rangeLabel + ')</div><div class="kpi-value">' + mtdNew.toLocaleString() + '</div><div class="kpi-per">' + fmt(mtdNewVal) + ' | ' + Math.round(mtdNew/n) + '/day</div></div>';
+    h += '<div class="kpi"><div class="kpi-label">PENDING PICKUP</div><div class="kpi-value" style="color:' + (pendingPickup > 50 ? '#f59e0b' : pendingPickup > 0 ? '#fcbb13' : '#4ade80') + '">' + pendingPickup.toLocaleString() + '</div><div class="kpi-per">AWB not assigned</div></div>';
     kpiEl.innerHTML = h;
 
-    // ── TAT Breakdown ──
-    const tatBox = document.getElementById('srTatBox');
-    if (monthAvgTat !== '—') {
-      const tatVal = parseFloat(monthAvgTat);
-      const tatColor = tatVal <= 3 ? '#4ade80' : tatVal <= 5 ? '#fcbb13' : tatVal <= 7 ? '#f59e0b' : '#ef4444';
-      const tatRating = tatVal <= 3 ? 'Excellent' : tatVal <= 5 ? 'Good' : tatVal <= 7 ? 'Needs Improvement' : 'Slow';
-      // TAT bar visual (0-10 day scale)
-      const tatPct = Math.min(tatVal / 10 * 100, 100);
-      tatBox.innerHTML =
-        '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">' +
-          '<div>' +
-            '<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;">AVG TURNAROUND TIME (Order Placed → Delivered)</div>' +
-            '<div style="display:flex;align-items:baseline;gap:8px;margin-top:4px;">' +
-              '<span style="font-size:28px;font-weight:800;color:' + tatColor + ';">' + monthAvgTat + '</span>' +
-              '<span style="font-size:14px;color:var(--muted);">days</span>' +
-              '<span style="font-size:12px;font-weight:600;color:' + tatColor + ';background:' + tatColor + '18;padding:2px 8px;border-radius:4px;">' + tatRating + '</span>' +
-            '</div>' +
-          '</div>' +
-          '<div style="flex:1;min-width:200px;max-width:400px;">' +
-            '<div style="display:flex;justify-content:space-between;font-size:9px;color:var(--muted);margin-bottom:3px;"><span>0d</span><span>3d</span><span>5d</span><span>7d</span><span>10d+</span></div>' +
-            '<div style="height:10px;background:var(--bg);border-radius:5px;overflow:hidden;position:relative;">' +
-              '<div style="position:absolute;left:0;top:0;height:100%;width:30%;background:linear-gradient(90deg,#4ade80,#fcbb13);opacity:0.2;"></div>' +
-              '<div style="position:absolute;left:30%;top:0;height:100%;width:20%;background:linear-gradient(90deg,#fcbb13,#f59e0b);opacity:0.2;"></div>' +
-              '<div style="position:absolute;left:50%;top:0;height:100%;width:50%;background:linear-gradient(90deg,#f59e0b,#ef4444);opacity:0.2;"></div>' +
-              '<div style="position:absolute;left:' + tatPct + '%;top:-2px;width:3px;height:14px;background:' + tatColor + ';border-radius:2px;box-shadow:0 0 6px ' + tatColor + ';"></div>' +
-            '</div>' +
-            '<div style="font-size:10px;color:var(--muted);margin-top:4px;">Based on ' + tatDays + ' days with delivery data</div>' +
-          '</div>' +
-        '</div>';
-      tatBox.style.display = '';
+    // ── TAT Overview Cards ──
+    const tatOverview = document.getElementById('srTatOverview');
+    const avgShipDays = shipTatDays > 0 ? (shipTatSum / shipTatDays).toFixed(1) : null;
+
+    if (monthAvgTat !== '—' || avgShipDays !== null) {
+      tatOverview.style.display = 'grid';
+
+      // Card 1: Order Placed → Delivered (full TAT)
+      const delEl = document.getElementById('srTatDeliverVal');
+      const delBadge = document.getElementById('srTatDeliverBadge');
+      const delSub = document.getElementById('srTatDeliverSub');
+      if (monthAvgTat !== '—') {
+        const tv = parseFloat(monthAvgTat);
+        const tatColor = tv <= 3 ? '#4ade80' : tv <= 5 ? '#fcbb13' : tv <= 7 ? '#f59e0b' : '#ef4444';
+        const tatRating = tv <= 3 ? 'Excellent' : tv <= 5 ? 'Good' : tv <= 7 ? 'Needs Improvement' : 'Slow';
+        delEl.textContent = monthAvgTat;
+        delEl.style.color = tatColor;
+        delBadge.textContent = tatRating;
+        delBadge.style.color = tatColor;
+        delBadge.style.background = tatColor + '18';
+        delSub.textContent = 'Based on ' + tatDays + ' days with delivery data';
+      } else {
+        delEl.textContent = '—';
+        delEl.style.color = 'var(--muted)';
+        delBadge.textContent = '';
+        delSub.textContent = '';
+      }
+
+      // Card 2: Order Placed → Shipped
+      const shipEl = document.getElementById('srTatShipVal');
+      const shipBadge = document.getElementById('srTatShipBadge');
+      if (avgShipDays !== null) {
+        const sv = parseFloat(avgShipDays);
+        const shipColor = sv <= 2 ? '#4ade80' : '#ef4444';
+        const shipLabel = sv <= 2 ? 'On Target' : 'Exceeds Target';
+        shipEl.textContent = avgShipDays;
+        shipEl.style.color = shipColor;
+        shipBadge.textContent = shipLabel;
+        shipBadge.style.color = shipColor;
+        shipBadge.style.background = shipColor + '18';
+      } else {
+        shipEl.textContent = '—';
+        shipEl.style.color = 'var(--muted)';
+        shipBadge.textContent = '';
+      }
     } else {
-      tatBox.style.display = 'none';
+      tatOverview.style.display = 'none';
     }
 
     // Trend chart (filtered)
@@ -3054,15 +3204,22 @@ function renderShiprocket() {
       const day = _srGetDayData(sr[dt], product, category);
       const tatStr = day.avg_tat_days > 0 ? day.avg_tat_days + 'd' : '—';
       const tatCls = day.avg_tat_days > 0 ? (day.avg_tat_days <= 5 ? 'positive' : 'negative') : '';
+      const shipStr = day.avg_ship_days > 0 ? day.avg_ship_days + 'd' : '—';
+      const shipCls = day.avg_ship_days > 0 ? (day.avg_ship_days <= 2 ? 'positive' : 'negative') : '';
+      const delStr = day.avg_deliver_days > 0 ? day.avg_deliver_days + 'd' : '—';
+      const delCls = day.avg_deliver_days > 0 ? (day.avg_deliver_days <= 5 ? 'positive' : 'negative') : '';
       tableHTML += '<tr>';
       tableHTML += '<td style="font-weight:600">' + dt.split('-').reverse().join('/') + '</td>';
       tableHTML += '<td>' + (day.new_orders||0) + '</td>';
+      tableHTML += '<td>' + Math.max(0, (day.new_orders||0) - (day.shipped||0) - (day.cancelled||0)) + '</td>';
       tableHTML += '<td>' + fmt(day.new_value||0) + '</td>';
       tableHTML += '<td>' + (day.shipped||0) + '</td>';
       tableHTML += '<td class="positive">' + (day.delivered||0) + '</td>';
       tableHTML += '<td>' + (day.in_transit||0) + '</td>';
       tableHTML += '<td class="negative">' + (day.rto||0) + '</td>';
       tableHTML += '<td>' + (day.cancelled||0) + '</td>';
+      tableHTML += '<td class="' + shipCls + '">' + shipStr + '</td>';
+      tableHTML += '<td class="' + delCls + '">' + delStr + '</td>';
       tableHTML += '<td class="' + tatCls + '">' + tatStr + '</td>';
       tableHTML += '</tr>';
     });
@@ -3238,12 +3395,22 @@ function renderCalendar() {
 }
 
 document.addEventListener('mousedown', function(e) {
+  // MTD calendar click-outside
   const popup = document.getElementById('calPopup');
-  if (!popup || !popup.classList.contains('open')) return;
-  const btn = document.getElementById('mtdDateBtn');
-  // Check if click is inside popup or on the button
-  if (popup.contains(e.target) || e.target === btn || btn.contains(e.target)) return;
-  popup.classList.remove('open');
+  if (popup && popup.classList.contains('open')) {
+    const btn = document.getElementById('mtdDateBtn');
+    if (!popup.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
+      popup.classList.remove('open');
+    }
+  }
+  // SR calendar click-outside
+  const srPopup = document.getElementById('srCalPopup');
+  if (srPopup && srPopup.classList.contains('open')) {
+    const srBtn = document.getElementById('srDateBtn');
+    if (!srPopup.contains(e.target) && e.target !== srBtn && !srBtn.contains(e.target)) {
+      srPopup.classList.remove('open');
+    }
+  }
 });
 
 initCalendar();

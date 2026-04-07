@@ -184,6 +184,26 @@ def get_delivered_date(order):
     return parse_date_str(dd)
 
 
+def get_shipped_date(order):
+    """Try to get shipped/pickup date from shipments or top-level fields."""
+    # Try shipments array
+    shipments = order.get("shipments", [])
+    if shipments and isinstance(shipments, list):
+        for s in shipments:
+            for field in ("pickup_date", "shipped_date", "pickup_scheduled_date", "created_at"):
+                result = parse_date_str(s.get(field))
+                if result:
+                    return result
+
+    # Try top-level fields
+    for field in ("pickup_date", "shipped_date", "pickup_scheduled_date"):
+        result = parse_date_str(order.get(field))
+        if result:
+            return result
+
+    return None
+
+
 def get_order_value(order):
     """Get total order value."""
     # Try total field first
@@ -216,6 +236,8 @@ def _empty_bucket():
         "delivered": 0, "delivered_value": 0.0,
         "in_transit": 0, "rto": 0, "cancelled": 0,
         "tat_total_days": 0.0, "tat_count": 0,
+        "ship_tat_total": 0.0, "ship_tat_count": 0,
+        "deliver_tat_total": 0.0, "deliver_tat_count": 0,
     }
 
 
@@ -242,6 +264,8 @@ def _add_to_bucket(bucket, status, order_value):
 
 def _finalize_bucket(d):
     avg_tat = round(d["tat_total_days"] / d["tat_count"], 1) if d["tat_count"] > 0 else 0
+    avg_ship = round(d["ship_tat_total"] / d["ship_tat_count"], 1) if d["ship_tat_count"] > 0 else 0
+    avg_deliver = round(d["deliver_tat_total"] / d["deliver_tat_count"], 1) if d["deliver_tat_count"] > 0 else 0
     return {
         "new_orders": d["new_orders"],
         "new_value": round(d["new_value"], 2),
@@ -255,6 +279,8 @@ def _finalize_bucket(d):
         "rto": d["rto"],
         "cancelled": d["cancelled"],
         "avg_tat_days": avg_tat,
+        "avg_ship_days": avg_ship,
+        "avg_deliver_days": avg_deliver,
     }
 
 
@@ -309,6 +335,7 @@ def build_daily_data(orders, month_start, today):
 
         order_value = get_order_value(order)
         delivered_date = get_delivered_date(order)
+        shipped_date = get_shipped_date(order)
         product = _get_order_product(order)
 
         # Count as "new order" on its creation date (this month only)
@@ -316,6 +343,16 @@ def build_daily_data(orders, month_start, today):
             day = daily[created_str]
             _add_to_bucket(day, status, order_value)
             _add_to_bucket(day["products"][product], status, order_value)
+
+        # Ship TAT (Order→Shipped): for shipped orders, accumulate on creation date
+        if shipped_date and status in ("delivered", "in_transit", "rto"):
+            ship_days = (shipped_date - created).days
+            if 0 <= ship_days <= 15 and created_month == month_str:
+                day = daily[created_str]
+                day["ship_tat_total"] += ship_days
+                day["ship_tat_count"] += 1
+                day["products"][product]["ship_tat_total"] += ship_days
+                day["products"][product]["ship_tat_count"] += 1
 
         # TAT: if delivered this month, compute TAT regardless of creation month
         if status == "delivered" and delivered_date:
@@ -329,6 +366,15 @@ def build_daily_data(orders, month_start, today):
                     day["tat_count"] += 1
                     day["products"][product]["tat_total_days"] += tat_days
                     day["products"][product]["tat_count"] += 1
+
+                # Deliver TAT (Shipped→Delivered): accumulate on delivered date
+                if shipped_date:
+                    del_days = (delivered_date - shipped_date).days
+                    if 0 <= del_days <= 30:
+                        day["deliver_tat_total"] += del_days
+                        day["deliver_tat_count"] += 1
+                        day["products"][product]["deliver_tat_total"] += del_days
+                        day["products"][product]["deliver_tat_count"] += 1
 
     # Build final output
     result = {}
