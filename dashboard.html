@@ -2497,23 +2497,21 @@ function renderMTD() {
       '<span><span class="sub-label">Soft Toy</span><span class="sub-val">'+mtdSfCac+'</span></span>' +
       (channel==='combined'?'<span><span class="sub-label">Amazon</span><span class="sub-val">'+mtdAmzCac+'</span></span>':'')) +
     (function(){
-      const mtdRtoShipLoss = (mtd.bb_orders*0.10 + mtd.stem_orders*0.20 + mtd.soft_orders*0.15) * 100;
       const mtdRtoRevLoss = mtd.bb_rev*0.10 + mtd.stem_rev*0.20 + mtd.soft_rev*0.15;
       const mtdCogsPct = mtd.revenue > 0 ? (mtd.cogs||0) / mtd.revenue : 0;
       const mtdRtoCogsSaved = mtdRtoRevLoss * mtdCogsPct;
       const mtdAdjRev = mtd.revenue - mtdRtoRevLoss;
-      const mtdAdjProfit = mtd.profit - mtdRtoRevLoss + mtdRtoCogsSaved - mtdRtoShipLoss;
+      const mtdAdjProfit = mtd.profit - mtdRtoRevLoss + mtdRtoCogsSaved;
       const mtdAdjPct = mtdAdjRev > 0 ? pctStr(mtdAdjProfit/mtdAdjRev) : '—';
-      const mtdTotalRtoLoss = mtdRtoRevLoss - mtdRtoCogsSaved + mtdRtoShipLoss;
+      const mtdNetRtoLoss = mtdRtoRevLoss - mtdRtoCogsSaved;
       return mkMtdKpi('adjrev', 'MTD Adj. Revenue', fmt(mtdAdjRev), '', fmt(mtdAdjRev/n)+'/day | RTO rev loss: '+fmt(mtdRtoRevLoss),
         '<span><span class="sub-label">BB (-10%)</span><span class="sub-val">-'+fmt(mtd.bb_rev*0.10)+'</span></span>' +
         '<span><span class="sub-label">STEM (-20%)</span><span class="sub-val">-'+fmt(mtd.stem_rev*0.20)+'</span></span>' +
         '<span><span class="sub-label">Soft (-15%)</span><span class="sub-val">-'+fmt(mtd.soft_rev*0.15)+'</span></span>' +
         '<span><span class="sub-label">Gross Revenue</span><span class="sub-val">'+fmt(mtd.revenue)+'</span></span>') +
-      mkMtdKpi('profit', 'MTD Profit (RTO adj)', fmt(mtdAdjProfit), mtdAdjProfit>=0?'positive':'negative', fmt(mtdAdjProfit/n)+'/day | '+mtdAdjPct+' | Total RTO loss: '+fmt(mtdTotalRtoLoss),
+      mkMtdKpi('profit', 'MTD Profit (RTO adj)', fmt(mtdAdjProfit), mtdAdjProfit>=0?'positive':'negative', fmt(mtdAdjProfit/n)+'/day | '+mtdAdjPct+' | Net RTO loss: '+fmt(mtdNetRtoLoss),
         '<span><span class="sub-label">RTO Rev Loss</span><span class="sub-val">-'+fmt(mtdRtoRevLoss)+'</span></span>' +
         '<span><span class="sub-label">COGS Saved</span><span class="sub-val">+'+fmt(mtdRtoCogsSaved)+'</span></span>' +
-        '<span><span class="sub-label">RTO Ship Cost</span><span class="sub-val">-'+fmt(mtdRtoShipLoss)+'</span></span>' +
         '<span><span class="sub-label">Raw Profit</span><span class="sub-val">'+fmt(mtd.profit)+'</span></span>');
     })() +
     mkMtdKpi('roas', 'MTD ROAS', mtdRoas, parseFloat(mtdRoas)>=2.5?'positive':'negative', 'Revenue / Ad Spend',
@@ -2533,25 +2531,22 @@ function renderMTD() {
 
   const dayEl = document.getElementById('mtdDayKpis');
   // RTO-adjusted profit: deduct revenue loss + shipping cost, add back COGS saved
-  const RTO_COST = 100; // forward + reverse shipping per RTO
   const RTO_RATES = { bb: 0.10, stem: 0.20, soft: 0.15 };
-  const selRtoShipLoss = (sel.bb_orders * RTO_RATES.bb + sel.stem_orders * RTO_RATES.stem + sel.soft_orders * RTO_RATES.soft) * RTO_COST;
   const selRtoRevLoss = sel.bb_rev * RTO_RATES.bb + sel.stem_rev * RTO_RATES.stem + sel.soft_rev * RTO_RATES.soft;
   const selCogsPct = sel.revenue > 0 ? (sel.cogs||0) / sel.revenue : 0;
   const selRtoCogsSaved = selRtoRevLoss * selCogsPct;
   const selAdjRev = sel.revenue - selRtoRevLoss;
-  const selAdjProfit = sel.profit - selRtoRevLoss + selRtoCogsSaved - selRtoShipLoss;
-  const selTotalRtoLoss = selRtoRevLoss - selRtoCogsSaved + selRtoShipLoss;
+  const selAdjProfit = sel.profit - selRtoRevLoss + selRtoCogsSaved;
+  const selNetRtoLoss = selRtoRevLoss - selRtoCogsSaved;
   const selRoas = sel.ad_spend > 0 ? (sel.revenue / sel.ad_spend).toFixed(1) + 'x' : '∞';
   const selCac = sel.orders > 0 ? fmt(sel.ad_spend / sel.orders) : '—';
   const selProfitPct = selAdjRev > 0 ? pctStr(selAdjProfit / selAdjRev) : '—';
 
   // Previous period RTO-adjusted profit
-  const prevRtoShipLoss = (prev.bb_orders||0) * RTO_RATES.bb * RTO_COST + (prev.stem_orders||0) * RTO_RATES.stem * RTO_COST + (prev.soft_orders||0) * RTO_RATES.soft * RTO_COST;
   const prevRtoRevLoss = (prev.bb_rev||0) * RTO_RATES.bb + (prev.stem_rev||0) * RTO_RATES.stem + (prev.soft_rev||0) * RTO_RATES.soft;
   const prevCogsPct = prev.revenue > 0 ? (prev.cogs||0) / prev.revenue : 0;
   const prevRtoCogsSaved = prevRtoRevLoss * prevCogsPct;
-  const prevAdjProfit = prev.profit - prevRtoRevLoss + prevRtoCogsSaved - prevRtoShipLoss;
+  const prevAdjProfit = prev.profit - prevRtoRevLoss + prevRtoCogsSaved;
   const prevAdjRev = prev.revenue - prevRtoRevLoss;
 
   // Helper: build a clickable KPI with category breakdown
@@ -2617,10 +2612,9 @@ function renderMTD() {
       '<span><span class="sub-label">STEM</span><span class="sub-val">' + stCac + '</span></span>' +
       '<span><span class="sub-label">Soft Toy</span><span class="sub-val">' + sfCac + '</span></span>' +
       (channel==='combined' ? '<span><span class="sub-label">Amazon</span><span class="sub-val">' + amzCac + '</span></span>' : '')) +
-    mkKpi('profit', 'Profit (RTO adj)', fmt(selAdjProfit), selAdjProfit>=0?'positive':'negative', selProfitPct + ' | Total RTO loss: ' + fmt(selTotalRtoLoss),
+    mkKpi('profit', 'Profit (RTO adj)', fmt(selAdjProfit), selAdjProfit>=0?'positive':'negative', selProfitPct + ' | Net RTO loss: ' + fmt(selNetRtoLoss),
       '<span><span class="sub-label">RTO Rev Loss</span><span class="sub-val">-' + fmt(selRtoRevLoss) + '</span></span>' +
       '<span><span class="sub-label">COGS Saved</span><span class="sub-val">+' + fmt(selRtoCogsSaved) + '</span></span>' +
-      '<span><span class="sub-label">RTO Ship Cost</span><span class="sub-val">-' + fmt(selRtoShipLoss) + '</span></span>' +
       '<span><span class="sub-label">Raw Profit</span><span class="sub-val">' + fmt(s.profit) + '</span></span>',
       growthBadgeMtd(selAdjProfit, prevAdjProfit)) +
     mkKpi('roas', 'ROAS', selRoas, parseFloat(selRoas)>=2.5?'positive':'negative', 'Revenue / Ad Spend',
