@@ -1,0 +1,51 @@
+name: Critical File Protection
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'encrypt_dashboard.py'
+      - 'shiprocket_sync.py'
+      - 'sync_mtd.py'
+      - 'sync_dashboard.py'
+      - 'amazon_daily_mis.py'
+      - 'automation/config.py'
+      - '.github/workflows/**'
+      - '.github/CODEOWNERS'
+
+permissions:
+  pull-requests: read
+
+jobs:
+  require-approval:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for owner approval
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          echo "=========================================="
+          echo "  CRITICAL FILES CHANGED — REVIEW REQUIRED"
+          echo "=========================================="
+          echo ""
+          echo "This PR modifies protected files that affect"
+          echo "the dashboard, sync pipeline, or workflows."
+          echo ""
+          echo "Required reviewer: @veddaang"
+          echo ""
+
+          # Check if veddaang has approved
+          APPROVED=$(gh api repos/${{ github.repository }}/pulls/${PR_NUMBER}/reviews \
+            --jq '[.[] | select(.user.login == "veddaang" and .state == "APPROVED")] | length')
+
+          if [ "$APPROVED" -gt 0 ]; then
+            echo "✅ @veddaang has approved this PR"
+            exit 0
+          else
+            echo "❌ @veddaang has NOT approved this PR"
+            echo ""
+            echo "This PR cannot be merged without approval from @veddaang."
+            echo "Please request a review from @veddaang before merging."
+            exit 1
+          fi

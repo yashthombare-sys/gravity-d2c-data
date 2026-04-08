@@ -1,0 +1,23 @@
+# Critical files — changes require review from @veddaang
+# GitHub will auto-request review on PRs touching these files
+#
+# NOTE: dashboard.html and index.html are NOT protected
+# so UI changes can be made freely.
+
+# Encryption script (controls how dashboard becomes index.html)
+encrypt_dashboard.py @veddaang
+
+# Sync pipeline scripts
+shiprocket_sync.py @veddaang
+sync_mtd.py @veddaang
+sync_dashboard.py @veddaang
+amazon_daily_mis.py @veddaang
+
+# Core config
+automation/config.py @veddaang
+
+# Workflows (CI/CD)
+.github/workflows/ @veddaang
+
+# This file itself
+.github/CODEOWNERS @veddaang
