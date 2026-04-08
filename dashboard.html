@@ -2383,7 +2383,7 @@ function renderMTD() {
   }
 
   // MTD totals (including category splits)
-  let mtd = { revenue:0, orders:0, ad_spend:0, profit:0, total_expense:0, bb_rev:0, bb_orders:0, bb_ads:0, bb_profit:0, bb_sessions:0, stem_rev:0, stem_orders:0, stem_ads:0, stem_profit:0, stem_sessions:0, soft_rev:0, soft_orders:0, soft_ads:0, soft_profit:0, soft_sessions:0, amz_rev:0, amz_orders:0, amz_ads:0, amz_profit:0, sessions:0, shopify_orders:0 };
+  let mtd = { revenue:0, orders:0, ad_spend:0, profit:0, total_expense:0, cogs:0, bb_rev:0, bb_orders:0, bb_ads:0, bb_profit:0, bb_sessions:0, stem_rev:0, stem_orders:0, stem_ads:0, stem_profit:0, stem_sessions:0, soft_rev:0, soft_orders:0, soft_ads:0, soft_profit:0, soft_sessions:0, amz_rev:0, amz_orders:0, amz_ads:0, amz_profit:0, sessions:0, shopify_orders:0 };
   monthDates.forEach(dt => {
     const day = getDay(dt);
     for (const k of Object.keys(mtd)) mtd[k] += (day[k] || 0);
@@ -2404,16 +2404,20 @@ function renderMTD() {
   const prevEndStr = new Date(new Date(dateStart + 'T00:00:00').getTime() - 86400000).toISOString().split('T')[0];
   const prevDates = allDates.filter(d => d >= prevStartStr && d <= prevEndStr).sort();
 
-  let prev = { revenue:0, orders:0, ad_spend:0, profit:0, bb_orders:0, stem_orders:0, soft_orders:0, sessions:0, shopify_orders:0 };
+  let prev = { revenue:0, orders:0, ad_spend:0, profit:0, cogs:0, bb_orders:0, stem_orders:0, soft_orders:0, bb_rev:0, stem_rev:0, soft_rev:0, sessions:0, shopify_orders:0 };
   prevDates.forEach(dt => {
     const day = getDay(dt);
     prev.revenue += day.revenue || 0;
     prev.orders += day.orders || 0;
     prev.ad_spend += day.ad_spend || 0;
     prev.profit += day.profit || 0;
+    prev.cogs += day.cogs || 0;
     prev.bb_orders += day.bb_orders || 0;
     prev.stem_orders += day.stem_orders || 0;
     prev.soft_orders += day.soft_orders || 0;
+    prev.bb_rev += day.bb_rev || 0;
+    prev.stem_rev += day.stem_rev || 0;
+    prev.soft_rev += day.soft_rev || 0;
     prev.sessions += day.sessions || 0;
     prev.shopify_orders += day.shopify_orders || 0;
   });
@@ -2493,13 +2497,23 @@ function renderMTD() {
       '<span><span class="sub-label">Soft Toy</span><span class="sub-val">'+mtdSfCac+'</span></span>' +
       (channel==='combined'?'<span><span class="sub-label">Amazon</span><span class="sub-val">'+mtdAmzCac+'</span></span>':'')) +
     (function(){
-      const mtdRtoLoss = (mtd.bb_orders*0.10 + mtd.stem_orders*0.18 + mtd.soft_orders*0.22) * 100;
-      const mtdAdjProfit = mtd.profit - mtdRtoLoss;
-      const mtdAdjPct = mtd.revenue > 0 ? pctStr(mtdAdjProfit/mtd.revenue) : '—';
-      return mkMtdKpi('profit', 'MTD Profit (RTO adj)', fmt(mtdAdjProfit), mtdAdjProfit>=0?'positive':'negative', fmt(mtdAdjProfit/n)+'/day | '+mtdAdjPct+' | RTO loss: '+fmt(mtdRtoLoss),
-        '<span><span class="sub-label">BB (10%)</span><span class="sub-val">-'+fmt(mtd.bb_orders*0.10*100)+'</span></span>' +
-        '<span><span class="sub-label">STEM (18%)</span><span class="sub-val">-'+fmt(mtd.stem_orders*0.18*100)+'</span></span>' +
-        '<span><span class="sub-label">Soft (22%)</span><span class="sub-val">-'+fmt(mtd.soft_orders*0.22*100)+'</span></span>' +
+      const mtdRtoShipLoss = (mtd.bb_orders*0.10 + mtd.stem_orders*0.20 + mtd.soft_orders*0.15) * 100;
+      const mtdRtoRevLoss = mtd.bb_rev*0.10 + mtd.stem_rev*0.20 + mtd.soft_rev*0.15;
+      const mtdCogsPct = mtd.revenue > 0 ? (mtd.cogs||0) / mtd.revenue : 0;
+      const mtdRtoCogsSaved = mtdRtoRevLoss * mtdCogsPct;
+      const mtdAdjRev = mtd.revenue - mtdRtoRevLoss;
+      const mtdAdjProfit = mtd.profit - mtdRtoRevLoss + mtdRtoCogsSaved - mtdRtoShipLoss;
+      const mtdAdjPct = mtdAdjRev > 0 ? pctStr(mtdAdjProfit/mtdAdjRev) : '—';
+      const mtdTotalRtoLoss = mtdRtoRevLoss - mtdRtoCogsSaved + mtdRtoShipLoss;
+      return mkMtdKpi('adjrev', 'MTD Adj. Revenue', fmt(mtdAdjRev), '', fmt(mtdAdjRev/n)+'/day | RTO rev loss: '+fmt(mtdRtoRevLoss),
+        '<span><span class="sub-label">BB (-10%)</span><span class="sub-val">-'+fmt(mtd.bb_rev*0.10)+'</span></span>' +
+        '<span><span class="sub-label">STEM (-20%)</span><span class="sub-val">-'+fmt(mtd.stem_rev*0.20)+'</span></span>' +
+        '<span><span class="sub-label">Soft (-15%)</span><span class="sub-val">-'+fmt(mtd.soft_rev*0.15)+'</span></span>' +
+        '<span><span class="sub-label">Gross Revenue</span><span class="sub-val">'+fmt(mtd.revenue)+'</span></span>') +
+      mkMtdKpi('profit', 'MTD Profit (RTO adj)', fmt(mtdAdjProfit), mtdAdjProfit>=0?'positive':'negative', fmt(mtdAdjProfit/n)+'/day | '+mtdAdjPct+' | Total RTO loss: '+fmt(mtdTotalRtoLoss),
+        '<span><span class="sub-label">RTO Rev Loss</span><span class="sub-val">-'+fmt(mtdRtoRevLoss)+'</span></span>' +
+        '<span><span class="sub-label">COGS Saved</span><span class="sub-val">+'+fmt(mtdRtoCogsSaved)+'</span></span>' +
+        '<span><span class="sub-label">RTO Ship Cost</span><span class="sub-val">-'+fmt(mtdRtoShipLoss)+'</span></span>' +
         '<span><span class="sub-label">Raw Profit</span><span class="sub-val">'+fmt(mtd.profit)+'</span></span>');
     })() +
     mkMtdKpi('roas', 'MTD ROAS', mtdRoas, parseFloat(mtdRoas)>=2.5?'positive':'negative', 'Revenue / Ad Spend',
@@ -2518,18 +2532,27 @@ function renderMTD() {
   }
 
   const dayEl = document.getElementById('mtdDayKpis');
-  // RTO-adjusted profit: deduct shipping cost per RTO (₹100/RTO), don't touch ad spend or COGS
+  // RTO-adjusted profit: deduct revenue loss + shipping cost, add back COGS saved
   const RTO_COST = 100; // forward + reverse shipping per RTO
-  const RTO_RATES = { bb: 0.10, stem: 0.18, soft: 0.22 };
-  const selRtoLoss = (sel.bb_orders * RTO_RATES.bb + sel.stem_orders * RTO_RATES.stem + sel.soft_orders * RTO_RATES.soft) * RTO_COST;
-  const selAdjProfit = sel.profit - selRtoLoss;
+  const RTO_RATES = { bb: 0.10, stem: 0.20, soft: 0.15 };
+  const selRtoShipLoss = (sel.bb_orders * RTO_RATES.bb + sel.stem_orders * RTO_RATES.stem + sel.soft_orders * RTO_RATES.soft) * RTO_COST;
+  const selRtoRevLoss = sel.bb_rev * RTO_RATES.bb + sel.stem_rev * RTO_RATES.stem + sel.soft_rev * RTO_RATES.soft;
+  const selCogsPct = sel.revenue > 0 ? (sel.cogs||0) / sel.revenue : 0;
+  const selRtoCogsSaved = selRtoRevLoss * selCogsPct;
+  const selAdjRev = sel.revenue - selRtoRevLoss;
+  const selAdjProfit = sel.profit - selRtoRevLoss + selRtoCogsSaved - selRtoShipLoss;
+  const selTotalRtoLoss = selRtoRevLoss - selRtoCogsSaved + selRtoShipLoss;
   const selRoas = sel.ad_spend > 0 ? (sel.revenue / sel.ad_spend).toFixed(1) + 'x' : '∞';
   const selCac = sel.orders > 0 ? fmt(sel.ad_spend / sel.orders) : '—';
-  const selProfitPct = sel.revenue > 0 ? pctStr(selAdjProfit / sel.revenue) : '—';
+  const selProfitPct = selAdjRev > 0 ? pctStr(selAdjProfit / selAdjRev) : '—';
 
   // Previous period RTO-adjusted profit
-  const prevRtoLoss = (prev.bb_orders||0) * RTO_RATES.bb * RTO_COST + (prev.stem_orders||0) * RTO_RATES.stem * RTO_COST + (prev.soft_orders||0) * RTO_RATES.soft * RTO_COST;
-  const prevAdjProfit = prev.profit - prevRtoLoss;
+  const prevRtoShipLoss = (prev.bb_orders||0) * RTO_RATES.bb * RTO_COST + (prev.stem_orders||0) * RTO_RATES.stem * RTO_COST + (prev.soft_orders||0) * RTO_RATES.soft * RTO_COST;
+  const prevRtoRevLoss = (prev.bb_rev||0) * RTO_RATES.bb + (prev.stem_rev||0) * RTO_RATES.stem + (prev.soft_rev||0) * RTO_RATES.soft;
+  const prevCogsPct = prev.revenue > 0 ? (prev.cogs||0) / prev.revenue : 0;
+  const prevRtoCogsSaved = prevRtoRevLoss * prevCogsPct;
+  const prevAdjProfit = prev.profit - prevRtoRevLoss + prevRtoCogsSaved - prevRtoShipLoss;
+  const prevAdjRev = prev.revenue - prevRtoRevLoss;
 
   // Helper: build a clickable KPI with category breakdown
   function mkKpi(id, label, value, valueCls, sub, breakdownHtml, growth) {
@@ -2575,6 +2598,12 @@ function renderMTD() {
       '<span><span class="sub-label">Soft Toy</span><span class="sub-val">'+(s.soft_sessions||0).toLocaleString()+'</span></span>',
       growthBadgeMtd(s.sessions, prev.sessions||0)) : '') +
     mkKpi('rev', 'Revenue', fmt(s.revenue), '', channel==='combined'?'D2C: '+fmt(s.d2c_rev)+' | Amz: '+fmt(s.amz_rev):'', bk('rev'), growthBadgeMtd(s.revenue, prev.revenue)) +
+    mkKpi('adjrev', 'Adj. Revenue', fmt(selAdjRev), '', 'RTO rev loss: '+fmt(selRtoRevLoss)+' | '+pctStr(selRtoRevLoss/s.revenue)+' of gross',
+      '<span><span class="sub-label">BB (-10%)</span><span class="sub-val">-'+fmt(s.bb_rev*RTO_RATES.bb)+'</span></span>' +
+      '<span><span class="sub-label">STEM (-20%)</span><span class="sub-val">-'+fmt(s.stem_rev*RTO_RATES.stem)+'</span></span>' +
+      '<span><span class="sub-label">Soft (-15%)</span><span class="sub-val">-'+fmt(s.soft_rev*RTO_RATES.soft)+'</span></span>' +
+      '<span><span class="sub-label">Gross Revenue</span><span class="sub-val">'+fmt(s.revenue)+'</span></span>',
+      growthBadgeMtd(selAdjRev, prevAdjRev)) +
     mkKpi('orders', 'Units Sold', s.orders.toLocaleString(), '', channel==='combined'?'D2C: '+s.d2c_orders+' | Amz: '+s.amz_orders:'', bk('orders', numFmt), growthBadgeMtd(s.orders, prev.orders)) +
     mkKpi('ads', 'Ad Spend <span style="font-size:8px;color:var(--muted);font-weight:400">(inc GST)</span>', fmt(s.ad_spend), '', (s.revenue>0?(s.ad_spend/s.revenue*100).toFixed(1)+'% of revenue':'') + (channel==='combined'?' | D2C: '+fmt(s.d2c_ads)+' | Amz: '+fmt(s.amz_ads):''), bk('ads'), growthBadgeMtd(s.ad_spend, prev.ad_spend)) +
     mkKpi('aov', 'AOV', s.orders>0?fmt(s.revenue/s.orders):'—', '', s.orders>0?s.orders+' units':'',
@@ -2588,10 +2617,10 @@ function renderMTD() {
       '<span><span class="sub-label">STEM</span><span class="sub-val">' + stCac + '</span></span>' +
       '<span><span class="sub-label">Soft Toy</span><span class="sub-val">' + sfCac + '</span></span>' +
       (channel==='combined' ? '<span><span class="sub-label">Amazon</span><span class="sub-val">' + amzCac + '</span></span>' : '')) +
-    mkKpi('profit', 'Profit (RTO adj)', fmt(selAdjProfit), selAdjProfit>=0?'positive':'negative', selProfitPct + ' | RTO loss: ' + fmt(selRtoLoss),
-      '<span><span class="sub-label">BB (10% RTO)</span><span class="sub-val">-' + fmt(sel.bb_orders*RTO_RATES.bb*RTO_COST) + '</span></span>' +
-      '<span><span class="sub-label">STEM (18% RTO)</span><span class="sub-val">-' + fmt(sel.stem_orders*RTO_RATES.stem*RTO_COST) + '</span></span>' +
-      '<span><span class="sub-label">Soft (22% RTO)</span><span class="sub-val">-' + fmt(sel.soft_orders*RTO_RATES.soft*RTO_COST) + '</span></span>' +
+    mkKpi('profit', 'Profit (RTO adj)', fmt(selAdjProfit), selAdjProfit>=0?'positive':'negative', selProfitPct + ' | Total RTO loss: ' + fmt(selTotalRtoLoss),
+      '<span><span class="sub-label">RTO Rev Loss</span><span class="sub-val">-' + fmt(selRtoRevLoss) + '</span></span>' +
+      '<span><span class="sub-label">COGS Saved</span><span class="sub-val">+' + fmt(selRtoCogsSaved) + '</span></span>' +
+      '<span><span class="sub-label">RTO Ship Cost</span><span class="sub-val">-' + fmt(selRtoShipLoss) + '</span></span>' +
       '<span><span class="sub-label">Raw Profit</span><span class="sub-val">' + fmt(s.profit) + '</span></span>',
       growthBadgeMtd(selAdjProfit, prevAdjProfit)) +
     mkKpi('roas', 'ROAS', selRoas, parseFloat(selRoas)>=2.5?'positive':'negative', 'Revenue / Ad Spend',
@@ -2678,7 +2707,7 @@ function renderMTD() {
   });
 
   // Profit % by Category (horizontal bar, RTO adjusted)
-  const RTO_R = { bb: 0.10, stem: 0.18, soft: 0.22 };
+  const RTO_R = { bb: 0.10, stem: 0.20, soft: 0.15 };
   const catProfitPcts = [
     sel.bb_rev > 0 ? (sel.bb_profit - sel.bb_orders*RTO_R.bb*100) / sel.bb_rev * 100 : 0,
     sel.stem_rev > 0 ? (sel.stem_profit - sel.stem_orders*RTO_R.stem*100) / sel.stem_rev * 100 : 0,
