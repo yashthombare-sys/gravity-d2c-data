@@ -2450,7 +2450,7 @@ function renderMTD() {
   const prevEndStr = new Date(new Date(dateStart + 'T00:00:00').getTime() - 86400000).toISOString().split('T')[0];
   const prevDates = allDates.filter(d => d >= prevStartStr && d <= prevEndStr).sort();
 
-  let prev = { revenue:0, orders:0, ad_spend:0, profit:0, cogs:0, bb_orders:0, stem_orders:0, soft_orders:0, bb_rev:0, stem_rev:0, soft_rev:0, sessions:0, shopify_orders:0 };
+  let prev = { revenue:0, orders:0, ad_spend:0, profit:0, cogs:0, bb_orders:0, stem_orders:0, soft_orders:0, bb_rev:0, stem_rev:0, soft_rev:0, amz_rev:0, amz_profit:0, sessions:0, shopify_orders:0 };
   prevDates.forEach(dt => {
     const day = getDay(dt);
     prev.revenue += day.revenue || 0;
@@ -2464,6 +2464,8 @@ function renderMTD() {
     prev.bb_rev += day.bb_rev || 0;
     prev.stem_rev += day.stem_rev || 0;
     prev.soft_rev += day.soft_rev || 0;
+    prev.amz_rev += day.amz_rev || 0;
+    prev.amz_profit += day.amz_profit || 0;
     prev.sessions += day.sessions || 0;
     prev.shopify_orders += day.shopify_orders || 0;
   });
