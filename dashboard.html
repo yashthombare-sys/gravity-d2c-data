@@ -783,13 +783,15 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 
   <!-- Urgent Ship Now Alert -->
-  <div id="srUrgentAlert" style="display:none;margin-bottom:16px;padding:16px 18px;background:rgba(239,68,68,0.06);border:1.5px solid rgba(239,68,68,0.3);border-radius:14px;">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-      <span style="font-size:16px;">🚨</span>
-      <span style="font-size:13px;font-weight:800;color:#ef4444;text-transform:uppercase;letter-spacing:0.5px;">Urgent: Ship Now</span>
+  <div id="srUrgentAlert" style="display:none;margin-bottom:16px;padding:16px 18px;background:rgba(239,68,68,0.05);border:1.5px solid rgba(239,68,68,0.25);border-radius:14px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+      <span style="font-size:13px;font-weight:800;color:#ef4444;text-transform:uppercase;letter-spacing:0.8px;">Urgent: Ship Now</span>
       <span id="srUrgentTotal" style="font-size:13px;font-weight:800;color:var(--primary);margin-left:auto;"></span>
     </div>
-    <div id="srUrgentProducts" style="font-size:11px;line-height:1.8;"></div>
+    <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:2px 12px;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;padding-bottom:6px;border-bottom:1px solid rgba(239,68,68,0.15);margin-bottom:4px;">
+      <span>Product</span><span style="text-align:right;">Ship Days</span><span style="text-align:right;">Units</span><span style="text-align:right;">Stuck Rev</span>
+    </div>
+    <div id="srUrgentProducts" style="font-size:12px;"></div>
   </div>
 
   <!-- 2. Slow SKUs Alert -->
@@ -3440,15 +3442,18 @@ function renderShiprocket() {
     var urgentEl = document.getElementById('srUrgentAlert');
     if (urgentSkus.length > 0) {
       var totalStuck = urgentSkus.reduce((s, p) => s + p.stuckRev, 0);
-      document.getElementById('srUrgentTotal').textContent = fmt(totalStuck) + ' stuck';
+      var totalUnits = urgentSkus.reduce((s, p) => s + p.unshipped, 0);
+      document.getElementById('srUrgentTotal').innerHTML = totalUnits + ' units · ' + fmt(totalStuck) + ' stuck';
       var urgentHTML = '';
       urgentSkus.forEach(s => {
-        urgentHTML += '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(239,68,68,0.1);">';
-        urgentHTML += '<span style="color:#ef4444;font-weight:600;max-width:55%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + s.name + '</span>';
-        urgentHTML += '<span style="display:flex;gap:12px;font-weight:600;">';
-        urgentHTML += '<span style="color:var(--muted);">' + s.unshipped + ' units</span>';
-        urgentHTML += '<span style="color:var(--primary);">' + fmt(s.stuckRev) + '</span>';
-        urgentHTML += '</span></div>';
+        var shipDayStr = s.avgShip > 0 ? s.avgShip + 'd' : '—';
+        var shipDayColor = s.avgShip > 2 ? '#ef4444' : '#4ade80';
+        urgentHTML += '<div style="display:grid;grid-template-columns:1fr auto auto auto;gap:2px 12px;align-items:center;padding:6px 0;border-bottom:1px solid rgba(239,68,68,0.08);">';
+        urgentHTML += '<span style="color:#ef4444;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + s.name + '</span>';
+        urgentHTML += '<span style="text-align:right;color:' + shipDayColor + ';font-weight:700;">' + shipDayStr + '</span>';
+        urgentHTML += '<span style="text-align:right;color:var(--muted);font-weight:600;">' + s.unshipped + '</span>';
+        urgentHTML += '<span style="text-align:right;color:var(--primary);font-weight:700;">' + fmt(s.stuckRev) + '</span>';
+        urgentHTML += '</div>';
       });
       document.getElementById('srUrgentProducts').innerHTML = urgentHTML;
       urgentEl.style.display = '';
