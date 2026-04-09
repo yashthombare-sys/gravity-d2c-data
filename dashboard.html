@@ -84,7 +84,7 @@
   .kpi.clickable { cursor: pointer; }
   .kpi.clickable .kpi-label::after { content: ' ⇄'; font-size: 8px; opacity: 0.4; }
   .kpi.clickable:active { transform: scale(0.97); }
-  .kpi-per { font-size: 9px; color: var(--muted); margin-top: 2px; font-weight: 500; }
+  .kpi-per { font-size: 9px; color: var(--muted); margin-top: 2px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .kpi-sub { font-size: 9px; color: var(--muted); margin-top: 5px; font-weight: 500; display: grid; grid-template-columns: 1fr 1fr; gap: 2px 8px; }
   .kpi-sub span { display: flex; justify-content: space-between; }
   .kpi-sub .sub-label { color: var(--muted); }
