@@ -2554,11 +2554,11 @@ function renderMTD() {
     mkMtdKpi('rev', mtdApplyRto ? 'MTD Revenue <span style="font-size:8px;color:var(--muted);font-weight:400">(RTO adj)</span>' : 'MTD Revenue',
       fmt(mtdApplyRto ? (channel==='combined' ? mtdCombAdjRev : mtdAdjRev) : mtd.revenue), '',
       monthDates.length+' days | '+fmt((mtdApplyRto ? (channel==='combined' ? mtdCombAdjRev : mtdAdjRev) : mtd.revenue)/n)+'/day | <span style="font-size:8px;color:var(--muted)">MRR: '+fmt((mtdApplyRto ? (channel==='combined' ? mtdCombAdjRev : mtdAdjRev) : mtd.revenue)/n*30)+'</span>',
-      mtdApplyRto ? '<span><span class="sub-label">Gross Revenue</span><span class="sub-val">'+fmt(mtd.revenue)+'</span></span>' +
-        '<span><span class="sub-label">D2C RTO Loss</span><span class="sub-val">-'+fmt(mtdRtoRevLoss)+'</span></span>' +
-        '<span><span class="sub-label">BB (-10%)</span><span class="sub-val">-'+fmt(mtd.bb_rev*0.10)+'</span></span>' +
-        '<span><span class="sub-label">STEM (-20%)</span><span class="sub-val">-'+fmt(mtd.stem_rev*0.20)+'</span></span>' +
-        '<span><span class="sub-label">Soft (-15%)</span><span class="sub-val">-'+fmt(mtd.soft_rev*0.15)+'</span></span>'
+      mtdApplyRto ? '<span><span class="sub-label">Gross</span><span class="sub-val">'+fmt(mtd.revenue)+'</span></span>' +
+        '<span><span class="sub-label">RTO Loss</span><span class="sub-val negative">-'+fmt(mtdRtoRevLoss)+'</span></span>' +
+        '<span><span class="sub-label">BB -10%</span><span class="sub-val">-'+fmt(mtd.bb_rev*0.10)+'</span></span>' +
+        '<span><span class="sub-label">STEM -20%</span><span class="sub-val">-'+fmt(mtd.stem_rev*0.20)+'</span></span>' +
+        '<span><span class="sub-label">Soft -15%</span><span class="sub-val">-'+fmt(mtd.soft_rev*0.15)+'</span></span>'
       : mtdBk('rev')) +
     mkMtdKpi('orders', 'MTD Units', mtd.orders.toLocaleString(), '', Math.round(mtd.orders/n)+' units/day', mtdBk('orders', numFmtM)) +
     mkMtdKpi('ads', 'MTD Ad Spend <span style="font-size:8px;color:var(--muted);font-weight:400">(inc GST)</span>', fmt(mtd.ad_spend), '', fmt(mtd.ad_spend/n)+'/day | ROAS: '+mtdRoas, mtdBk('ads')) +
@@ -2581,10 +2581,10 @@ function renderMTD() {
         fmt(mtdApplyRto ? mtdAdjProfitVal : mtd.profit),
         (mtdApplyRto ? mtdAdjProfitVal : mtd.profit)>=0?'positive':'negative',
         fmt((mtdApplyRto ? mtdAdjProfitVal : mtd.profit)/n)+'/day | '+(mtdApplyRto ? mtdAdjProfitPct : mtdGrossProfitPct),
-        mtdApplyRto ? '<span><span class="sub-label">Gross Profit</span><span class="sub-val">'+fmt(mtd.profit)+'</span></span>' +
-          '<span><span class="sub-label">Gross Profit %</span><span class="sub-val">'+mtdGrossProfitPct+'</span></span>' +
-          '<span><span class="sub-label">RTO Rev Loss</span><span class="sub-val">-'+fmt(mtdRtoRevLoss)+'</span></span>' +
-          '<span><span class="sub-label">COGS Saved</span><span class="sub-val">+'+fmt(mtdRtoCogsSaved)+'</span></span>'
+        mtdApplyRto ? '<span><span class="sub-label">Gross</span><span class="sub-val">'+fmt(mtd.profit)+'</span></span>' +
+          '<span><span class="sub-label">Gross %</span><span class="sub-val">'+mtdGrossProfitPct+'</span></span>' +
+          '<span><span class="sub-label">RTO Loss</span><span class="sub-val negative">-'+fmt(mtdRtoRevLoss)+'</span></span>' +
+          '<span><span class="sub-label">COGS Back</span><span class="sub-val positive">+'+fmt(mtdRtoCogsSaved)+'</span></span>'
         : '<span><span class="sub-label">Revenue</span><span class="sub-val">'+fmt(mtd.revenue)+'</span></span>' +
           '<span><span class="sub-label">Total Expense</span><span class="sub-val">'+fmt(mtd.total_expense||0)+'</span></span>' +
           '<span><span class="sub-label">COGS</span><span class="sub-val">'+fmt(mtd.cogs||0)+'</span></span>');
@@ -2673,11 +2673,11 @@ function renderMTD() {
     mkKpi('rev', applyRto ? 'Revenue <span style="font-size:8px;color:var(--muted);font-weight:400">(RTO adj)</span>' : 'Revenue',
       applyRto ? fmt(channel==='combined' ? combAdjRev : selAdjRev) : fmt(s.revenue), '',
       applyRto ? (channel==='combined' ? 'D2C adj: '+fmt(selAdjRev)+' | Amz: '+fmt(s.amz_rev) : 'RTO loss: '+fmt(selRtoRevLoss)+' | '+pctStr(selRtoRevLoss/s.revenue)+' of gross') : '',
-      applyRto ? '<span><span class="sub-label">Gross Revenue</span><span class="sub-val">'+fmt(s.revenue)+'</span></span>' +
-        '<span><span class="sub-label">D2C RTO Loss</span><span class="sub-val">-'+fmt(selRtoRevLoss)+'</span></span>' +
-        '<span><span class="sub-label">BB (-10%)</span><span class="sub-val">-'+fmt(s.bb_rev*RTO_RATES.bb)+'</span></span>' +
-        '<span><span class="sub-label">STEM (-20%)</span><span class="sub-val">-'+fmt(s.stem_rev*RTO_RATES.stem)+'</span></span>' +
-        '<span><span class="sub-label">Soft (-15%)</span><span class="sub-val">-'+fmt(s.soft_rev*RTO_RATES.soft)+'</span></span>'
+      applyRto ? '<span><span class="sub-label">Gross</span><span class="sub-val">'+fmt(s.revenue)+'</span></span>' +
+        '<span><span class="sub-label">RTO Loss</span><span class="sub-val negative">-'+fmt(selRtoRevLoss)+'</span></span>' +
+        '<span><span class="sub-label">BB -10%</span><span class="sub-val">-'+fmt(s.bb_rev*RTO_RATES.bb)+'</span></span>' +
+        '<span><span class="sub-label">STEM -20%</span><span class="sub-val">-'+fmt(s.stem_rev*RTO_RATES.stem)+'</span></span>' +
+        '<span><span class="sub-label">Soft -15%</span><span class="sub-val">-'+fmt(s.soft_rev*RTO_RATES.soft)+'</span></span>'
       : bk('rev'),
       applyRto ? growthBadgeMtd(channel==='combined' ? combAdjRev : selAdjRev, (prev.revenue||0) - prevRtoRevLoss + (channel==='combined' ? (prev.amz_rev||0) : 0)) : growthBadgeMtd(s.revenue, prev.revenue)) +
     mkKpi('aov', 'AOV', s.orders>0?fmt(s.revenue/s.orders):'—', '', s.orders>0?s.orders+' units':'',
@@ -2697,10 +2697,10 @@ function renderMTD() {
       applyRto ? fmt(channel==='combined' ? combAdjProfit : selAdjProfit) : fmt(sel.profit),
       applyRto ? ((channel==='combined' ? combAdjProfit : selAdjProfit)>=0?'positive':'negative') : (sel.profit>=0?'positive':'negative'),
       applyRto ? (channel==='combined' ? combAdjProfitPct : selAdjProfitPct)+' | Net RTO loss: '+fmt(selNetRtoLoss) : selProfitPct,
-      applyRto ? '<span><span class="sub-label">Gross Profit</span><span class="sub-val">'+fmt(sel.profit)+'</span></span>' +
-        '<span><span class="sub-label">Gross Profit %</span><span class="sub-val">'+selProfitPct+'</span></span>' +
-        '<span><span class="sub-label">RTO Rev Loss</span><span class="sub-val">-'+fmt(selRtoRevLoss)+'</span></span>' +
-        '<span><span class="sub-label">COGS Saved</span><span class="sub-val">+'+fmt(selRtoCogsSaved)+'</span></span>'
+      applyRto ? '<span><span class="sub-label">Gross</span><span class="sub-val">'+fmt(sel.profit)+'</span></span>' +
+        '<span><span class="sub-label">Gross %</span><span class="sub-val">'+selProfitPct+'</span></span>' +
+        '<span><span class="sub-label">RTO Loss</span><span class="sub-val negative">-'+fmt(selRtoRevLoss)+'</span></span>' +
+        '<span><span class="sub-label">COGS Back</span><span class="sub-val positive">+'+fmt(selRtoCogsSaved)+'</span></span>'
       : '<span><span class="sub-label">Revenue</span><span class="sub-val">' + fmt(sel.revenue) + '</span></span>' +
         '<span><span class="sub-label">Total Expense</span><span class="sub-val">' + fmt(sel.total_expense||0) + '</span></span>' +
         '<span><span class="sub-label">COGS</span><span class="sub-val">' + fmt(sel.cogs||0) + '</span></span>',
