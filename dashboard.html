@@ -523,10 +523,17 @@
     <div class="kpi-row" id="mtdDayKpis" style="grid-template-columns:repeat(8,1fr);gap:8px;"></div>
   </div>
 
-  <!-- MTD KPI Row (below daily) -->
+  <!-- MTD KPI Row (collapsible) -->
   <div class="section">
-    <div class="section-title">Month-To-Date</div>
-    <div class="kpi-row" id="mtdKpiRow" style="grid-template-columns:repeat(8,1fr);gap:8px;"></div>
+    <div class="section-title" id="mtdToggle" style="cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px;" onclick="toggleMtdKpis()">
+      Month-To-Date
+      <svg id="mtdChevron" width="16" height="16" viewBox="0 0 16 16" fill="none" style="transition:transform 0.3s ease;transform:rotate(0deg);">
+        <path d="M4 6l4 4 4-4" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div id="mtdKpiCollapse" style="max-height:0;overflow:hidden;transition:max-height 0.4s ease;">
+      <div class="kpi-row" id="mtdKpiRow" style="grid-template-columns:repeat(8,1fr);gap:8px;padding-top:8px;"></div>
+    </div>
   </div>
 
   <!-- Daily Trend Chart (hidden) -->
@@ -2298,6 +2305,20 @@ document.addEventListener('keydown', function(e) {
 
 let mtdChart = null;
 let currentView = 'mtd';
+
+let mtdKpisOpen = false;
+function toggleMtdKpis() {
+  mtdKpisOpen = !mtdKpisOpen;
+  const el = document.getElementById('mtdKpiCollapse');
+  const chevron = document.getElementById('mtdChevron');
+  if (mtdKpisOpen) {
+    el.style.maxHeight = el.scrollHeight + 'px';
+    chevron.style.transform = 'rotate(180deg)';
+  } else {
+    el.style.maxHeight = '0';
+    chevron.style.transform = 'rotate(0deg)';
+  }
+}
 
 function switchView(view) {
   currentView = view;
