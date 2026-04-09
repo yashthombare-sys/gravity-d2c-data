@@ -525,7 +525,7 @@
         <path d="M4 6l4 4 4-4" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
-    <div id="dayKpiCollapse" style="overflow:hidden;transition:max-height 0.4s ease;">
+    <div id="dayKpiCollapse" style="overflow:hidden;transition:max-height 0.4s ease;max-height:none;">
       <div class="kpi-row" id="mtdDayKpis" style="grid-template-columns:repeat(8,1fr);gap:8px;padding-top:8px;"></div>
     </div>
   </div>
@@ -2337,9 +2337,18 @@ function toggleSection(collapseId, chevronId) {
   const el = document.getElementById(collapseId);
   const chevron = document.getElementById(chevronId);
   if (_sectionState[collapseId]) {
+    // If currently none, set explicit height first for transition
+    if (el.style.maxHeight === 'none' || el.style.maxHeight === '') {
+      el.style.maxHeight = el.scrollHeight + 'px';
+    }
     el.style.maxHeight = el.scrollHeight + 'px';
     chevron.style.transform = 'rotate(180deg)';
+    // After transition, switch to none for dynamic content
+    setTimeout(function() { if (_sectionState[collapseId]) el.style.maxHeight = 'none'; }, 400);
   } else {
+    // Set explicit height first so transition works from none
+    el.style.maxHeight = el.scrollHeight + 'px';
+    el.offsetHeight; // force reflow
     el.style.maxHeight = '0';
     chevron.style.transform = 'rotate(0deg)';
   }
@@ -2674,7 +2683,7 @@ function renderMTD() {
       (channel==='combined' ? '<span><span class="sub-label">Amazon</span><span class="sub-val">' + amzRoas + '</span></span>' : ''));
   // Keep daily KPIs expanded if open
   var dayCollapse = document.getElementById('dayKpiCollapse');
-  if (_sectionState.dayKpiCollapse) { dayCollapse.style.maxHeight = dayCollapse.scrollHeight + 'px'; }
+  if (_sectionState.dayKpiCollapse) { dayCollapse.style.maxHeight = 'none'; } else { dayCollapse.style.maxHeight = '0'; }
   // (old hidden chart removed)
 
   // ── MTD Revenue & Profit Chart (stacked by category) ──
