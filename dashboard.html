@@ -770,7 +770,6 @@ document.addEventListener('DOMContentLoaded', function() {
         <span id="srTatShipBadge" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px;"></span>
       </div>
       <div style="font-size:11px;color:var(--muted);margin-top:6px;">Target: ≤ 2 days</div>
-      <div id="srShipSlowProducts" style="font-size:9px;color:var(--muted);margin-top:8px;line-height:1.5;"></div>
     </div>
     <div id="srTatDeliverCard" style="padding:20px;background:var(--card);border:2px solid var(--border);border-radius:14px;">
       <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">ORDER → DELIVERED</div>
@@ -781,6 +780,16 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
       <div id="srTatDeliverSub" style="font-size:11px;color:var(--muted);margin-top:6px;">Target: ≤ 4 days</div>
     </div>
+  </div>
+
+  <!-- Urgent Ship Now Alert -->
+  <div id="srUrgentAlert" style="display:none;margin-bottom:16px;padding:16px 18px;background:rgba(239,68,68,0.06);border:1.5px solid rgba(239,68,68,0.3);border-radius:14px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+      <span style="font-size:16px;">🚨</span>
+      <span style="font-size:13px;font-weight:800;color:#ef4444;text-transform:uppercase;letter-spacing:0.5px;">Urgent: Ship Now</span>
+      <span id="srUrgentTotal" style="font-size:13px;font-weight:800;color:var(--primary);margin-left:auto;"></span>
+    </div>
+    <div id="srUrgentProducts" style="font-size:11px;line-height:1.8;"></div>
   </div>
 
   <!-- 2. Slow SKUs Alert -->
@@ -3422,13 +3431,29 @@ function renderShiprocket() {
     }
     slowSkus.sort((a, b) => b.avgShip - a.avgShip);
 
-    // Populate slow products on Ship TAT card (top 4 red SKUs by stuck revenue)
-    var redSkus = slowSkus.filter(s => s.avgShip > 2).sort((a, b) => Math.max(0,b.stuckRev) - Math.max(0,a.stuckRev)).slice(0, 4);
-    var shipSlowEl = document.getElementById('srShipSlowProducts');
-    if (redSkus.length > 0) {
-      shipSlowEl.innerHTML = redSkus.map(s => '<span style="color:#ef4444;">' + s.name.split(' ').slice(0,3).join(' ') + '</span> <span style="color:var(--primary);">' + fmt(Math.max(0,s.stuckRev)) + '</span>').join(' · ');
+    // Urgent Ship Now alert (products with unshipped orders, sorted by stuck revenue)
+    var urgentSkus = Object.entries(allProducts)
+      .map(([name, d]) => ({ name, unshipped: Math.max(0, d.orders - d.shipped), stuckRev: Math.max(0, d.value - d.shippedVal), avgShip: d._shipN > 0 ? +(d._shipSum/d._shipN).toFixed(1) : 0 }))
+      .filter(s => s.unshipped > 0 || s.avgShip > 2)
+      .sort((a, b) => b.stuckRev - a.stuckRev)
+      .slice(0, 6);
+    var urgentEl = document.getElementById('srUrgentAlert');
+    if (urgentSkus.length > 0) {
+      var totalStuck = urgentSkus.reduce((s, p) => s + p.stuckRev, 0);
+      document.getElementById('srUrgentTotal').textContent = fmt(totalStuck) + ' stuck';
+      var urgentHTML = '';
+      urgentSkus.forEach(s => {
+        urgentHTML += '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(239,68,68,0.1);">';
+        urgentHTML += '<span style="color:#ef4444;font-weight:600;max-width:55%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + s.name + '</span>';
+        urgentHTML += '<span style="display:flex;gap:12px;font-weight:600;">';
+        urgentHTML += '<span style="color:var(--muted);">' + s.unshipped + ' units</span>';
+        urgentHTML += '<span style="color:var(--primary);">' + fmt(s.stuckRev) + '</span>';
+        urgentHTML += '</span></div>';
+      });
+      document.getElementById('srUrgentProducts').innerHTML = urgentHTML;
+      urgentEl.style.display = '';
     } else {
-      shipSlowEl.innerHTML = '';
+      urgentEl.style.display = 'none';
     }
 
     if (slowSkus.length > 0) {
