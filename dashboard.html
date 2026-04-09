@@ -2578,7 +2578,12 @@ function renderMTD() {
   const selCac = sel.orders > 0 ? fmt(sel.ad_spend / sel.orders) : '—';
   const selProfitPct = sel.revenue > 0 ? pctStr(sel.profit / sel.revenue) : '—';
   const isD2C = (channel === 'd2c');
+  const applyRto = (channel !== 'amazon');
   const selAdjProfitPct = selAdjRev > 0 ? pctStr(selAdjProfit / selAdjRev) : '—';
+  // For combined: D2C adjusted + Amazon gross
+  const combAdjRev = selAdjRev + (s.amz_rev||0);
+  const combAdjProfit = selAdjProfit + (s.amz_profit||0);
+  const combAdjProfitPct = combAdjRev > 0 ? pctStr(combAdjProfit / combAdjRev) : '—';
 
   // Previous period RTO-adjusted profit
   const prevRtoRevLoss = (prev.bb_rev||0) * RTO_RATES.bb + (prev.stem_rev||0) * RTO_RATES.stem + (prev.soft_rev||0) * RTO_RATES.soft;
@@ -2625,15 +2630,16 @@ function renderMTD() {
   const amzCac = s.amz_orders > 0 ? fmt(s.amz_ads / s.amz_orders) : '—';
 
   dayEl.innerHTML =
-    mkKpi('rev', isD2C ? 'Revenue <span style="font-size:8px;color:var(--muted);font-weight:400">(RTO adj)</span>' : 'Revenue',
-      isD2C ? fmt(selAdjRev) : fmt(s.revenue), '',
-      isD2C ? 'RTO loss: '+fmt(selRtoRevLoss)+' | '+pctStr(selRtoRevLoss/s.revenue)+' of gross' : (channel==='combined'?'D2C: '+fmt(s.d2c_rev)+' | Amz: '+fmt(s.amz_rev):''),
-      isD2C ? '<span><span class="sub-label">Gross Revenue</span><span class="sub-val">'+fmt(s.revenue)+'</span></span>' +
-        '<span><span class="sub-label">BB RTO (-10%)</span><span class="sub-val">-'+fmt(s.bb_rev*RTO_RATES.bb)+'</span></span>' +
-        '<span><span class="sub-label">STEM RTO (-20%)</span><span class="sub-val">-'+fmt(s.stem_rev*RTO_RATES.stem)+'</span></span>' +
-        '<span><span class="sub-label">Soft RTO (-15%)</span><span class="sub-val">-'+fmt(s.soft_rev*RTO_RATES.soft)+'</span></span>'
+    mkKpi('rev', applyRto ? 'Revenue <span style="font-size:8px;color:var(--muted);font-weight:400">(RTO adj)</span>' : 'Revenue',
+      applyRto ? fmt(channel==='combined' ? combAdjRev : selAdjRev) : fmt(s.revenue), '',
+      applyRto ? (channel==='combined' ? 'D2C adj: '+fmt(selAdjRev)+' | Amz: '+fmt(s.amz_rev) : 'RTO loss: '+fmt(selRtoRevLoss)+' | '+pctStr(selRtoRevLoss/s.revenue)+' of gross') : '',
+      applyRto ? '<span><span class="sub-label">Gross Revenue</span><span class="sub-val">'+fmt(s.revenue)+'</span></span>' +
+        '<span><span class="sub-label">D2C RTO Loss</span><span class="sub-val">-'+fmt(selRtoRevLoss)+'</span></span>' +
+        '<span><span class="sub-label">BB (-10%)</span><span class="sub-val">-'+fmt(s.bb_rev*RTO_RATES.bb)+'</span></span>' +
+        '<span><span class="sub-label">STEM (-20%)</span><span class="sub-val">-'+fmt(s.stem_rev*RTO_RATES.stem)+'</span></span>' +
+        '<span><span class="sub-label">Soft (-15%)</span><span class="sub-val">-'+fmt(s.soft_rev*RTO_RATES.soft)+'</span></span>'
       : bk('rev'),
-      isD2C ? growthBadgeMtd(selAdjRev, prev.revenue - prevRtoRevLoss) : growthBadgeMtd(s.revenue, prev.revenue)) +
+      applyRto ? growthBadgeMtd(channel==='combined' ? combAdjRev : selAdjRev, (prev.revenue||0) - prevRtoRevLoss + (channel==='combined' ? (prev.amz_rev||0) : 0)) : growthBadgeMtd(s.revenue, prev.revenue)) +
     mkKpi('aov', 'AOV', s.orders>0?fmt(s.revenue/s.orders):'—', '', s.orders>0?s.orders+' units':'',
       '<span><span class="sub-label">Busy Board</span><span class="sub-val">'+(s.bb_orders>0?fmt(s.bb_rev/s.bb_orders):'—')+'</span></span>' +
       '<span><span class="sub-label">STEM</span><span class="sub-val">'+(s.stem_orders>0?fmt(s.stem_rev/s.stem_orders):'—')+'</span></span>' +
@@ -2647,18 +2653,18 @@ function renderMTD() {
       '<span><span class="sub-label">STEM</span><span class="sub-val">' + stCac + '</span></span>' +
       '<span><span class="sub-label">Soft Toy</span><span class="sub-val">' + sfCac + '</span></span>' +
       (channel==='combined' ? '<span><span class="sub-label">Amazon</span><span class="sub-val">' + amzCac + '</span></span>' : '')) +
-    mkKpi('profit', isD2C ? 'Profit <span style="font-size:8px;color:var(--muted);font-weight:400">(RTO adj)</span>' : 'Profit',
-      isD2C ? fmt(selAdjProfit) : fmt(sel.profit),
-      isD2C ? (selAdjProfit>=0?'positive':'negative') : (sel.profit>=0?'positive':'negative'),
-      isD2C ? selAdjProfitPct+' | Net RTO loss: '+fmt(selNetRtoLoss) : selProfitPct,
-      isD2C ? '<span><span class="sub-label">Gross Profit</span><span class="sub-val">'+fmt(sel.profit)+'</span></span>' +
+    mkKpi('profit', applyRto ? 'Profit <span style="font-size:8px;color:var(--muted);font-weight:400">(RTO adj)</span>' : 'Profit',
+      applyRto ? fmt(channel==='combined' ? combAdjProfit : selAdjProfit) : fmt(sel.profit),
+      applyRto ? ((channel==='combined' ? combAdjProfit : selAdjProfit)>=0?'positive':'negative') : (sel.profit>=0?'positive':'negative'),
+      applyRto ? (channel==='combined' ? combAdjProfitPct : selAdjProfitPct)+' | Net RTO loss: '+fmt(selNetRtoLoss) : selProfitPct,
+      applyRto ? '<span><span class="sub-label">Gross Profit</span><span class="sub-val">'+fmt(sel.profit)+'</span></span>' +
         '<span><span class="sub-label">Gross Profit %</span><span class="sub-val">'+selProfitPct+'</span></span>' +
         '<span><span class="sub-label">RTO Rev Loss</span><span class="sub-val">-'+fmt(selRtoRevLoss)+'</span></span>' +
         '<span><span class="sub-label">COGS Saved</span><span class="sub-val">+'+fmt(selRtoCogsSaved)+'</span></span>'
       : '<span><span class="sub-label">Revenue</span><span class="sub-val">' + fmt(sel.revenue) + '</span></span>' +
         '<span><span class="sub-label">Total Expense</span><span class="sub-val">' + fmt(sel.total_expense||0) + '</span></span>' +
         '<span><span class="sub-label">COGS</span><span class="sub-val">' + fmt(sel.cogs||0) + '</span></span>',
-      isD2C ? growthBadgeMtd(selAdjProfit, prevAdjProfit) : growthBadgeMtd(sel.profit, prev.profit)) +
+      applyRto ? growthBadgeMtd(channel==='combined' ? combAdjProfit : selAdjProfit, prevAdjProfit + (channel==='combined' ? (prev.amz_profit||0) : 0)) : growthBadgeMtd(sel.profit, prev.profit)) +
     mkKpi('roas', 'ROAS', selRoas, parseFloat(selRoas)>=2.5?'positive':'negative', 'Revenue / Ad Spend',
       '<span><span class="sub-label">Busy Board</span><span class="sub-val">' + bbRoas + '</span></span>' +
       '<span><span class="sub-label">STEM</span><span class="sub-val">' + stRoas + '</span></span>' +
