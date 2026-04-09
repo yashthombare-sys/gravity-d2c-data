@@ -541,29 +541,17 @@
     <div class="chart-card"><h3 id="mtdChartTitle"></h3><canvas id="mtdTrendChart" height="80"></canvas></div>
   </div>
 
-  <!-- MTD Revenue & Profit Chart (collapsible) -->
+  <!-- Daily Trends (collapsible) -->
   <div class="section">
     <div class="section-title" style="cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px;" onclick="toggleSection('chartCollapse','chartChevron')">
-      Daily Revenue Trend by Category
+      Daily Trends by Category
       <svg id="chartChevron" width="16" height="16" viewBox="0 0 16 16" fill="none" style="transition:transform 0.3s ease;transform:rotate(0deg);">
         <path d="M4 6l4 4 4-4" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
     <div id="chartCollapse" style="max-height:0;overflow:hidden;transition:max-height 0.4s ease;">
-      <div class="chart-card" style="margin-top:8px;"><canvas id="mtdRevProfitChart" height="120"></canvas></div>
-    </div>
-  </div>
-
-  <!-- Daily Profit Trend (collapsible) -->
-  <div class="section">
-    <div class="section-title" style="cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px;" onclick="toggleSection('profitChartCollapse','profitChartChevron')">
-      Daily Profit Trend by Category
-      <svg id="profitChartChevron" width="16" height="16" viewBox="0 0 16 16" fill="none" style="transition:transform 0.3s ease;transform:rotate(0deg);">
-        <path d="M4 6l4 4 4-4" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </div>
-    <div id="profitChartCollapse" style="max-height:0;overflow:hidden;transition:max-height 0.4s ease;">
-      <div class="chart-card" style="margin-top:8px;"><canvas id="mtdProfitTrendChart" height="120"></canvas></div>
+      <div class="chart-card" style="margin-top:8px;"><h3 style="color:var(--muted);font-size:13px;font-weight:600;margin-bottom:8px;">Revenue Trend</h3><canvas id="mtdRevProfitChart" height="120"></canvas></div>
+      <div class="chart-card" style="margin-top:12px;"><h3 style="color:var(--muted);font-size:13px;font-weight:600;margin-bottom:8px;">Profit Trend</h3><canvas id="mtdProfitTrendChart" height="120"></canvas></div>
     </div>
   </div>
 
