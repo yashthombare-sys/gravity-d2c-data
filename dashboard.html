@@ -770,6 +770,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <span id="srTatShipBadge" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px;"></span>
       </div>
       <div style="font-size:11px;color:var(--muted);margin-top:6px;">Target: ≤ 2 days</div>
+      <div id="srShipSlowProducts" style="font-size:9px;color:var(--muted);margin-top:8px;line-height:1.5;"></div>
     </div>
     <div id="srTatDeliverCard" style="padding:20px;background:var(--card);border:2px solid var(--border);border-radius:14px;">
       <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">ORDER → DELIVERED</div>
@@ -3420,6 +3421,15 @@ function renderShiprocket() {
       if (pData.avgShip > 2 || pData.unshipped > 0) slowSkus.push({ name: pName, ...pData });
     }
     slowSkus.sort((a, b) => b.avgShip - a.avgShip);
+
+    // Populate slow products on Ship TAT card (top 4 red SKUs by stuck revenue)
+    var redSkus = slowSkus.filter(s => s.avgShip > 2).sort((a, b) => Math.max(0,b.stuckRev) - Math.max(0,a.stuckRev)).slice(0, 4);
+    var shipSlowEl = document.getElementById('srShipSlowProducts');
+    if (redSkus.length > 0) {
+      shipSlowEl.innerHTML = redSkus.map(s => '<span style="color:#ef4444;">' + s.name.split(' ').slice(0,3).join(' ') + '</span> <span style="color:var(--primary);">' + fmt(Math.max(0,s.stuckRev)) + '</span>').join(' · ');
+    } else {
+      shipSlowEl.innerHTML = '';
+    }
 
     if (slowSkus.length > 0) {
       slowSkuSection.style.display = '';
