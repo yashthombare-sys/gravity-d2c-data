@@ -2654,7 +2654,7 @@ function renderMTD() {
     const rpDatasets = [];
     const singleCat = (channel === 'amazon') || (category !== 'all');
     const profitLine = { type: 'line', borderColor: '#4ade80', backgroundColor: 'rgba(74,222,128,0.1)', pointBackgroundColor: '#4ade80', pointBorderColor: '#4ade80', pointRadius: 4, pointHoverRadius: 6, borderWidth: 2, tension: 0.3, fill: false, order: 0 };
-    const adSpendLine = { type: 'line', borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.1)', pointBackgroundColor: '#f59e0b', pointBorderColor: '#f59e0b', pointRadius: 4, pointHoverRadius: 6, borderWidth: 2, tension: 0.3, fill: false, order: 0, borderDash: [5, 3] };
+    const adSpendLine = { type: 'line', borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.1)', pointBackgroundColor: '#ef4444', pointBorderColor: '#ef4444', pointRadius: 4, pointHoverRadius: 6, borderWidth: 2, tension: 0.3, fill: false, order: 0, borderDash: [5, 3] };
     if (channel === 'amazon') {
       rpDatasets.push({ label: 'Revenue', data: monthDates.map(d => Math.round((amz[d]||{}).revenue||0)), backgroundColor: '#3b82f6', borderRadius: 2, order: 2 });
       rpDatasets.push(Object.assign({ label: 'Profit', data: monthDates.map(d => Math.round((amz[d]||{}).profit||0)) }, profitLine));
