@@ -2851,10 +2851,10 @@ function renderMTD() {
       rpDatasets.push(Object.assign({ label: 'Profit', data: monthDates.map(d => adjProf(d2c_soft, 0.15, d)) }, profitLine));
       rpDatasets.push(Object.assign({ label: 'Ad Spend', data: monthDates.map(d => Math.round((d2c_soft[d]||{}).ad_spend||0)) }, adSpendLine));
     } else {
-      rpDatasets.push({ label: 'Busy Board', data: monthDates.map(d => adjRev(d2c_bb, 0.10, d)), backgroundColor: '#FCBB13', borderRadius: 2 });
-      rpDatasets.push({ label: 'STEM', data: monthDates.map(d => adjRev(d2c_stem, 0.20, d)), backgroundColor: '#3b82f6', borderRadius: 2 });
-      rpDatasets.push({ label: 'Soft Toy', data: monthDates.map(d => adjRev(d2c_soft, 0.15, d)), backgroundColor: '#a78bfa', borderRadius: 2 });
-      if (channel === 'combined') rpDatasets.push({ label: 'Amazon', data: monthDates.map(d => Math.round((amz[d]||{}).revenue||0)), backgroundColor: '#3b82f6', borderRadius: 2 });
+      rpDatasets.push({ label: 'Busy Board', data: monthDates.map(d => adjRev(d2c_bb, 0.10, d)), backgroundColor: '#FCBB13', borderRadius: 2, order: 2 });
+      rpDatasets.push({ label: 'STEM', data: monthDates.map(d => adjRev(d2c_stem, 0.20, d)), backgroundColor: '#3b82f6', borderRadius: 2, order: 2 });
+      rpDatasets.push({ label: 'Soft Toy', data: monthDates.map(d => adjRev(d2c_soft, 0.15, d)), backgroundColor: '#a78bfa', borderRadius: 2, order: 2 });
+      if (channel === 'combined') rpDatasets.push({ label: 'Amazon', data: monthDates.map(d => Math.round((amz[d]||{}).revenue||0)), backgroundColor: '#3b82f6', borderRadius: 2, order: 2 });
       // Total Profit line (sum of all categories)
       rpDatasets.push(Object.assign({ label: 'Profit', data: monthDates.map(d => adjProf(d2c_bb, 0.10, d) + adjProf(d2c_stem, 0.20, d) + adjProf(d2c_soft, 0.15, d) + (channel==='combined' ? Math.round((amz[d]||{}).profit||0) : 0)) }, profitLine));
       // Total Ad Spend line (sum of all categories)
