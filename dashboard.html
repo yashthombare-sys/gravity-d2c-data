@@ -2536,9 +2536,8 @@ function renderMTD() {
     : category === 'stem' ? mtd.stem_rev*0.20
     : category === 'softtoy' ? mtd.soft_rev*0.15
     : mtd.bb_rev*0.10 + mtd.stem_rev*0.20 + mtd.soft_rev*0.15;
-  const mtdD2cRev = (mtd.bb_rev||0) + (mtd.stem_rev||0) + (mtd.soft_rev||0);
-  const mtdD2cCogsPct = mtdD2cRev > 0 ? (mtd.cogs||0) / (channel==='combined' ? mtdD2cRev : mtd.revenue) : 0;
-  const mtdRtoCogsSaved = mtdRtoRevLoss * mtdD2cCogsPct;
+  const mtdCogsPct = mtd.revenue > 0 ? (mtd.cogs||0) / mtd.revenue : 0;
+  const mtdRtoCogsSaved = mtdRtoRevLoss * mtdCogsPct;
   const mtdAdjRev = mtd.revenue - mtdRtoRevLoss;
   const mtdAdjProfit = mtd.profit - mtdRtoRevLoss + mtdRtoCogsSaved;
   const mtdNetRtoLoss = mtdRtoRevLoss - mtdRtoCogsSaved;
