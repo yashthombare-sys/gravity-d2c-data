@@ -615,8 +615,7 @@
       </svg>
     </div>
     <div id="chartCollapse" style="max-height:0;overflow:hidden;transition:max-height 0.4s ease;">
-      <div class="chart-card" style="margin-top:8px;"><h3 style="color:var(--muted);font-size:13px;font-weight:600;margin-bottom:8px;">Revenue Trend</h3><canvas id="mtdRevProfitChart" height="120"></canvas></div>
-      <div class="chart-card" style="margin-top:12px;"><h3 style="color:var(--muted);font-size:13px;font-weight:600;margin-bottom:8px;">Profit Trend</h3><canvas id="mtdProfitTrendChart" height="120"></canvas></div>
+      <div class="chart-card" style="margin-top:8px;"><canvas id="mtdRevProfitChart" height="120"></canvas></div>
     </div>
   </div>
 
@@ -2830,44 +2829,6 @@ function renderMTD() {
     });
   } catch(e) { console.error('MTD Rev/Profit chart error:', e); }
 
-  // ── MTD Profit Trend Chart (stacked by category, hidden for single category) ──
-  try {
-    if (window._mtdCharts['mtdProfitTrendChart']) { window._mtdCharts['mtdProfitTrendChart'].destroy(); window._mtdCharts['mtdProfitTrendChart'] = null; }
-    var profitChartCard = document.getElementById('mtdProfitTrendChart').closest('.chart-card');
-    if (singleCat) { profitChartCard.style.display = 'none'; } else { profitChartCard.style.display = '';
-    const ptLabels = monthDates.map(d => parseInt(d.split('-')[2]));
-    const ptDatasets = [];
-    if (channel === 'amazon') {
-      ptDatasets.push({ label: 'Amazon', data: monthDates.map(d => Math.round((amz[d]||{}).profit||0)), backgroundColor: '#3b82f6', borderRadius: 2 });
-    } else if (category === 'busyboard') {
-      ptDatasets.push({ label: 'Busy Board', data: monthDates.map(d => adjProf(d2c_bb, 0.10, d)), backgroundColor: '#FCBB13', borderRadius: 2 });
-    } else if (category === 'stem') {
-      ptDatasets.push({ label: 'STEM', data: monthDates.map(d => adjProf(d2c_stem, 0.20, d)), backgroundColor: '#3b82f6', borderRadius: 2 });
-    } else if (category === 'softtoy') {
-      ptDatasets.push({ label: 'Soft Toy', data: monthDates.map(d => adjProf(d2c_soft, 0.15, d)), backgroundColor: '#a78bfa', borderRadius: 2 });
-    } else {
-      ptDatasets.push({ label: 'Busy Board', data: monthDates.map(d => adjProf(d2c_bb, 0.10, d)), backgroundColor: '#FCBB13', borderRadius: 2 });
-      ptDatasets.push({ label: 'STEM', data: monthDates.map(d => adjProf(d2c_stem, 0.20, d)), backgroundColor: '#3b82f6', borderRadius: 2 });
-      ptDatasets.push({ label: 'Soft Toy', data: monthDates.map(d => adjProf(d2c_soft, 0.15, d)), backgroundColor: '#a78bfa', borderRadius: 2 });
-      if (channel === 'combined') ptDatasets.push({ label: 'Amazon', data: monthDates.map(d => Math.round((amz[d]||{}).profit||0)), backgroundColor: '#3b82f6', borderRadius: 2 });
-    }
-    window._mtdCharts['mtdProfitTrendChart'] = new Chart(document.getElementById('mtdProfitTrendChart'), {
-      type: 'bar',
-      data: { labels: ptLabels, datasets: ptDatasets },
-      options: {
-        responsive: true,
-        scales: {
-          x: { stacked: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8a94a6' } },
-          y: { stacked: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8a94a6', callback: function(v) { return v >= 100000 ? '₹'+(v/100000).toFixed(1)+'L' : v <= -100000 ? '-₹'+(-v/100000).toFixed(1)+'L' : '₹'+(v/1000).toFixed(0)+'K'; } } }
-        },
-        plugins: {
-          legend: { labels: { color: '#e8ecf1', usePointStyle: true, pointStyle: 'circle' } },
-          tooltip: { callbacks: { label: function(ctx) { return ctx.dataset.label + ': ₹' + (Math.abs(ctx.raw) >= 100000 ? (ctx.raw/100000).toFixed(2)+'L' : (ctx.raw/1000).toFixed(1)+'K'); } } }
-        }
-      }
-    });
-    } // close else for !singleCat
-  } catch(e) { console.error('MTD Profit Trend chart error:', e); }
 
   // ── Daily Table ──
   const tbody = document.getElementById('mtdTableBody');
