@@ -517,10 +517,17 @@
     </div>
   </div>
 
-  <!-- Selected Date KPIs (Daily Numbers — shown first) -->
+  <!-- Selected Date KPIs (Daily Numbers — collapsible, open by default) -->
   <div class="section" id="mtdDaySection">
-    <div class="section-title" id="mtdDayTitle">Yesterday's Numbers</div>
-    <div class="kpi-row" id="mtdDayKpis" style="grid-template-columns:repeat(8,1fr);gap:8px;"></div>
+    <div class="section-title" id="mtdDayTitle" style="cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px;" onclick="toggleSection('dayKpiCollapse','dayKpiChevron')">
+      Yesterday's Numbers
+      <svg id="dayKpiChevron" width="16" height="16" viewBox="0 0 16 16" fill="none" style="transition:transform 0.3s ease;transform:rotate(180deg);">
+        <path d="M4 6l4 4 4-4" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div id="dayKpiCollapse" style="overflow:hidden;transition:max-height 0.4s ease;">
+      <div class="kpi-row" id="mtdDayKpis" style="grid-template-columns:repeat(8,1fr);gap:8px;padding-top:8px;"></div>
+    </div>
   </div>
 
   <!-- MTD KPI Row (collapsible) -->
@@ -2324,7 +2331,7 @@ function toggleMtdKpis() {
   }
 }
 
-const _sectionState = {};
+const _sectionState = { dayKpiCollapse: true };
 function toggleSection(collapseId, chevronId) {
   _sectionState[collapseId] = !_sectionState[collapseId];
   const el = document.getElementById(collapseId);
@@ -2549,12 +2556,13 @@ function renderMTD() {
       (channel==='combined'?'<span><span class="sub-label">Amazon</span><span class="sub-val">'+mtdAmzRoas+'</span></span>':''));
   // ── Selected Date KPIs ──
   const dayTitle = document.getElementById('mtdDayTitle');
+  const chevronSvg = document.getElementById('dayKpiChevron').outerHTML;
   if (dateStart === dateEnd) {
     const dayDate = new Date(dateStart + 'T00:00:00');
     const dayName = dayDate.toLocaleDateString('en-IN', {weekday:'short', day:'numeric', month:'short', year:'numeric'});
-    dayTitle.textContent = dayName + ' — Daily Numbers';
+    dayTitle.innerHTML = dayName + ' — Daily Numbers ' + chevronSvg;
   } else {
-    dayTitle.textContent = fmtDateShort(dateStart) + ' — ' + fmtDateShort(dateEnd) + ' (' + rangeDates.length + ' days)';
+    dayTitle.innerHTML = fmtDateShort(dateStart) + ' — ' + fmtDateShort(dateEnd) + ' (' + rangeDates.length + ' days) ' + chevronSvg;
   }
 
   const dayEl = document.getElementById('mtdDayKpis');
@@ -2615,11 +2623,6 @@ function renderMTD() {
   const amzCac = s.amz_orders > 0 ? fmt(s.amz_ads / s.amz_orders) : '—';
 
   dayEl.innerHTML =
-    (channel !== 'amazon' ? mkKpi('sessions', 'Sessions', s.sessions.toLocaleString(), '', (s.sessions>0?(s.orders/s.sessions*100).toFixed(2)+'% CR | '+fmt(s.ad_spend/s.sessions)+'/session':''),
-      '<span><span class="sub-label">Busy Board</span><span class="sub-val">'+(s.bb_sessions||0).toLocaleString()+'</span></span>' +
-      '<span><span class="sub-label">STEM</span><span class="sub-val">'+(s.stem_sessions||0).toLocaleString()+'</span></span>' +
-      '<span><span class="sub-label">Soft Toy</span><span class="sub-val">'+(s.soft_sessions||0).toLocaleString()+'</span></span>',
-      growthBadgeMtd(s.sessions, prev.sessions||0)) : '') +
     mkKpi('rev', 'Revenue', fmt(s.revenue), '', channel==='combined'?'D2C: '+fmt(s.d2c_rev)+' | Amz: '+fmt(s.amz_rev):'', bk('rev'), growthBadgeMtd(s.revenue, prev.revenue)) +
     mkKpi('orders', 'Units Sold', s.orders.toLocaleString(), '', channel==='combined'?'D2C: '+s.d2c_orders+' | Amz: '+s.amz_orders:'', bk('orders', numFmt), growthBadgeMtd(s.orders, prev.orders)) +
     mkKpi('ads', 'Ad Spend <span style="font-size:8px;color:var(--muted);font-weight:400">(inc GST)</span>', fmt(s.ad_spend), '', (s.revenue>0?(s.ad_spend/s.revenue*100).toFixed(1)+'% of revenue':'') + (channel==='combined'?' | D2C: '+fmt(s.d2c_ads)+' | Amz: '+fmt(s.amz_ads):''), bk('ads'), growthBadgeMtd(s.ad_spend, prev.ad_spend)) +
@@ -2644,6 +2647,9 @@ function renderMTD() {
       '<span><span class="sub-label">STEM</span><span class="sub-val">' + stRoas + '</span></span>' +
       '<span><span class="sub-label">Soft Toy</span><span class="sub-val">' + sfRoas + '</span></span>' +
       (channel==='combined' ? '<span><span class="sub-label">Amazon</span><span class="sub-val">' + amzRoas + '</span></span>' : ''));
+  // Keep daily KPIs expanded if open
+  var dayCollapse = document.getElementById('dayKpiCollapse');
+  if (_sectionState.dayKpiCollapse) { dayCollapse.style.maxHeight = dayCollapse.scrollHeight + 'px'; }
   // (old hidden chart removed)
 
   // ── MTD Revenue & Profit Chart (stacked by category) ──
