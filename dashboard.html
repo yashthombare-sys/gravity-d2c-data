@@ -2652,14 +2652,19 @@ function renderMTD() {
     if (window._mtdCharts['mtdRevProfitChart']) { window._mtdCharts['mtdRevProfitChart'].destroy(); window._mtdCharts['mtdRevProfitChart'] = null; }
     const rpLabels = monthDates.map(d => parseInt(d.split('-')[2]));
     const rpDatasets = [];
+    const singleCat = (channel === 'amazon') || (category !== 'all');
     if (channel === 'amazon') {
-      rpDatasets.push({ label: 'Amazon', data: monthDates.map(d => Math.round((amz[d]||{}).revenue||0)), backgroundColor: '#3b82f6', borderRadius: 2 });
+      rpDatasets.push({ label: 'Revenue', data: monthDates.map(d => Math.round((amz[d]||{}).revenue||0)), backgroundColor: '#3b82f6', borderRadius: 2 });
+      rpDatasets.push({ label: 'Profit', data: monthDates.map(d => Math.round((amz[d]||{}).profit||0)), backgroundColor: monthDates.map(d => ((amz[d]||{}).profit||0) >= 0 ? '#22c55e' : '#ef4444'), borderRadius: 2 });
     } else if (category === 'busyboard') {
-      rpDatasets.push({ label: 'Busy Board', data: monthDates.map(d => Math.round((d2c_bb[d]||{}).revenue||0)), backgroundColor: '#FCBB13', borderRadius: 2 });
+      rpDatasets.push({ label: 'Revenue', data: monthDates.map(d => Math.round((d2c_bb[d]||{}).revenue||0)), backgroundColor: '#FCBB13', borderRadius: 2 });
+      rpDatasets.push({ label: 'Profit', data: monthDates.map(d => Math.round((d2c_bb[d]||{}).profit||0)), backgroundColor: monthDates.map(d => ((d2c_bb[d]||{}).profit||0) >= 0 ? '#22c55e' : '#ef4444'), borderRadius: 2 });
     } else if (category === 'stem') {
-      rpDatasets.push({ label: 'STEM', data: monthDates.map(d => Math.round((d2c_stem[d]||{}).revenue||0)), backgroundColor: '#22c55e', borderRadius: 2 });
+      rpDatasets.push({ label: 'Revenue', data: monthDates.map(d => Math.round((d2c_stem[d]||{}).revenue||0)), backgroundColor: '#22c55e', borderRadius: 2 });
+      rpDatasets.push({ label: 'Profit', data: monthDates.map(d => Math.round((d2c_stem[d]||{}).profit||0)), backgroundColor: monthDates.map(d => ((d2c_stem[d]||{}).profit||0) >= 0 ? '#4ade80' : '#ef4444'), borderRadius: 2 });
     } else if (category === 'softtoy') {
-      rpDatasets.push({ label: 'Soft Toy', data: monthDates.map(d => Math.round((d2c_soft[d]||{}).revenue||0)), backgroundColor: '#a78bfa', borderRadius: 2 });
+      rpDatasets.push({ label: 'Revenue', data: monthDates.map(d => Math.round((d2c_soft[d]||{}).revenue||0)), backgroundColor: '#a78bfa', borderRadius: 2 });
+      rpDatasets.push({ label: 'Profit', data: monthDates.map(d => Math.round((d2c_soft[d]||{}).profit||0)), backgroundColor: monthDates.map(d => ((d2c_soft[d]||{}).profit||0) >= 0 ? '#22c55e' : '#ef4444'), borderRadius: 2 });
     } else {
       rpDatasets.push({ label: 'Busy Board', data: monthDates.map(d => Math.round((d2c_bb[d]||{}).revenue||0)), backgroundColor: '#FCBB13', borderRadius: 2 });
       rpDatasets.push({ label: 'STEM', data: monthDates.map(d => Math.round((d2c_stem[d]||{}).revenue||0)), backgroundColor: '#22c55e', borderRadius: 2 });
@@ -2672,12 +2677,12 @@ function renderMTD() {
       options: {
         responsive: true,
         scales: {
-          x: { stacked: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8a94a6' } },
-          y: { stacked: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8a94a6', callback: function(v) { return v >= 100000 ? '₹'+(v/100000).toFixed(1)+'L' : '₹'+(v/1000).toFixed(0)+'K'; } } }
+          x: { stacked: !singleCat, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8a94a6' } },
+          y: { stacked: !singleCat, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8a94a6', callback: function(v) { return v >= 100000 ? '₹'+(v/100000).toFixed(1)+'L' : '₹'+(v/1000).toFixed(0)+'K'; } } }
         },
         plugins: {
           legend: { labels: { color: '#e8ecf1', usePointStyle: true, pointStyle: 'circle' } },
-          tooltip: { callbacks: { label: function(ctx) { return ctx.dataset.label + ': ₹' + (ctx.raw >= 100000 ? (ctx.raw/100000).toFixed(2)+'L' : (ctx.raw/1000).toFixed(1)+'K'); } } }
+          tooltip: { callbacks: { label: function(ctx) { return ctx.dataset.label + ': ₹' + (Math.abs(ctx.raw) >= 100000 ? (ctx.raw/100000).toFixed(2)+'L' : (ctx.raw/1000).toFixed(1)+'K'); } } }
         }
       }
     });
