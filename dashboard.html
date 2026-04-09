@@ -203,29 +203,29 @@
 
   /* ── Mobile ── */
   @media (max-width: 768px) {
-    /* KPI Cards — clean, spacious, readable */
-    .kpi-row { grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important; }
+    /* KPI Cards — large, bold, decision-ready */
+    .kpi-row { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
     .kpi {
-      padding: 14px 12px; min-height: 92px; border-radius: 12px;
+      padding: 16px 14px; min-height: 100px; border-radius: 14px;
       -webkit-tap-highlight-color: transparent;
     }
     .kpi:hover { transform: none; box-shadow: none; }
-    .kpi-value { font-size: 20px; font-weight: 800; }
-    .kpi-label { font-size: 9px; letter-spacing: 0.8px; margin-bottom: 4px; }
-    .kpi-per { font-size: 9px; margin-top: 4px; }
-    .kpi-sub { font-size: 8.5px; gap: 3px 8px; }
-    .kpi-change { font-size: 12px; font-weight: 700; }
+    .kpi-value { font-size: 24px; font-weight: 800; line-height: 1.1; }
+    .kpi-label { font-size: 10px; letter-spacing: 1px; margin-bottom: 5px; }
+    .kpi-per { font-size: 10px; margin-top: 5px; line-height: 1.4; }
+    .kpi-sub { font-size: 9px; gap: 4px 8px; }
+    .kpi-change { font-size: 13px; font-weight: 700; }
 
     /* Layout */
     .container { padding: 16px 12px; }
     .section { margin-bottom: 10px; }
-    .section-title { font-size: 14px; font-weight: 700; margin-bottom: 8px; -webkit-tap-highlight-color: transparent; padding: 6px 0; }
+    .section-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; -webkit-tap-highlight-color: transparent; padding: 8px 0; }
     .section-title::before { width: 3px; height: 16px; }
 
     /* Charts & Tables */
     .chart-card { padding: 16px 12px; border-radius: 12px; }
     .chart-card h3 { font-size: 11px; margin-bottom: 10px; }
-    .chart-card canvas { min-height: 200px; }
+    .chart-card canvas { min-height: 240px; }
     .table-wrap { padding: 12px 8px; border-radius: 12px; }
     table { font-size: 11px; }
     th { font-size: 9px; font-weight: 700; }
@@ -276,11 +276,11 @@
 
   /* ── Small mobile ── */
   @media (max-width: 480px) {
-    .kpi-row { gap: 6px !important; }
-    .kpi { padding: 12px 10px; min-height: 82px; }
-    .kpi-value { font-size: 18px; }
-    .kpi-label { font-size: 8px; }
-    .kpi-per { font-size: 8px; }
+    .kpi-row { gap: 8px !important; }
+    .kpi { padding: 14px 10px; min-height: 90px; }
+    .kpi-value { font-size: 22px; }
+    .kpi-label { font-size: 9px; }
+    .kpi-per { font-size: 9px; }
     .container { padding: 12px 8px; }
     .header { padding: 12px 12px 10px; gap: 10px; }
     .header-left { gap: 8px; }
