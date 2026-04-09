@@ -187,18 +187,6 @@
     .actions-grid { grid-template-columns: 1fr; }
   }
 
-  /* ── Desktop large ── */
-  @media (max-width: 1400px) {
-    .kpi-row { grid-template-columns: repeat(4, 1fr) !important; }
-  }
-
-  /* ── Tablet / small desktop ── */
-  @media (max-width: 1200px) {
-    .kpi-row { grid-template-columns: repeat(3, 1fr) !important; }
-    .charts-grid, .charts-row { grid-template-columns: 1fr; }
-    .actions-grid { grid-template-columns: 1fr; }
-  }
-
   /* ── Tablet portrait ── */
   @media (max-width: 900px) {
     .header { padding: 14px 16px; flex-direction: column; gap: 12px; align-items: stretch; }
@@ -623,7 +611,7 @@
       </svg>
     </div>
     <div id="dayKpiCollapse" style="overflow:hidden;transition:max-height 0.4s ease;max-height:none;">
-      <div class="kpi-row" id="mtdDayKpis" style="grid-template-columns:repeat(8,1fr);gap:8px;padding-top:8px;"></div>
+      <div class="kpi-row" id="mtdDayKpis" style="grid-template-columns:repeat(7,1fr);gap:8px;padding-top:8px;"></div>
     </div>
   </div>
 
@@ -638,11 +626,6 @@
     <div id="mtdKpiCollapse" style="max-height:0;overflow:hidden;transition:max-height 0.4s ease;">
       <div class="kpi-row" id="mtdKpiRow" style="grid-template-columns:repeat(8,1fr);gap:8px;padding-top:8px;"></div>
     </div>
-  </div>
-
-  <!-- Daily Trend Chart (hidden) -->
-  <div style="display:none;">
-    <div class="chart-card"><h3 id="mtdChartTitle"></h3><canvas id="mtdTrendChart" height="80"></canvas></div>
   </div>
 
   <!-- Daily Trends (collapsible) -->
@@ -2491,7 +2474,7 @@ function renderMTD() {
   }
 
   // Get all dates and find current month
-  const allDates = [...new Set([...Object.keys(d2c), ...Object.keys(amz)])].sort();
+  const allDates = [...new Set([...Object.keys(d2c_all), ...Object.keys(amz)])].sort();
   if (allDates.length === 0) return;
 
   // Date range
@@ -2772,7 +2755,7 @@ function renderMTD() {
   dayEl.innerHTML =
     mkKpi('rev', applyRto ? 'Revenue <span style="font-size:8px;color:var(--muted);font-weight:400">(RTO adj)</span>' : 'Revenue',
       applyRto ? fmt(selAdjRev) : fmt(s.revenue), '',
-      applyRto ? (channel==='combined' ? 'D2C adj: '+fmt(selAdjRev)+' | Amz: '+fmt(s.amz_rev) : 'RTO loss: '+fmt(selRtoRevLoss)+' | Gross: '+fmt(s.revenue)) : '',
+      applyRto ? (channel==='combined' ? 'D2C adj: '+fmt(sel.d2c_rev - selRtoRevLoss)+' | Amz: '+fmt(s.amz_rev) : 'RTO loss: '+fmt(selRtoRevLoss)+' | Gross: '+fmt(s.revenue)) : '',
       applyRto ? '<span><span class="sub-label">Gross Rev</span><span class="sub-val">'+fmt(s.revenue)+'</span></span>' +
         '<span><span class="sub-label">RTO Loss ('+pctStr(selRtoRevLoss/s.revenue)+')</span><span class="sub-val negative">-'+fmt(selRtoRevLoss)+'</span></span>' +
         '<span style="grid-column:1/-1;font-size:8px;opacity:0.7">BB: -'+fmt(s.bb_rev*RTO_RATES.bb)+' · STEM: -'+fmt(s.stem_rev*RTO_RATES.stem)+' · Soft: -'+fmt(s.soft_rev*RTO_RATES.soft)+'</span>'
@@ -2878,7 +2861,7 @@ function renderMTD() {
     const ac = amz[dt] || {};
     const profPct = day.revenue > 0 ? (day.profit/day.revenue*100).toFixed(1)+'%' : '—';
     const isSelected = dt === selectedDate ? ' style="background:rgba(252,187,19,0.08)"' : '';
-    tableHTML += '<tr' + isSelected + ' onclick="document.getElementById(\'mtdDate\').value=\'' + dt + '\';renderMTD()" style="cursor:pointer">';
+    tableHTML += '<tr' + isSelected + ' onclick="document.getElementById(\'mtdDate\').value=\'' + dt + '\';document.getElementById(\'mtdDateEnd\').value=\'' + dt + '\';renderMTD()" style="cursor:pointer">';
     tableHTML += '<td style="text-align:left;font-weight:600">' + dt.split('-').reverse().join('/') + '</td>';
     tableHTML += '<td>' + fmt(dc.revenue||0) + '</td>';
     tableHTML += '<td>' + (dc.orders||0) + '</td>';
