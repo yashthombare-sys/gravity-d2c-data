@@ -541,21 +541,35 @@
     <div class="chart-card"><h3 id="mtdChartTitle"></h3><canvas id="mtdTrendChart" height="80"></canvas></div>
   </div>
 
-  <!-- MTD Revenue & Profit Chart -->
+  <!-- MTD Revenue & Profit Chart (collapsible) -->
   <div class="section">
-    <div class="section-title">Daily Revenue Trend by Category</div>
-    <div class="chart-card"><canvas id="mtdRevProfitChart" height="120"></canvas></div>
+    <div class="section-title" style="cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px;" onclick="toggleSection('chartCollapse','chartChevron')">
+      Daily Revenue Trend by Category
+      <svg id="chartChevron" width="16" height="16" viewBox="0 0 16 16" fill="none" style="transition:transform 0.3s ease;transform:rotate(0deg);">
+        <path d="M4 6l4 4 4-4" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div id="chartCollapse" style="max-height:0;overflow:hidden;transition:max-height 0.4s ease;">
+      <div class="chart-card" style="margin-top:8px;"><canvas id="mtdRevProfitChart" height="120"></canvas></div>
+    </div>
   </div>
 
-  <!-- Daily Table -->
+  <!-- Daily Table (collapsible) -->
   <div class="section">
-    <div class="section-title">Daily Breakdown</div>
-    <div class="table-wrap">
-      <table><thead><tr>
-        <th>Date</th><th>D2C Rev</th><th>D2C Units</th><th>D2C Ads</th>
-        <th>Amz Rev</th><th>Amz Units</th><th>Amz Ads</th>
-        <th>Total Rev</th><th>Total Profit</th><th>Profit %</th>
-      </tr></thead><tbody id="mtdTableBody"></tbody></table>
+    <div class="section-title" style="cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px;" onclick="toggleSection('tableCollapse','tableChevron')">
+      Daily Breakdown
+      <svg id="tableChevron" width="16" height="16" viewBox="0 0 16 16" fill="none" style="transition:transform 0.3s ease;transform:rotate(0deg);">
+        <path d="M4 6l4 4 4-4" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div id="tableCollapse" style="max-height:0;overflow:hidden;transition:max-height 0.4s ease;">
+      <div class="table-wrap" style="margin-top:8px;">
+        <table><thead><tr>
+          <th>Date</th><th>D2C Rev</th><th>D2C Units</th><th>D2C Ads</th>
+          <th>Amz Rev</th><th>Amz Units</th><th>Amz Ads</th>
+          <th>Total Rev</th><th>Total Profit</th><th>Profit %</th>
+        </tr></thead><tbody id="mtdTableBody"></tbody></table>
+      </div>
     </div>
   </div>
 </div>
@@ -2301,6 +2315,20 @@ function toggleMtdKpis() {
   const el = document.getElementById('mtdKpiCollapse');
   const chevron = document.getElementById('mtdChevron');
   if (mtdKpisOpen) {
+    el.style.maxHeight = el.scrollHeight + 'px';
+    chevron.style.transform = 'rotate(180deg)';
+  } else {
+    el.style.maxHeight = '0';
+    chevron.style.transform = 'rotate(0deg)';
+  }
+}
+
+const _sectionState = {};
+function toggleSection(collapseId, chevronId) {
+  _sectionState[collapseId] = !_sectionState[collapseId];
+  const el = document.getElementById(collapseId);
+  const chevron = document.getElementById(chevronId);
+  if (_sectionState[collapseId]) {
     el.style.maxHeight = el.scrollHeight + 'px';
     chevron.style.transform = 'rotate(180deg)';
   } else {
