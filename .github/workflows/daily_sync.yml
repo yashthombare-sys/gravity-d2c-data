@@ -46,17 +46,17 @@ jobs:
       - name: Verify credentials file
         run: python3 -c "import json; json.load(open('shiproket-mis-70c28ae6e7fb.json')); print('Credentials JSON is valid')"
 
-      - name: Run Monthly MIS sync
-        run: python3 sync_dashboard.py
-
-      - name: Run MTD sync
-        run: python3 sync_mtd.py
-
-      - name: Run Shiprocket fulfillment sync
+      - name: Run Shiprocket fulfillment sync (writes to Google Sheet)
         env:
           SHIPROCKET_EMAIL: ${{ secrets.SHIPROCKET_EMAIL }}
           SHIPROCKET_PASSWORD: ${{ secrets.SHIPROCKET_PASSWORD }}
         run: python3 shiprocket_sync.py
+
+      - name: Run Monthly MIS sync
+        run: python3 sync_dashboard.py
+
+      - name: Run MTD sync (reads Fulfillment tab from Google Sheet)
+        run: python3 sync_mtd.py
 
       - name: Encrypt dashboard for GitHub Pages
         env:

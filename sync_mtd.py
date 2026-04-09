@@ -388,7 +388,8 @@ def read_amazon_daily(sh, month_key, month_tabs):
 
 
 def read_fulfillment_tab(sh):
-    """Read the Fulfillment tab from the D2C sheet (written by Apps Script syncFulfillmentData).
+    """Read the Fulfillment tab from the D2C sheet (written by shiprocket_sync.py).
+    Supports both old 14-column and new 16-column formats.
     Returns dict keyed by date string with fulfillment metrics + per-product breakdown."""
     try:
         ws = sh.worksheet("Fulfillment")
@@ -403,7 +404,7 @@ def read_fulfillment_tab(sh):
 
     result = {}
     for row in data[1:]:  # skip header
-        if len(row) < 14:
+        if len(row) < 13:
             continue
         date_str = parse_date(row[0])
         if not date_str:
@@ -414,9 +415,20 @@ def read_fulfillment_tab(sh):
         if new_orders == 0 and new_value == 0:
             continue
 
-        # Parse products JSON (column N)
+        # Detect format: 16-col (new) vs 14-col (old)
         products = {}
-        if len(row) > 13 and row[13]:
+        avg_ship_days = 0
+        avg_deliver_days = 0
+        if len(row) >= 16 and row[15]:
+            # New format: cols 13,14 = ship/deliver days; col 15 = products JSON
+            avg_ship_days = safe_float(row[13])
+            avg_deliver_days = safe_float(row[14])
+            try:
+                products = json.loads(row[15])
+            except (json.JSONDecodeError, TypeError):
+                pass
+        elif len(row) > 13 and row[13]:
+            # Old format: col 13 = products JSON
             try:
                 products = json.loads(row[13])
             except (json.JSONDecodeError, TypeError):
@@ -435,6 +447,8 @@ def read_fulfillment_tab(sh):
             "rto": int(safe_float(row[10])),
             "cancelled": int(safe_float(row[11])),
             "avg_tat_days": safe_float(row[12]),
+            "avg_ship_days": avg_ship_days,
+            "avg_deliver_days": avg_deliver_days,
             "products": products,
         }
 
