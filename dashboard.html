@@ -671,7 +671,6 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
     <div id="chartCollapse" style="max-height:0;overflow:hidden;transition:max-height 0.4s ease;">
       <div class="chart-card" style="margin-top:8px;"><canvas id="mtdRevProfitChart" height="120"></canvas></div>
-      <div class="chart-card" style="margin-top:10px;" id="mtdProfitAdLineCard"><h3 style="color:var(--muted);font-size:11px;font-weight:600;margin-bottom:6px;">Profit & Ad Spend</h3><canvas id="mtdProfitAdLineChart" height="80"></canvas></div>
     </div>
   </div>
 
@@ -2844,8 +2843,8 @@ function renderMTD() {
     const rpLabels = monthDates.map(d => parseInt(d.split('-')[2]));
     const rpDatasets = [];
     const singleCat = (channel === 'amazon') || (category !== 'all');
-    function mkProfitLine(data) { return { type: 'line', label: 'Profit', data: data, borderColor: '#4ade80', backgroundColor: 'rgba(74,222,128,0.1)', pointBackgroundColor: '#4ade80', pointBorderColor: '#4ade80', pointRadius: 5, pointHoverRadius: 7, borderWidth: 3, tension: 0.3, fill: false, order: 0, stack: 'lines' }; }
-    function mkAdSpendLine(data) { return { type: 'line', label: 'Ad Spend', data: data, borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.1)', pointBackgroundColor: '#ef4444', pointBorderColor: '#ef4444', pointRadius: 5, pointHoverRadius: 7, borderWidth: 3, tension: 0.3, fill: false, order: 0, borderDash: [6, 4], stack: 'lines' }; }
+    function mkProfitLine(data) { return { type: 'line', label: 'Profit', data: data, borderColor: '#4ade80', backgroundColor: 'rgba(74,222,128,0.1)', pointBackgroundColor: '#4ade80', pointBorderColor: '#4ade80', pointRadius: 5, pointHoverRadius: 7, borderWidth: 3, tension: 0.3, fill: false, order: 0 }; }
+    function mkAdSpendLine(data) { return { type: 'line', label: 'Ad Spend', data: data, borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.1)', pointBackgroundColor: '#ef4444', pointBorderColor: '#ef4444', pointRadius: 5, pointHoverRadius: 7, borderWidth: 3, tension: 0.3, fill: false, order: 0, borderDash: [6, 4] }; }
     if (channel === 'amazon') {
       rpDatasets.push({ label: 'Revenue', data: monthDates.map(d => Math.round((amz[d]||{}).revenue||0)), backgroundColor: '#3b82f6', borderRadius: 4, order: 2, stack: 'rev' });
       rpDatasets.push(mkProfitLine(monthDates.map(d => Math.round((amz[d]||{}).profit||0))));
@@ -2893,45 +2892,6 @@ function renderMTD() {
     });
   } catch(e) { console.error('MTD Rev/Profit chart error:', e); }
 
-  // ── Profit & Ad Spend mini-chart (only for All Categories) ──
-  try {
-    if (window._mtdCharts['mtdProfitAdLineChart']) { window._mtdCharts['mtdProfitAdLineChart'].destroy(); window._mtdCharts['mtdProfitAdLineChart'] = null; }
-    var palCard = document.getElementById('mtdProfitAdLineCard');
-    if (!singleCat) {
-      palCard.style.display = '';
-      var palLabels = monthDates.map(d => parseInt(d.split('-')[2]));
-      var palProfitData = monthDates.map(d => adjProf(d2c_bb, 0.10, d) + adjProf(d2c_stem, 0.20, d) + adjProf(d2c_soft, 0.15, d) + (channel==='combined' ? Math.round((amz[d]||{}).profit||0) : 0));
-      var palAdsData = monthDates.map(d => Math.round(((d2c_bb[d]||{}).ad_spend||0) + ((d2c_stem[d]||{}).ad_spend||0) + ((d2c_soft[d]||{}).ad_spend||0) + (channel==='combined' ? ((amz[d]||{}).ad_spend||0) : 0)));
-      window._mtdCharts['mtdProfitAdLineChart'] = new Chart(document.getElementById('mtdProfitAdLineChart'), {
-        type: 'line',
-        data: {
-          labels: palLabels,
-          datasets: [
-            { label: 'Profit', data: palProfitData, borderColor: '#4ade80', backgroundColor: 'rgba(74,222,128,0.08)', pointBackgroundColor: '#4ade80', pointRadius: 5, pointHoverRadius: 7, borderWidth: 3, tension: 0.3, fill: true },
-            { label: 'Ad Spend', data: palAdsData, borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.08)', pointBackgroundColor: '#ef4444', pointRadius: 5, pointHoverRadius: 7, borderWidth: 3, tension: 0.3, fill: true, borderDash: [6, 4] }
-          ]
-        },
-        options: {
-          responsive: true,
-          scales: {
-            x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#8a94a6', font: { size: 12, weight: '600' } } },
-            y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#8a94a6', font: { size: 11 }, maxTicksLimit: 5, callback: function(v) { return v >= 100000 ? '₹'+(v/100000).toFixed(1)+'L' : v <= -100000 ? '-₹'+(-v/100000).toFixed(1)+'L' : '₹'+(v/1000).toFixed(0)+'K'; } } }
-          },
-          plugins: {
-            legend: { labels: { color: '#e8ecf1', usePointStyle: true, padding: 10, font: { size: 10, weight: '600' }, boxWidth: 6 }, position: 'bottom' },
-            tooltip: {
-              backgroundColor: 'rgba(20,24,32,0.95)', titleColor: '#e8ecf1', bodyColor: '#e8ecf1',
-              borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1, cornerRadius: 8, padding: 10,
-              bodyFont: { size: 12, weight: '600' },
-              callbacks: { label: function(ctx) { return ctx.dataset.label + ': ₹' + (Math.abs(ctx.raw) >= 100000 ? (ctx.raw/100000).toFixed(2)+'L' : (ctx.raw/1000).toFixed(1)+'K'); } }
-            }
-          }
-        }
-      });
-    } else {
-      palCard.style.display = 'none';
-    }
-  } catch(e) { console.error('Profit/AdSpend line chart error:', e); }
 
   // ── Daily Table ──
   const tbody = document.getElementById('mtdTableBody');
