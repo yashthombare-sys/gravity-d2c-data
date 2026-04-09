@@ -2694,9 +2694,11 @@ function renderMTD() {
     });
   } catch(e) { console.error('MTD Rev/Profit chart error:', e); }
 
-  // ── MTD Profit Trend Chart (stacked by category) ──
+  // ── MTD Profit Trend Chart (stacked by category, hidden for single category) ──
   try {
     if (window._mtdCharts['mtdProfitTrendChart']) { window._mtdCharts['mtdProfitTrendChart'].destroy(); window._mtdCharts['mtdProfitTrendChart'] = null; }
+    var profitChartCard = document.getElementById('mtdProfitTrendChart').closest('.chart-card');
+    if (singleCat) { profitChartCard.style.display = 'none'; } else { profitChartCard.style.display = '';
     const ptLabels = monthDates.map(d => parseInt(d.split('-')[2]));
     const ptDatasets = [];
     if (channel === 'amazon') {
@@ -2728,6 +2730,7 @@ function renderMTD() {
         }
       }
     });
+    } // close else for !singleCat
   } catch(e) { console.error('MTD Profit Trend chart error:', e); }
 
   // ── Daily Table ──
