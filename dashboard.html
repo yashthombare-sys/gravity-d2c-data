@@ -2592,8 +2592,8 @@ function renderMTD() {
   const applyRto = (channel !== 'amazon');
   const selAdjProfitPct = selAdjRev > 0 ? pctStr(selAdjProfit / selAdjRev) : '—';
   // For combined: D2C adjusted + Amazon gross
-  const combAdjRev = selAdjRev + (s.amz_rev||0);
-  const combAdjProfit = selAdjProfit + (s.amz_profit||0);
+  const combAdjRev = selAdjRev + (sel.amz_rev||0);
+  const combAdjProfit = selAdjProfit + (sel.amz_profit||0);
   const combAdjProfitPct = combAdjRev > 0 ? pctStr(combAdjProfit / combAdjRev) : '—';
 
   // Previous period RTO-adjusted profit
