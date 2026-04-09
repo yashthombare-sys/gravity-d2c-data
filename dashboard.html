@@ -2678,7 +2678,7 @@ function renderMTD() {
   dayEl.innerHTML =
     mkKpi('rev', applyRto ? 'Revenue <span style="font-size:8px;color:var(--muted);font-weight:400">(RTO adj)</span>' : 'Revenue',
       applyRto ? fmt(selAdjRev) : fmt(s.revenue), '',
-      applyRto ? (channel==='combined' ? 'D2C adj: '+fmt(selAdjRev)+' | Amz: '+fmt(s.amz_rev) : 'RTO loss: '+fmt(selRtoRevLoss)+' | '+pctStr(selRtoRevLoss/s.revenue)+' of gross') : '',
+      applyRto ? (channel==='combined' ? 'D2C adj: '+fmt(selAdjRev)+' | Amz: '+fmt(s.amz_rev) : 'RTO loss: '+fmt(selRtoRevLoss)+' | Gross: '+fmt(s.revenue)) : '',
       applyRto ? '<span><span class="sub-label">Gross Rev</span><span class="sub-val">'+fmt(s.revenue)+'</span></span>' +
         '<span><span class="sub-label">RTO Loss</span><span class="sub-val negative">-'+fmt(selRtoRevLoss)+'</span></span>' +
         '<span style="grid-column:1/-1;font-size:8px;opacity:0.7">BB: -'+fmt(s.bb_rev*RTO_RATES.bb)+' · STEM: -'+fmt(s.stem_rev*RTO_RATES.stem)+' · Soft: -'+fmt(s.soft_rev*RTO_RATES.soft)+'</span>'
