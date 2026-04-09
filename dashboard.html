@@ -2504,12 +2504,7 @@ function renderMTD() {
       const mtdAdjProfit = mtd.profit - mtdRtoRevLoss + mtdRtoCogsSaved;
       const mtdAdjPct = mtdAdjRev > 0 ? pctStr(mtdAdjProfit/mtdAdjRev) : '—';
       const mtdNetRtoLoss = mtdRtoRevLoss - mtdRtoCogsSaved;
-      return mkMtdKpi('adjrev', 'MTD Adj. Revenue', fmt(mtdAdjRev), '', fmt(mtdAdjRev/n)+'/day | RTO rev loss: '+fmt(mtdRtoRevLoss),
-        '<span><span class="sub-label">BB (-10%)</span><span class="sub-val">-'+fmt(mtd.bb_rev*0.10)+'</span></span>' +
-        '<span><span class="sub-label">STEM (-20%)</span><span class="sub-val">-'+fmt(mtd.stem_rev*0.20)+'</span></span>' +
-        '<span><span class="sub-label">Soft (-15%)</span><span class="sub-val">-'+fmt(mtd.soft_rev*0.15)+'</span></span>' +
-        '<span><span class="sub-label">Gross Revenue</span><span class="sub-val">'+fmt(mtd.revenue)+'</span></span>') +
-      mkMtdKpi('profit', 'MTD Profit (RTO adj)', fmt(mtdAdjProfit), mtdAdjProfit>=0?'positive':'negative', fmt(mtdAdjProfit/n)+'/day | '+mtdAdjPct+' | Net RTO loss: '+fmt(mtdNetRtoLoss),
+      return mkMtdKpi('profit', 'MTD Profit (RTO adj)', fmt(mtdAdjProfit), mtdAdjProfit>=0?'positive':'negative', fmt(mtdAdjProfit/n)+'/day | '+mtdAdjPct+' | Net RTO loss: '+fmt(mtdNetRtoLoss),
         '<span><span class="sub-label">RTO Rev Loss</span><span class="sub-val">-'+fmt(mtdRtoRevLoss)+'</span></span>' +
         '<span><span class="sub-label">COGS Saved</span><span class="sub-val">+'+fmt(mtdRtoCogsSaved)+'</span></span>' +
         '<span><span class="sub-label">Raw Profit</span><span class="sub-val">'+fmt(mtd.profit)+'</span></span>');
@@ -2593,12 +2588,6 @@ function renderMTD() {
       '<span><span class="sub-label">Soft Toy</span><span class="sub-val">'+(s.soft_sessions||0).toLocaleString()+'</span></span>',
       growthBadgeMtd(s.sessions, prev.sessions||0)) : '') +
     mkKpi('rev', 'Revenue', fmt(s.revenue), '', channel==='combined'?'D2C: '+fmt(s.d2c_rev)+' | Amz: '+fmt(s.amz_rev):'', bk('rev'), growthBadgeMtd(s.revenue, prev.revenue)) +
-    mkKpi('adjrev', 'Adj. Revenue', fmt(selAdjRev), '', 'RTO rev loss: '+fmt(selRtoRevLoss)+' | '+pctStr(selRtoRevLoss/s.revenue)+' of gross',
-      '<span><span class="sub-label">BB (-10%)</span><span class="sub-val">-'+fmt(s.bb_rev*RTO_RATES.bb)+'</span></span>' +
-      '<span><span class="sub-label">STEM (-20%)</span><span class="sub-val">-'+fmt(s.stem_rev*RTO_RATES.stem)+'</span></span>' +
-      '<span><span class="sub-label">Soft (-15%)</span><span class="sub-val">-'+fmt(s.soft_rev*RTO_RATES.soft)+'</span></span>' +
-      '<span><span class="sub-label">Gross Revenue</span><span class="sub-val">'+fmt(s.revenue)+'</span></span>',
-      growthBadgeMtd(selAdjRev, prevAdjRev)) +
     mkKpi('orders', 'Units Sold', s.orders.toLocaleString(), '', channel==='combined'?'D2C: '+s.d2c_orders+' | Amz: '+s.amz_orders:'', bk('orders', numFmt), growthBadgeMtd(s.orders, prev.orders)) +
     mkKpi('ads', 'Ad Spend <span style="font-size:8px;color:var(--muted);font-weight:400">(inc GST)</span>', fmt(s.ad_spend), '', (s.revenue>0?(s.ad_spend/s.revenue*100).toFixed(1)+'% of revenue':'') + (channel==='combined'?' | D2C: '+fmt(s.d2c_ads)+' | Amz: '+fmt(s.amz_ads):''), bk('ads'), growthBadgeMtd(s.ad_spend, prev.ad_spend)) +
     mkKpi('aov', 'AOV', s.orders>0?fmt(s.revenue/s.orders):'—', '', s.orders>0?s.orders+' units':'',
