@@ -65,6 +65,8 @@
   .header h1 .clap { color: var(--primary); }
   .header h1 .store { color: var(--text); }
   .header .subtitle { color: var(--muted); font-size: 12px; margin-top: 1px; }
+  .header-right { display: flex; align-items: center; gap: 12px; }
+  .header-meta { display: flex; align-items: center; gap: 10px; }
   .header .period {
     background: rgba(252,187,19,0.08); padding: 8px 18px; border-radius: 8px;
     font-size: 13px; color: var(--primary); border: 1px solid rgba(252,187,19,0.2);
@@ -185,64 +187,99 @@
     .actions-grid { grid-template-columns: 1fr; }
   }
 
+  /* ── Desktop large ── */
+  @media (max-width: 1400px) {
+    .kpi-row { grid-template-columns: repeat(4, 1fr) !important; }
+  }
+
+  /* ── Tablet / small desktop ── */
+  @media (max-width: 1200px) {
+    .kpi-row { grid-template-columns: repeat(3, 1fr) !important; }
+    .charts-grid, .charts-row { grid-template-columns: 1fr; }
+    .actions-grid { grid-template-columns: 1fr; }
+  }
+
   /* ── Tablet portrait ── */
   @media (max-width: 900px) {
-    .header { padding: 16px 20px; flex-direction: column; gap: 10px; align-items: flex-start; }
+    .header { padding: 14px 16px; flex-direction: column; gap: 12px; align-items: stretch; }
+    .header-left { gap: 10px; }
     .header h1 { font-size: 18px; }
+    .header .subtitle { font-size: 10px; }
     .header .period { font-size: 11px; padding: 6px 12px; }
-    .container { padding: 16px 14px; }
-    .filter-bar { gap: 8px; }
-    .filter-select { min-width: 110px; font-size: 11px; padding: 6px 24px 6px 10px; }
-    .filter-label { font-size: 9px; }
-    .view-toggle { flex-wrap: wrap; }
+    .header-right { flex-direction: column; gap: 10px; width: 100%; }
+    .view-toggle { width: 100%; }
+    .vt-btn { flex: 1; text-align: center; padding: 8px 6px; font-size: 12px; }
+    .header-meta { width: 100%; justify-content: space-between; }
+    .container { padding: 14px 12px; }
   }
 
   /* ── Mobile ── */
   @media (max-width: 768px) {
-    .kpi-row { grid-template-columns: repeat(2, 1fr) !important; gap: 6px !important; }
-    .kpi { padding: 10px 10px; min-height: 90px; border-radius: 10px; }
-    .kpi-value { font-size: 16px; }
-    .kpi-label { font-size: 8px; letter-spacing: 0.5px; }
-    .kpi-per { font-size: 8px; }
-    .kpi-sub { font-size: 8px; gap: 1px 4px; }
+    .kpi-row { grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important; }
+    .kpi {
+      padding: 12px 10px; min-height: 88px; border-radius: 10px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .kpi-value { font-size: 18px; }
+    .kpi-label { font-size: 8.5px; letter-spacing: 0.6px; margin-bottom: 3px; }
+    .kpi-per { font-size: 8.5px; }
+    .kpi-sub { font-size: 8px; gap: 2px 6px; }
+    .kpi-change { font-size: 11px; }
     .container { padding: 12px 10px; }
-    .section-title { font-size: 13px; }
-    .chart-card { padding: 12px; border-radius: 10px; }
+    .section { margin-bottom: 16px; }
+    .section-title { font-size: 13px; margin-bottom: 10px; -webkit-tap-highlight-color: transparent; }
+    .section-title::before { width: 3px; height: 16px; }
+    .chart-card { padding: 14px 10px; border-radius: 10px; }
     .chart-card h3 { font-size: 11px; margin-bottom: 8px; }
-    .table-wrap { padding: 10px; border-radius: 10px; }
+    .table-wrap { padding: 10px 6px; border-radius: 10px; }
     table { font-size: 10px; }
-    th, td { padding: 6px 4px; }
-    .header { padding: 12px 14px; }
-    .header h1 { font-size: 16px; }
-    .header .subtitle { font-size: 10px; }
-    .header .period { font-size: 10px; padding: 5px 10px; }
-    .header-logo { width: 34px; height: 34px; }
-    .sync-wrap { flex-wrap: wrap; }
-    #syncBtn { padding: 6px 12px; font-size: 10px; }
-    .filter-bar { gap: 6px; margin-bottom: 12px; }
-    .filter-select { min-width: 90px; font-size: 10px; padding: 6px 22px 6px 8px; border-radius: 6px; }
-    .filter-label { font-size: 8px; }
-    .filter-group { gap: 4px; }
-  }
+    th { font-size: 9px; }
+    th, td { padding: 6px 5px; }
 
-  /* ── Mobile view toggle + touch ── */
-  @media (max-width: 768px) {
-    .vt-btn { padding: 6px 12px; font-size: 11px; }
-    .kpi { -webkit-tap-highlight-color: transparent; }
-    .section-title { -webkit-tap-highlight-color: transparent; }
+    /* Header mobile */
+    .header { padding: 12px 14px; border-bottom-width: 1px; }
+    .header h1 { font-size: 16px; }
+    .header .subtitle { font-size: 9px; }
+    .header .period { font-size: 10px; padding: 5px 10px; border-radius: 6px; }
+    .header-logo { width: 32px; height: 32px; border-radius: 8px; }
+    .view-toggle { border-radius: 6px; }
+    .vt-btn { padding: 7px 0; font-size: 11px; }
+
+    /* Sync */
+    .sync-wrap { width: 100%; justify-content: space-between; }
+    #syncBtn { padding: 6px 14px; font-size: 10px; border-radius: 6px; }
+    #syncStatus { font-size: 9px; }
+
+    /* Filters — compact rows */
+    .mtd-header { margin-bottom: 12px; }
+    .mtd-filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end; }
+    .mtd-filters .filter-group { flex-direction: column; gap: 2px; }
+    .filter-label { font-size: 8px; letter-spacing: 0.5px; }
+    .filter-select { min-width: 0; width: 100%; font-size: 11px; padding: 7px 24px 7px 8px; border-radius: 6px; }
+    .filter-group:first-child { flex: 1 1 45%; }
+    .filter-group:nth-child(2) { flex: 1 1 25%; }
+    .filter-group:nth-child(3) { flex: 1 1 25%; }
+    .filter-group:nth-child(4) { flex-basis: 100%; }
+    .filter-group:nth-child(4) .filter-label { font-size: 8px; }
+
+    /* Calendar popup mobile */
+    .cal-popup { left: 0; right: 0; width: auto; max-width: 95vw; }
   }
 
   /* ── Small mobile ── */
   @media (max-width: 480px) {
-    .kpi-row { grid-template-columns: 1fr 1fr !important; gap: 5px !important; }
-    .kpi { padding: 8px 8px; min-height: 80px; }
-    .kpi-value { font-size: 15px; }
-    .container { padding: 8px 8px; }
+    .kpi-row { gap: 6px !important; }
+    .kpi { padding: 10px 8px; min-height: 80px; }
+    .kpi-value { font-size: 16px; }
+    .kpi-label { font-size: 8px; }
+    .container { padding: 10px 8px; }
     .header { padding: 10px 10px; }
-    .header h1 { font-size: 14px; }
-    .filter-bar { flex-direction: row; flex-wrap: wrap; }
-    .section { margin-bottom: 16px; }
-    .section-title { font-size: 12px; margin-bottom: 10px; }
+    .header-left { gap: 8px; }
+    .header h1 { font-size: 15px; }
+    .header-logo { width: 28px; height: 28px; }
+    .vt-btn { font-size: 10px; padding: 6px 0; }
+    .section-title { font-size: 12px; }
+    .filter-select { font-size: 10px; padding: 6px 20px 6px 7px; }
   }
 
   /* Filter Dropdowns */
@@ -504,17 +541,19 @@
       <div class="subtitle">Master Dashboard</div>
     </div>
   </div>
-  <div style="display:flex;align-items:center;gap:12px;">
+  <div class="header-right">
     <div class="view-toggle" id="viewToggle">
       <button class="vt-btn" id="vtMIS" onclick="switchView('mis')">Monthly MIS</button>
       <button class="vt-btn active" id="vtMTD" onclick="switchView('mtd')">Reporting Daily</button>
       <button class="vt-btn" id="vtSR" onclick="switchView('sr')">D2C Orders</button>
     </div>
-    <div class="period" id="periodLabel">Apr 2025 — Feb 2026</div>
-    <div class="sync-wrap">
-      <span id="dataAgeWarn" class="data-age-warn" style="display:none;"></span>
-      <button id="syncBtn" onclick="triggerSync()">⟳ Sync Now</button>
-      <span id="syncStatus"></span>
+    <div class="header-meta">
+      <div class="period" id="periodLabel">Apr 2025 — Feb 2026</div>
+      <div class="sync-wrap">
+        <span id="dataAgeWarn" class="data-age-warn" style="display:none;"></span>
+        <button id="syncBtn" onclick="triggerSync()">⟳ Sync Now</button>
+        <span id="syncStatus"></span>
+      </div>
     </div>
   </div>
 </div>
