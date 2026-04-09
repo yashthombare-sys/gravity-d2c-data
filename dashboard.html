@@ -544,7 +544,7 @@
     </div>
     <div class="charts-grid" style="grid-template-columns: 1fr 1fr; margin-top: 16px;">
       <div class="chart-card"><h3>ROAS by Category</h3><canvas id="mtdCatRoas" height="180"></canvas></div>
-      <div class="chart-card"><h3>Profit % by Category (RTO Adjusted)</h3><canvas id="mtdCatProfit" height="180"></canvas></div>
+      <div class="chart-card"><h3>Profit % by Category</h3><canvas id="mtdCatProfit" height="180"></canvas></div>
     </div>
     <div class="charts-grid" style="grid-template-columns: 1fr; margin-top: 16px;">
       <div class="chart-card"><h3>Daily Revenue Trend by Category</h3><canvas id="mtdCatTrend" height="100"></canvas></div>
@@ -2497,17 +2497,11 @@ function renderMTD() {
       '<span><span class="sub-label">Soft Toy</span><span class="sub-val">'+mtdSfCac+'</span></span>' +
       (channel==='combined'?'<span><span class="sub-label">Amazon</span><span class="sub-val">'+mtdAmzCac+'</span></span>':'')) +
     (function(){
-      const mtdRtoRevLoss = mtd.bb_rev*0.10 + mtd.stem_rev*0.20 + mtd.soft_rev*0.15;
-      const mtdCogsPct = mtd.revenue > 0 ? (mtd.cogs||0) / mtd.revenue : 0;
-      const mtdRtoCogsSaved = mtdRtoRevLoss * mtdCogsPct;
-      const mtdAdjRev = mtd.revenue - mtdRtoRevLoss;
-      const mtdAdjProfit = mtd.profit - mtdRtoRevLoss + mtdRtoCogsSaved;
-      const mtdAdjPct = mtdAdjRev > 0 ? pctStr(mtdAdjProfit/mtdAdjRev) : '—';
-      const mtdNetRtoLoss = mtdRtoRevLoss - mtdRtoCogsSaved;
-      return mkMtdKpi('profit', 'MTD Profit (RTO adj)', fmt(mtdAdjProfit), mtdAdjProfit>=0?'positive':'negative', fmt(mtdAdjProfit/n)+'/day | '+mtdAdjPct+' | Net RTO loss: '+fmt(mtdNetRtoLoss),
-        '<span><span class="sub-label">RTO Rev Loss</span><span class="sub-val">-'+fmt(mtdRtoRevLoss)+'</span></span>' +
-        '<span><span class="sub-label">COGS Saved</span><span class="sub-val">+'+fmt(mtdRtoCogsSaved)+'</span></span>' +
-        '<span><span class="sub-label">Raw Profit</span><span class="sub-val">'+fmt(mtd.profit)+'</span></span>');
+      const mtdProfitPct = mtd.revenue > 0 ? pctStr(mtd.profit/mtd.revenue) : '—';
+      return mkMtdKpi('profit', 'MTD Profit', fmt(mtd.profit), mtd.profit>=0?'positive':'negative', fmt(mtd.profit/n)+'/day | '+mtdProfitPct,
+        '<span><span class="sub-label">Revenue</span><span class="sub-val">'+fmt(mtd.revenue)+'</span></span>' +
+        '<span><span class="sub-label">Total Expense</span><span class="sub-val">'+fmt(mtd.total_expense||0)+'</span></span>' +
+        '<span><span class="sub-label">COGS</span><span class="sub-val">'+fmt(mtd.cogs||0)+'</span></span>');
     })() +
     mkMtdKpi('roas', 'MTD ROAS', mtdRoas, parseFloat(mtdRoas)>=2.5?'positive':'negative', 'Revenue / Ad Spend',
       '<span><span class="sub-label">Busy Board</span><span class="sub-val">'+mtdBbRoas+'</span></span>' +
@@ -2535,7 +2529,7 @@ function renderMTD() {
   const selNetRtoLoss = selRtoRevLoss - selRtoCogsSaved;
   const selRoas = sel.ad_spend > 0 ? (sel.revenue / sel.ad_spend).toFixed(1) + 'x' : '∞';
   const selCac = sel.orders > 0 ? fmt(sel.ad_spend / sel.orders) : '—';
-  const selProfitPct = selAdjRev > 0 ? pctStr(selAdjProfit / selAdjRev) : '—';
+  const selProfitPct = sel.revenue > 0 ? pctStr(sel.profit / sel.revenue) : '—';
 
   // Previous period RTO-adjusted profit
   const prevRtoRevLoss = (prev.bb_rev||0) * RTO_RATES.bb + (prev.stem_rev||0) * RTO_RATES.stem + (prev.soft_rev||0) * RTO_RATES.soft;
@@ -2601,11 +2595,11 @@ function renderMTD() {
       '<span><span class="sub-label">STEM</span><span class="sub-val">' + stCac + '</span></span>' +
       '<span><span class="sub-label">Soft Toy</span><span class="sub-val">' + sfCac + '</span></span>' +
       (channel==='combined' ? '<span><span class="sub-label">Amazon</span><span class="sub-val">' + amzCac + '</span></span>' : '')) +
-    mkKpi('profit', 'Profit (RTO adj)', fmt(selAdjProfit), selAdjProfit>=0?'positive':'negative', selProfitPct + ' | Net RTO loss: ' + fmt(selNetRtoLoss),
-      '<span><span class="sub-label">RTO Rev Loss</span><span class="sub-val">-' + fmt(selRtoRevLoss) + '</span></span>' +
-      '<span><span class="sub-label">COGS Saved</span><span class="sub-val">+' + fmt(selRtoCogsSaved) + '</span></span>' +
-      '<span><span class="sub-label">Raw Profit</span><span class="sub-val">' + fmt(s.profit) + '</span></span>',
-      growthBadgeMtd(selAdjProfit, prevAdjProfit)) +
+    mkKpi('profit', 'Profit', fmt(sel.profit), sel.profit>=0?'positive':'negative', selProfitPct,
+      '<span><span class="sub-label">Revenue</span><span class="sub-val">' + fmt(sel.revenue) + '</span></span>' +
+      '<span><span class="sub-label">Total Expense</span><span class="sub-val">' + fmt(sel.total_expense||0) + '</span></span>' +
+      '<span><span class="sub-label">COGS</span><span class="sub-val">' + fmt(sel.cogs||0) + '</span></span>',
+      growthBadgeMtd(sel.profit, prev.profit)) +
     mkKpi('roas', 'ROAS', selRoas, parseFloat(selRoas)>=2.5?'positive':'negative', 'Revenue / Ad Spend',
       '<span><span class="sub-label">Busy Board</span><span class="sub-val">' + bbRoas + '</span></span>' +
       '<span><span class="sub-label">STEM</span><span class="sub-val">' + stRoas + '</span></span>' +
@@ -2689,12 +2683,11 @@ function renderMTD() {
     }
   });
 
-  // Profit % by Category (horizontal bar, RTO adjusted)
-  const RTO_R = { bb: 0.10, stem: 0.20, soft: 0.15 };
+  // Profit % by Category (horizontal bar)
   const catProfitPcts = [
-    sel.bb_rev > 0 ? (sel.bb_profit - sel.bb_orders*RTO_R.bb*100) / sel.bb_rev * 100 : 0,
-    sel.stem_rev > 0 ? (sel.stem_profit - sel.stem_orders*RTO_R.stem*100) / sel.stem_rev * 100 : 0,
-    sel.soft_rev > 0 ? (sel.soft_profit - sel.soft_orders*RTO_R.soft*100) / sel.soft_rev * 100 : 0,
+    sel.bb_rev > 0 ? sel.bb_profit / sel.bb_rev * 100 : 0,
+    sel.stem_rev > 0 ? sel.stem_profit / sel.stem_rev * 100 : 0,
+    sel.soft_rev > 0 ? sel.soft_profit / sel.soft_rev * 100 : 0,
   ];
   if (channel === 'combined') catProfitPcts.push(sel.amz_rev > 0 ? sel.amz_profit / sel.amz_rev * 100 : 0);
   const profitBarColors = catProfitPcts.map(v => v >= 0 ? '#22c55e' : '#ef4444');
