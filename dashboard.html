@@ -173,19 +173,76 @@
     background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2);
   }
 
+  /* ── Desktop large ── */
   @media (max-width: 1400px) {
-    .kpi-row { grid-template-columns: repeat(5, 1fr); }
+    .kpi-row { grid-template-columns: repeat(4, 1fr) !important; }
   }
-  @media (max-width: 1200px) {
-    .kpi-row { grid-template-columns: repeat(3, 1fr); }
 
+  /* ── Tablet / small desktop ── */
+  @media (max-width: 1200px) {
+    .kpi-row { grid-template-columns: repeat(3, 1fr) !important; }
     .charts-grid, .charts-row { grid-template-columns: 1fr; }
     .actions-grid { grid-template-columns: 1fr; }
-
   }
+
+  /* ── Tablet portrait ── */
+  @media (max-width: 900px) {
+    .header { padding: 16px 20px; flex-direction: column; gap: 10px; align-items: flex-start; }
+    .header h1 { font-size: 18px; }
+    .header .period { font-size: 11px; padding: 6px 12px; }
+    .container { padding: 16px 14px; }
+    .filter-bar { gap: 8px; }
+    .filter-select { min-width: 110px; font-size: 11px; padding: 6px 24px 6px 10px; }
+    .filter-label { font-size: 9px; }
+    .view-toggle { flex-wrap: wrap; }
+  }
+
+  /* ── Mobile ── */
   @media (max-width: 768px) {
-    .kpi-row { grid-template-columns: repeat(2, 1fr); }
-    .container { padding: 16px; }
+    .kpi-row { grid-template-columns: repeat(2, 1fr) !important; gap: 6px !important; }
+    .kpi { padding: 10px 10px; min-height: 90px; border-radius: 10px; }
+    .kpi-value { font-size: 16px; }
+    .kpi-label { font-size: 8px; letter-spacing: 0.5px; }
+    .kpi-per { font-size: 8px; }
+    .kpi-sub { font-size: 8px; gap: 1px 4px; }
+    .container { padding: 12px 10px; }
+    .section-title { font-size: 13px; }
+    .chart-card { padding: 12px; border-radius: 10px; }
+    .chart-card h3 { font-size: 11px; margin-bottom: 8px; }
+    .table-wrap { padding: 10px; border-radius: 10px; }
+    table { font-size: 10px; }
+    th, td { padding: 6px 4px; }
+    .header { padding: 12px 14px; }
+    .header h1 { font-size: 16px; }
+    .header .subtitle { font-size: 10px; }
+    .header .period { font-size: 10px; padding: 5px 10px; }
+    .header-logo { width: 34px; height: 34px; }
+    .sync-wrap { flex-wrap: wrap; }
+    #syncBtn { padding: 6px 12px; font-size: 10px; }
+    .filter-bar { gap: 6px; margin-bottom: 12px; }
+    .filter-select { min-width: 90px; font-size: 10px; padding: 6px 22px 6px 8px; border-radius: 6px; }
+    .filter-label { font-size: 8px; }
+    .filter-group { gap: 4px; }
+  }
+
+  /* ── Mobile view toggle + touch ── */
+  @media (max-width: 768px) {
+    .vt-btn { padding: 6px 12px; font-size: 11px; }
+    .kpi { -webkit-tap-highlight-color: transparent; }
+    .section-title { -webkit-tap-highlight-color: transparent; }
+  }
+
+  /* ── Small mobile ── */
+  @media (max-width: 480px) {
+    .kpi-row { grid-template-columns: 1fr 1fr !important; gap: 5px !important; }
+    .kpi { padding: 8px 8px; min-height: 80px; }
+    .kpi-value { font-size: 15px; }
+    .container { padding: 8px 8px; }
+    .header { padding: 10px 10px; }
+    .header h1 { font-size: 14px; }
+    .filter-bar { flex-direction: row; flex-wrap: wrap; }
+    .section { margin-bottom: 16px; }
+    .section-title { font-size: 12px; margin-bottom: 10px; }
   }
 
   /* Filter Dropdowns */
