@@ -2624,14 +2624,14 @@ function renderMTD() {
 
   dayEl.innerHTML =
     mkKpi('rev', 'Revenue', fmt(s.revenue), '', channel==='combined'?'D2C: '+fmt(s.d2c_rev)+' | Amz: '+fmt(s.amz_rev):'', bk('rev'), growthBadgeMtd(s.revenue, prev.revenue)) +
-    mkKpi('orders', 'Units Sold', s.orders.toLocaleString(), '', channel==='combined'?'D2C: '+s.d2c_orders+' | Amz: '+s.amz_orders:'', bk('orders', numFmt), growthBadgeMtd(s.orders, prev.orders)) +
-    mkKpi('ads', 'Ad Spend <span style="font-size:8px;color:var(--muted);font-weight:400">(inc GST)</span>', fmt(s.ad_spend), '', (s.revenue>0?(s.ad_spend/s.revenue*100).toFixed(1)+'% of revenue':'') + (channel==='combined'?' | D2C: '+fmt(s.d2c_ads)+' | Amz: '+fmt(s.amz_ads):''), bk('ads'), growthBadgeMtd(s.ad_spend, prev.ad_spend)) +
     mkKpi('aov', 'AOV', s.orders>0?fmt(s.revenue/s.orders):'—', '', s.orders>0?s.orders+' units':'',
       '<span><span class="sub-label">Busy Board</span><span class="sub-val">'+(s.bb_orders>0?fmt(s.bb_rev/s.bb_orders):'—')+'</span></span>' +
       '<span><span class="sub-label">STEM</span><span class="sub-val">'+(s.stem_orders>0?fmt(s.stem_rev/s.stem_orders):'—')+'</span></span>' +
       '<span><span class="sub-label">Soft Toy</span><span class="sub-val">'+(s.soft_orders>0?fmt(s.soft_rev/s.soft_orders):'—')+'</span></span>' +
       (channel==='combined'?'<span><span class="sub-label">Amazon</span><span class="sub-val">'+(s.amz_orders>0?fmt(s.amz_rev/s.amz_orders):'—')+'</span></span>':''),
       growthBadgeMtd(s.orders>0?s.revenue/s.orders:0, prev.orders>0?prev.revenue/prev.orders:0)) +
+    mkKpi('orders', 'Units Sold', s.orders.toLocaleString(), '', channel==='combined'?'D2C: '+s.d2c_orders+' | Amz: '+s.amz_orders:'', bk('orders', numFmt), growthBadgeMtd(s.orders, prev.orders)) +
+    mkKpi('ads', 'Ad Spend <span style="font-size:8px;color:var(--muted);font-weight:400">(inc GST)</span>', fmt(s.ad_spend), '', (s.revenue>0?(s.ad_spend/s.revenue*100).toFixed(1)+'% of revenue':'') + (channel==='combined'?' | D2C: '+fmt(s.d2c_ads)+' | Amz: '+fmt(s.amz_ads):''), bk('ads'), growthBadgeMtd(s.ad_spend, prev.ad_spend)) +
     mkKpi('cac', 'CAC <span style="font-size:8px;color:var(--muted);font-weight:400">(inc GST)</span>', selCac, (sel.orders>0&&sel.ad_spend/sel.orders>550)?'negative':'positive', 'Cost per unit',
       '<span><span class="sub-label">Busy Board</span><span class="sub-val">' + bbCac + '</span></span>' +
       '<span><span class="sub-label">STEM</span><span class="sub-val">' + stCac + '</span></span>' +
