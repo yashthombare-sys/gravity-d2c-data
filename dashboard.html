@@ -2426,7 +2426,7 @@ function renderMTD() {
       sessions: (dc.sessions||0), shopify_orders: (dc.shopify_orders||0),
     };
     if (channel === 'd2c') return { ...base, revenue: dc.revenue||0, orders: dc.orders||0, ad_spend: dc.ad_spend||0, profit: dc.profit||0, total_expense: dc.total_expense||0, cogs: dc.cogs||0 };
-    if (channel === 'amazon') return { ...base, bb_rev:0,bb_orders:0,bb_ads:0,bb_profit:0, stem_rev:0,stem_orders:0,stem_ads:0,stem_profit:0, soft_rev:0,soft_orders:0,soft_ads:0,soft_profit:0, revenue: ac.revenue||0, orders: ac.orders||0, ad_spend: ac.ad_spend||0, profit: ac.profit||0, total_expense: ac.total_expense||0, cogs: ac.product_expense||0 };
+    if (channel === 'amazon') return { ...base, bb_rev:0,bb_orders:0,bb_ads:0,bb_profit:0, stem_rev:0,stem_orders:0,stem_ads:0,stem_profit:0, soft_rev:0,soft_orders:0,soft_ads:0,soft_profit:0, revenue: ac.revenue||0, orders: ac.orders||0, ad_spend: ac.ad_spend||0, profit: ac.profit||0, total_expense: ac.total_expense||0, cogs: ac.product_expense||0, sessions: ac.sessions||0 };
     return { ...base,
       revenue: (dc.revenue||0) + (ac.revenue||0),
       orders: (dc.orders||0) + (ac.orders||0),
@@ -2434,6 +2434,7 @@ function renderMTD() {
       profit: (dc.profit||0) + (ac.profit||0),
       total_expense: (dc.total_expense||0) + (ac.total_expense||0),
       cogs: (dc.cogs||0) + (ac.product_expense||0),
+      sessions: (dc.sessions||0) + (ac.sessions||0),
     };
   }
 
@@ -2549,10 +2550,10 @@ function renderMTD() {
   const mtdAmzAov = mtd.amz_orders > 0 ? fmt(mtd.amz_rev / mtd.amz_orders) : '—';
 
   mtdEl.innerHTML =
-    (channel !== 'amazon' ? mkMtdKpi('sessions', 'MTD Sessions', mtd.sessions.toLocaleString(), '', (mtd.sessions>0?(mtd.orders/mtd.sessions*100).toFixed(2)+'% CR | '+fmt(mtd.ad_spend/mtd.sessions)+'/session | '+Math.round(mtd.sessions/n)+'/day':''),
+    mkMtdKpi('sessions', 'MTD Sessions', mtd.sessions.toLocaleString(), '', (mtd.sessions>0?(mtd.orders/mtd.sessions*100).toFixed(2)+'% CR | '+fmt(mtd.ad_spend/mtd.sessions)+'/session | '+Math.round(mtd.sessions/n)+'/day':''),
       '<span><span class="sub-label">Busy Board</span><span class="sub-val">'+(mtd.bb_sessions||0).toLocaleString()+'</span></span>' +
       '<span><span class="sub-label">STEM</span><span class="sub-val">'+(mtd.stem_sessions||0).toLocaleString()+'</span></span>' +
-      '<span><span class="sub-label">Soft Toy</span><span class="sub-val">'+(mtd.soft_sessions||0).toLocaleString()+'</span></span>') : '') +
+      '<span><span class="sub-label">Soft Toy</span><span class="sub-val">'+(mtd.soft_sessions||0).toLocaleString()+'</span></span>') +
     mkMtdKpi('rev', mtdApplyRto ? 'MTD Revenue <span style="font-size:8px;color:var(--muted);font-weight:400">(RTO adj)</span>' : 'MTD Revenue',
       fmt(mtdApplyRto ? mtdAdjRev : mtd.revenue), '',
       monthDates.length+' days | '+fmt((mtdApplyRto ? mtdAdjRev : mtd.revenue)/n)+'/day | <span style="font-size:8px;color:var(--muted)">MRR: '+fmt((mtdApplyRto ? mtdAdjRev : mtd.revenue)/n*30)+'</span>',
