@@ -5,6 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ClapStore Toys — Master Business Dashboard</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+// Fix pixelated charts on Retina/high-DPI screens
+document.addEventListener('DOMContentLoaded', function() {
+  if (window.Chart) {
+    Chart.defaults.devicePixelRatio = window.devicePixelRatio || 2;
+    Chart.defaults.font.family = 'Inter';
+  }
+});
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   /* Password Gate */
@@ -208,8 +217,9 @@
     .kpi {
       padding: 16px 14px; min-height: 100px; border-radius: 14px;
       -webkit-tap-highlight-color: transparent;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     }
-    .kpi:hover { transform: none; box-shadow: none; }
+    .kpi:hover { transform: none; }
     .kpi-value { font-size: 24px; font-weight: 800; line-height: 1.1; }
     .kpi-label { font-size: 10px; letter-spacing: 1px; margin-bottom: 5px; }
     .kpi-per { font-size: 10px; margin-top: 5px; line-height: 1.4; }
@@ -223,9 +233,9 @@
     .section-title::before { width: 3px; height: 16px; }
 
     /* Charts & Tables */
-    .chart-card { padding: 16px 12px; border-radius: 12px; }
+    .chart-card { padding: 16px 12px; border-radius: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
     .chart-card h3 { font-size: 11px; margin-bottom: 10px; }
-    .chart-card canvas { min-height: 240px; }
+    .chart-card canvas { min-height: 260px; }
     .table-wrap { padding: 12px 8px; border-radius: 12px; }
     table { font-size: 11px; }
     th { font-size: 9px; font-weight: 700; }
@@ -2833,29 +2843,29 @@ function renderMTD() {
     const rpLabels = monthDates.map(d => parseInt(d.split('-')[2]));
     const rpDatasets = [];
     const singleCat = (channel === 'amazon') || (category !== 'all');
-    const profitLine = { type: 'line', borderColor: '#4ade80', backgroundColor: 'rgba(74,222,128,0.1)', pointBackgroundColor: '#4ade80', pointBorderColor: '#4ade80', pointRadius: 4, pointHoverRadius: 6, borderWidth: 2, tension: 0.3, fill: false, order: 0 };
-    const adSpendLine = { type: 'line', borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.1)', pointBackgroundColor: '#ef4444', pointBorderColor: '#ef4444', pointRadius: 4, pointHoverRadius: 6, borderWidth: 2, tension: 0.3, fill: false, order: 0, borderDash: [5, 3] };
+    const profitLine = { type: 'line', borderColor: '#4ade80', backgroundColor: 'rgba(74,222,128,0.1)', pointBackgroundColor: '#4ade80', pointBorderColor: '#4ade80', pointRadius: 5, pointHoverRadius: 7, borderWidth: 3, tension: 0.3, fill: false, order: 0 };
+    const adSpendLine = { type: 'line', borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.1)', pointBackgroundColor: '#ef4444', pointBorderColor: '#ef4444', pointRadius: 5, pointHoverRadius: 7, borderWidth: 3, tension: 0.3, fill: false, order: 0, borderDash: [6, 4] };
     if (channel === 'amazon') {
-      rpDatasets.push({ label: 'Revenue', data: monthDates.map(d => Math.round((amz[d]||{}).revenue||0)), backgroundColor: '#3b82f6', borderRadius: 2, order: 2, stack: 'rev' });
+      rpDatasets.push({ label: 'Revenue', data: monthDates.map(d => Math.round((amz[d]||{}).revenue||0)), backgroundColor: '#3b82f6', borderRadius: 4, order: 2, stack: 'rev' });
       rpDatasets.push(Object.assign({ label: 'Profit', data: monthDates.map(d => Math.round((amz[d]||{}).profit||0)) }, profitLine));
       rpDatasets.push(Object.assign({ label: 'Ad Spend', data: monthDates.map(d => Math.round((amz[d]||{}).ad_spend||0)) }, adSpendLine));
     } else if (category === 'busyboard') {
-      rpDatasets.push({ label: 'Revenue', data: monthDates.map(d => adjRev(d2c_bb, 0.10, d)), backgroundColor: '#FCBB13', borderRadius: 2, order: 2, stack: 'rev' });
+      rpDatasets.push({ label: 'Revenue', data: monthDates.map(d => adjRev(d2c_bb, 0.10, d)), backgroundColor: '#FCBB13', borderRadius: 4, order: 2, stack: 'rev' });
       rpDatasets.push(Object.assign({ label: 'Profit', data: monthDates.map(d => adjProf(d2c_bb, 0.10, d)) }, profitLine));
       rpDatasets.push(Object.assign({ label: 'Ad Spend', data: monthDates.map(d => Math.round((d2c_bb[d]||{}).ad_spend||0)) }, adSpendLine));
     } else if (category === 'stem') {
-      rpDatasets.push({ label: 'Revenue', data: monthDates.map(d => adjRev(d2c_stem, 0.20, d)), backgroundColor: '#3b82f6', borderRadius: 2, order: 2, stack: 'rev' });
+      rpDatasets.push({ label: 'Revenue', data: monthDates.map(d => adjRev(d2c_stem, 0.20, d)), backgroundColor: '#3b82f6', borderRadius: 4, order: 2, stack: 'rev' });
       rpDatasets.push(Object.assign({ label: 'Profit', data: monthDates.map(d => adjProf(d2c_stem, 0.20, d)) }, profitLine));
       rpDatasets.push(Object.assign({ label: 'Ad Spend', data: monthDates.map(d => Math.round((d2c_stem[d]||{}).ad_spend||0)) }, adSpendLine));
     } else if (category === 'softtoy') {
-      rpDatasets.push({ label: 'Revenue', data: monthDates.map(d => adjRev(d2c_soft, 0.15, d)), backgroundColor: '#a78bfa', borderRadius: 2, order: 2, stack: 'rev' });
+      rpDatasets.push({ label: 'Revenue', data: monthDates.map(d => adjRev(d2c_soft, 0.15, d)), backgroundColor: '#a78bfa', borderRadius: 4, order: 2, stack: 'rev' });
       rpDatasets.push(Object.assign({ label: 'Profit', data: monthDates.map(d => adjProf(d2c_soft, 0.15, d)) }, profitLine));
       rpDatasets.push(Object.assign({ label: 'Ad Spend', data: monthDates.map(d => Math.round((d2c_soft[d]||{}).ad_spend||0)) }, adSpendLine));
     } else {
-      rpDatasets.push({ label: 'Busy Board', data: monthDates.map(d => adjRev(d2c_bb, 0.10, d)), backgroundColor: '#FCBB13', borderRadius: 2, order: 2, stack: 'rev' });
-      rpDatasets.push({ label: 'STEM', data: monthDates.map(d => adjRev(d2c_stem, 0.20, d)), backgroundColor: '#3b82f6', borderRadius: 2, order: 2, stack: 'rev' });
-      rpDatasets.push({ label: 'Soft Toy', data: monthDates.map(d => adjRev(d2c_soft, 0.15, d)), backgroundColor: '#a78bfa', borderRadius: 2, order: 2, stack: 'rev' });
-      if (channel === 'combined') rpDatasets.push({ label: 'Amazon', data: monthDates.map(d => Math.round((amz[d]||{}).revenue||0)), backgroundColor: '#3b82f6', borderRadius: 2, order: 2, stack: 'rev' });
+      rpDatasets.push({ label: 'Busy Board', data: monthDates.map(d => adjRev(d2c_bb, 0.10, d)), backgroundColor: '#FCBB13', borderRadius: 4, order: 2, stack: 'rev' });
+      rpDatasets.push({ label: 'STEM', data: monthDates.map(d => adjRev(d2c_stem, 0.20, d)), backgroundColor: '#3b82f6', borderRadius: 4, order: 2, stack: 'rev' });
+      rpDatasets.push({ label: 'Soft Toy', data: monthDates.map(d => adjRev(d2c_soft, 0.15, d)), backgroundColor: '#a78bfa', borderRadius: 4, order: 2, stack: 'rev' });
+      if (channel === 'combined') rpDatasets.push({ label: 'Amazon', data: monthDates.map(d => Math.round((amz[d]||{}).revenue||0)), backgroundColor: '#3b82f6', borderRadius: 4, order: 2, stack: 'rev' });
       // Total Profit line (sum of all categories)
       rpDatasets.push(Object.assign({ label: 'Profit', data: monthDates.map(d => adjProf(d2c_bb, 0.10, d) + adjProf(d2c_stem, 0.20, d) + adjProf(d2c_soft, 0.15, d) + (channel==='combined' ? Math.round((amz[d]||{}).profit||0) : 0)) }, profitLine));
       // Total Ad Spend line (sum of all categories)
@@ -2867,13 +2877,13 @@ function renderMTD() {
       options: {
         responsive: true,
         scales: {
-          x: { stacked: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8a94a6' } },
-          y: { stacked: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8a94a6', font: { size: 11 }, callback: function(v) { return v >= 100000 ? '₹'+(v/100000).toFixed(1)+'L' : v <= -100000 ? '-₹'+(-v/100000).toFixed(1)+'L' : '₹'+(v/1000).toFixed(0)+'K'; } } }
+          x: { stacked: true, grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#8a94a6', font: { size: 12, weight: '600' } } },
+          y: { stacked: true, grid: { color: 'rgba(255,255,255,0.04)', drawBorder: false }, ticks: { color: '#8a94a6', font: { size: 11 }, maxTicksLimit: 6, callback: function(v) { return v >= 100000 ? '₹'+(v/100000).toFixed(1)+'L' : v <= -100000 ? '-₹'+(-v/100000).toFixed(1)+'L' : '₹'+(v/1000).toFixed(0)+'K'; } } }
         },
         plugins: {
           legend: {
-            labels: { color: '#e8ecf1', usePointStyle: true, padding: 12, font: { size: 11, weight: '600' }, boxWidth: 8 },
-            position: 'top', align: 'center'
+            labels: { color: '#e8ecf1', usePointStyle: true, padding: 10, font: { size: 10, weight: '600' }, boxWidth: 6, boxHeight: 6 },
+            position: 'bottom'
           },
           tooltip: {
             backgroundColor: 'rgba(20,24,32,0.95)', titleColor: '#e8ecf1', bodyColor: '#e8ecf1',
