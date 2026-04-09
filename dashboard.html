@@ -798,11 +798,11 @@ document.addEventListener('DOMContentLoaded', function() {
   <div class="section" id="srSlowSkuSection" style="display:none;">
     <div class="section-title" style="cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px;" onclick="toggleSection('srSlowSkuCollapse','srSlowSkuChevron')">
       Slow Shipping Alert
-      <svg id="srSlowSkuChevron" width="16" height="16" viewBox="0 0 16 16" fill="none" style="transition:transform 0.3s ease;transform:rotate(180deg);">
+      <svg id="srSlowSkuChevron" width="16" height="16" viewBox="0 0 16 16" fill="none" style="transition:transform 0.3s ease;transform:rotate(0deg);">
         <path d="M4 6l4 4 4-4" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
-    <div id="srSlowSkuCollapse" style="overflow:hidden;transition:max-height 0.4s ease;max-height:none;">
+    <div id="srSlowSkuCollapse" style="overflow:hidden;transition:max-height 0.4s ease;max-height:0;">
       <div class="table-wrap" style="margin-top:8px;">
         <table><thead><tr>
           <th>Product</th><th>Ship Days</th><th>Del Days</th><th>Unshipped</th><th>Stuck Revenue</th>
@@ -2511,7 +2511,7 @@ function toggleMtdKpis() {
   }
 }
 
-const _sectionState = { dayKpiCollapse: true, srSlowSkuCollapse: true };
+const _sectionState = { dayKpiCollapse: true };
 function toggleSection(collapseId, chevronId) {
   _sectionState[collapseId] = !_sectionState[collapseId];
   const el = document.getElementById(collapseId);
