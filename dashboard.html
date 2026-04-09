@@ -2559,7 +2559,7 @@ function renderMTD() {
       fmt(mtdApplyRto ? mtdAdjRev : mtd.revenue), '',
       monthDates.length+' days | '+fmt((mtdApplyRto ? mtdAdjRev : mtd.revenue)/n)+'/day | <span style="font-size:8px;color:var(--muted)">MRR: '+fmt((mtdApplyRto ? mtdAdjRev : mtd.revenue)/n*30)+'</span>',
       mtdApplyRto ? '<span><span class="sub-label">Gross Rev</span><span class="sub-val">'+fmt(mtd.revenue)+'</span></span>' +
-        '<span><span class="sub-label">RTO Loss</span><span class="sub-val negative">-'+fmt(mtdRtoRevLoss)+'</span></span>' +
+        '<span><span class="sub-label">RTO Loss ('+pctStr(mtdRtoRevLoss/mtd.revenue)+')</span><span class="sub-val negative">-'+fmt(mtdRtoRevLoss)+'</span></span>' +
         '<span style="grid-column:1/-1;font-size:8px;opacity:0.7">BB: -'+fmt(mtd.bb_rev*0.10)+' · STEM: -'+fmt(mtd.stem_rev*0.20)+' · Soft: -'+fmt(mtd.soft_rev*0.15)+'</span>'
       : mtdBk('rev')) +
     mkMtdKpi('orders', 'MTD Units', mtd.orders.toLocaleString(), '', Math.round(mtd.orders/n)+' units/day', mtdBk('orders', numFmtM)) +
@@ -2680,7 +2680,7 @@ function renderMTD() {
       applyRto ? fmt(selAdjRev) : fmt(s.revenue), '',
       applyRto ? (channel==='combined' ? 'D2C adj: '+fmt(selAdjRev)+' | Amz: '+fmt(s.amz_rev) : 'RTO loss: '+fmt(selRtoRevLoss)+' | Gross: '+fmt(s.revenue)) : '',
       applyRto ? '<span><span class="sub-label">Gross Rev</span><span class="sub-val">'+fmt(s.revenue)+'</span></span>' +
-        '<span><span class="sub-label">RTO Loss</span><span class="sub-val negative">-'+fmt(selRtoRevLoss)+'</span></span>' +
+        '<span><span class="sub-label">RTO Loss ('+pctStr(selRtoRevLoss/s.revenue)+')</span><span class="sub-val negative">-'+fmt(selRtoRevLoss)+'</span></span>' +
         '<span style="grid-column:1/-1;font-size:8px;opacity:0.7">BB: -'+fmt(s.bb_rev*RTO_RATES.bb)+' · STEM: -'+fmt(s.stem_rev*RTO_RATES.stem)+' · Soft: -'+fmt(s.soft_rev*RTO_RATES.soft)+'</span>'
       : bk('rev'),
       applyRto ? growthBadgeMtd(selAdjRev, (prev.revenue||0) - prevRtoRevLoss) : growthBadgeMtd(s.revenue, prev.revenue)) +
