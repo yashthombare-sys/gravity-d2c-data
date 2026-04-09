@@ -760,47 +760,103 @@ document.addEventListener('DOMContentLoaded', function() {
     <span id="srPendingOrders" style="color:#fcbb13;font-weight:600;display:none;"></span>
   </div>
 
-  <!-- TAT Overview Cards (top) -->
-  <div id="srTatOverview" style="display:none;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
-    <div id="srTatDeliverCard" style="padding:18px 22px;background:var(--card);border:1px solid var(--border);border-radius:10px;">
-      <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;">ORDER PLACED → DELIVERED</div>
-      <div style="display:flex;align-items:baseline;gap:8px;margin-top:6px;">
-        <span id="srTatDeliverVal" style="font-size:32px;font-weight:800;">—</span>
+  <!-- 1. TAT Overview Cards (primary KPI) -->
+  <div id="srTatOverview" style="display:none;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+    <div id="srTatShipCard" style="padding:20px;background:var(--card);border:2px solid var(--border);border-radius:14px;">
+      <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">ORDER → SHIPPED</div>
+      <div style="display:flex;align-items:baseline;gap:8px;margin-top:8px;">
+        <span id="srTatShipVal" style="font-size:36px;font-weight:800;">—</span>
         <span style="font-size:14px;color:var(--muted);">days</span>
-        <span id="srTatDeliverBadge" style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;"></span>
+        <span id="srTatShipBadge" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px;"></span>
       </div>
-      <div id="srTatDeliverSub" style="font-size:11px;color:var(--muted);margin-top:4px;"></div>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px;">Target: ≤ 2 days</div>
     </div>
-    <div id="srTatShipCard" style="padding:18px 22px;background:var(--card);border:1px solid var(--border);border-radius:10px;">
-      <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;">ORDER PLACED → SHIPPED</div>
-      <div style="display:flex;align-items:baseline;gap:8px;margin-top:6px;">
-        <span id="srTatShipVal" style="font-size:32px;font-weight:800;">—</span>
+    <div id="srTatDeliverCard" style="padding:20px;background:var(--card);border:2px solid var(--border);border-radius:14px;">
+      <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">ORDER → DELIVERED</div>
+      <div style="display:flex;align-items:baseline;gap:8px;margin-top:8px;">
+        <span id="srTatDeliverVal" style="font-size:36px;font-weight:800;">—</span>
         <span style="font-size:14px;color:var(--muted);">days</span>
-        <span id="srTatShipBadge" style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;"></span>
+        <span id="srTatDeliverBadge" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px;"></span>
       </div>
-      <div style="font-size:11px;color:var(--muted);margin-top:4px;">Target: ≤ 2 days</div>
+      <div id="srTatDeliverSub" style="font-size:11px;color:var(--muted);margin-top:6px;">Target: ≤ 4 days</div>
+    </div>
+  </div>
+
+  <!-- 2. Slow SKUs Alert -->
+  <div class="section" id="srSlowSkuSection" style="display:none;">
+    <div class="section-title" style="cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px;" onclick="toggleSection('srSlowSkuCollapse','srSlowSkuChevron')">
+      Slow Shipping Alert
+      <svg id="srSlowSkuChevron" width="16" height="16" viewBox="0 0 16 16" fill="none" style="transition:transform 0.3s ease;transform:rotate(180deg);">
+        <path d="M4 6l4 4 4-4" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div id="srSlowSkuCollapse" style="overflow:hidden;transition:max-height 0.4s ease;max-height:none;">
+      <div class="table-wrap" style="margin-top:8px;">
+        <table><thead><tr>
+          <th>Product</th><th>Ship Days</th><th>Del Days</th><th>Unshipped</th><th>Stuck Revenue</th>
+        </tr></thead><tbody id="srSlowSkuBody"></tbody></table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. TAT Trend Chart -->
+  <div class="section">
+    <div class="section-title" style="cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px;" onclick="toggleSection('srTatTrendCollapse','srTatTrendChevron')">
+      TAT Trend
+      <svg id="srTatTrendChevron" width="16" height="16" viewBox="0 0 16 16" fill="none" style="transition:transform 0.3s ease;transform:rotate(0deg);">
+        <path d="M4 6l4 4 4-4" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div id="srTatTrendCollapse" style="max-height:0;overflow:hidden;transition:max-height 0.4s ease;">
+      <div class="chart-card" style="margin-top:8px;"><canvas id="srTatTrendChart" height="120"></canvas></div>
+    </div>
+  </div>
+
+  <!-- 4. SKU-Level Breakdown -->
+  <div class="section">
+    <div class="section-title" style="cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px;" onclick="toggleSection('srSkuTableCollapse','srSkuTableChevron')">
+      SKU Breakdown
+      <svg id="srSkuTableChevron" width="16" height="16" viewBox="0 0 16 16" fill="none" style="transition:transform 0.3s ease;transform:rotate(0deg);">
+        <path d="M4 6l4 4 4-4" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div id="srSkuTableCollapse" style="max-height:0;overflow:hidden;transition:max-height 0.4s ease;">
+      <div class="table-wrap" style="margin-top:8px;">
+        <table><thead><tr>
+          <th>Product</th><th>Orders</th><th>Shipped</th><th>Delivered</th><th>Ship Days</th><th>Del Days</th><th>Revenue</th><th>Stuck Rev</th>
+        </tr></thead><tbody id="srSkuTableBody"></tbody></table>
+      </div>
     </div>
   </div>
 
   <div class="section" id="srSection">
-    <div class="section-title">Shiprocket Fulfillment & TAT</div>
-    <!-- Fulfillment Pipeline -->
-    <div id="srPipeline" style="display:flex;align-items:center;justify-content:center;gap:0;margin:12px 0 18px;flex-wrap:wrap;"></div>
-    <!-- KPI Cards -->
-    <div class="kpi-row" id="srKpiRow" style="grid-template-columns:repeat(2,1fr);gap:8px;"></div>
-    <div class="charts-grid" style="grid-template-columns:1fr;margin-top:14px;">
-      <div class="chart-card"><h3>Daily Fulfillment Trend</h3><canvas id="srTrendChart" height="260"></canvas></div>
+    <!-- 5. Fulfillment Pipeline (secondary) -->
+    <div class="section-title" style="cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px;" onclick="toggleSection('srPipeCollapse','srPipeChevron')">
+      Fulfillment Pipeline
+      <svg id="srPipeChevron" width="16" height="16" viewBox="0 0 16 16" fill="none" style="transition:transform 0.3s ease;transform:rotate(0deg);">
+        <path d="M4 6l4 4 4-4" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div id="srPipeCollapse" style="max-height:0;overflow:hidden;transition:max-height 0.4s ease;">
+      <div id="srPipeline" style="display:flex;align-items:center;justify-content:center;gap:0;margin:12px 0 18px;flex-wrap:wrap;"></div>
+      <div class="kpi-row" id="srKpiRow" style="grid-template-columns:repeat(2,1fr);gap:8px;"></div>
     </div>
   </div>
 
-  <!-- Daily Table -->
+  <!-- 6. Daily Table (collapsible) -->
   <div class="section">
-    <div class="section-title">Daily Breakdown</div>
-    <div class="table-wrap">
-      <table><thead><tr>
-        <th>Date</th><th>Total Orders</th><th>Unshipped</th><th>New Value</th><th>Shipped</th>
-        <th>Delivered</th><th>In Transit</th><th>RTO</th><th>Cancelled</th><th>Ship Days</th><th>Deliver Days</th><th>Avg TAT</th>
-      </tr></thead><tbody id="srTableBody"></tbody></table>
+    <div class="section-title" style="cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px;" onclick="toggleSection('srDailyTableCollapse','srDailyTableChevron')">
+      Daily Breakdown
+      <svg id="srDailyTableChevron" width="16" height="16" viewBox="0 0 16 16" fill="none" style="transition:transform 0.3s ease;transform:rotate(0deg);">
+        <path d="M4 6l4 4 4-4" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div id="srDailyTableCollapse" style="max-height:0;overflow:hidden;transition:max-height 0.4s ease;">
+      <div class="table-wrap" style="margin-top:8px;">
+        <table><thead><tr>
+          <th>Date</th><th>Orders</th><th>Shipped</th><th>Delivered</th><th>RTO</th><th>Ship Days</th><th>Del Days</th>
+        </tr></thead><tbody id="srTableBody"></tbody></table>
+      </div>
     </div>
   </div>
 </div>
@@ -2443,7 +2499,7 @@ function toggleMtdKpis() {
   }
 }
 
-const _sectionState = { dayKpiCollapse: true };
+const _sectionState = { dayKpiCollapse: true, srSlowSkuCollapse: true };
 function toggleSection(collapseId, chevronId) {
   _sectionState[collapseId] = !_sectionState[collapseId];
   const el = document.getElementById(collapseId);
@@ -3300,14 +3356,15 @@ function renderShiprocket() {
       const delSub = document.getElementById('srTatDeliverSub');
       if (monthAvgTat !== '—') {
         const tv = parseFloat(monthAvgTat);
-        const tatColor = tv <= 3 ? '#4ade80' : tv <= 5 ? '#fcbb13' : tv <= 7 ? '#f59e0b' : '#ef4444';
-        const tatRating = tv <= 3 ? 'Excellent' : tv <= 5 ? 'Good' : tv <= 7 ? 'Needs Improvement' : 'Slow';
+        const tatColor = tv <= 4 ? '#4ade80' : tv <= 5 ? '#fcbb13' : tv <= 7 ? '#f59e0b' : '#ef4444';
+        const tatRating = tv <= 4 ? 'On Target' : tv <= 5 ? 'Needs Improvement' : tv <= 7 ? 'Slow' : 'Critical';
         delEl.textContent = monthAvgTat;
         delEl.style.color = tatColor;
         delBadge.textContent = tatRating;
         delBadge.style.color = tatColor;
         delBadge.style.background = tatColor + '18';
-        delSub.textContent = 'Based on ' + tatDays + ' days with delivery data';
+        document.getElementById('srTatDeliverCard').style.borderColor = tatColor + '44';
+        delSub.textContent = 'Based on ' + tatDays + ' days | Target: ≤ 4 days';
       } else {
         delEl.textContent = '—';
         delEl.style.color = 'var(--muted)';
@@ -3327,6 +3384,7 @@ function renderShiprocket() {
         shipBadge.textContent = shipLabel;
         shipBadge.style.color = shipColor;
         shipBadge.style.background = shipColor + '18';
+        document.getElementById('srTatShipCard').style.borderColor = shipColor + '44';
       } else {
         shipEl.textContent = '—';
         shipEl.style.color = 'var(--muted)';
@@ -3336,58 +3394,118 @@ function renderShiprocket() {
       tatOverview.style.display = 'none';
     }
 
-    // Trend chart (filtered)
-    const labels = monthDates.map(d => { const p = d.split('-'); return parseInt(p[2]) + '/' + parseInt(p[1]); });
-    const newArr = monthDates.map(d => _srGetDayData(sr[d], product, category).new_orders || 0);
-    const shipArr = monthDates.map(d => _srGetDayData(sr[d], product, category).shipped || 0);
-    const delArr = monthDates.map(d => _srGetDayData(sr[d], product, category).delivered || 0);
+    // ── 2. Slow SKU Alert ──
+    var slowSkuSection = document.getElementById('srSlowSkuSection');
+    var slowSkuBody = document.getElementById('srSlowSkuBody');
+    var allProducts = {};
+    monthDates.forEach(d => {
+      if (!sr[d].products) return;
+      for (var [p, pd] of Object.entries(sr[d].products)) {
+        if (category !== 'all' && (SR_CATS[p]||'') !== category) continue;
+        if (!allProducts[p]) allProducts[p] = { orders:0, shipped:0, delivered:0, value:0, shippedVal:0, unshipped:0, stuckRev:0, _shipSum:0, _shipN:0, _delSum:0, _delN:0 };
+        var ap = allProducts[p];
+        ap.orders += pd.new_orders||0; ap.shipped += pd.shipped||0; ap.delivered += pd.delivered||0;
+        ap.value += pd.new_value||0; ap.shippedVal += pd.shipped_value||0;
+        if (pd.avg_ship_days > 0) { ap._shipSum += pd.avg_ship_days; ap._shipN++; }
+        if (pd.avg_deliver_days > 0) { ap._delSum += pd.avg_deliver_days; ap._delN++; }
+      }
+    });
+    // Calculate averages and stuck revenue
+    var slowSkus = [];
+    for (var [pName, pData] of Object.entries(allProducts)) {
+      pData.avgShip = pData._shipN > 0 ? +(pData._shipSum / pData._shipN).toFixed(1) : 0;
+      pData.avgDel = pData._delN > 0 ? +(pData._delSum / pData._delN).toFixed(1) : 0;
+      pData.unshipped = Math.max(0, pData.orders - pData.shipped - (pData.cancelled||0));
+      pData.stuckRev = pData.value - pData.shippedVal;
+      if (pData.avgShip > 2 || pData.unshipped > 0) slowSkus.push({ name: pName, ...pData });
+    }
+    slowSkus.sort((a, b) => b.avgShip - a.avgShip);
 
-    if (_srChart) { _srChart.destroy(); _srChart = null; }
-    const ctx = document.getElementById('srTrendChart').getContext('2d');
-    _srChart = new Chart(ctx, {
+    if (slowSkus.length > 0) {
+      slowSkuSection.style.display = '';
+      var slowHTML = '';
+      slowSkus.forEach(s => {
+        var shipCls = s.avgShip > 2 ? 'negative' : 'positive';
+        var delCls = s.avgDel > 4 ? 'negative' : s.avgDel > 0 ? 'positive' : '';
+        slowHTML += '<tr>';
+        slowHTML += '<td style="font-weight:600;max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + s.name + '</td>';
+        slowHTML += '<td class="' + shipCls + '">' + (s.avgShip > 0 ? s.avgShip + 'd' : '—') + '</td>';
+        slowHTML += '<td class="' + delCls + '">' + (s.avgDel > 0 ? s.avgDel + 'd' : '—') + '</td>';
+        slowHTML += '<td>' + s.unshipped + '</td>';
+        slowHTML += '<td style="color:var(--primary);font-weight:600">' + fmt(Math.max(0, s.stuckRev)) + '</td>';
+        slowHTML += '</tr>';
+      });
+      slowSkuBody.innerHTML = slowHTML;
+    } else {
+      slowSkuSection.style.display = 'none';
+    }
+
+    // ── 3. TAT Trend Chart ──
+    if (window._srTatChart) { window._srTatChart.destroy(); window._srTatChart = null; }
+    var tatLabels = monthDates.map(d => parseInt(d.split('-')[2]));
+    var shipDaysArr = monthDates.map(d => { var dd = _srGetDayData(sr[d], product, category); return dd.avg_ship_days > 0 ? dd.avg_ship_days : null; });
+    var delDaysArr = monthDates.map(d => { var dd = _srGetDayData(sr[d], product, category); return dd.avg_deliver_days > 0 ? dd.avg_deliver_days : null; });
+    window._srTatChart = new Chart(document.getElementById('srTatTrendChart'), {
       type: 'line',
       data: {
-        labels: labels,
+        labels: tatLabels,
         datasets: [
-          { label: 'New Orders', data: newArr, borderColor: '#fcbb13', backgroundColor: 'rgba(252,187,19,0.08)', borderWidth: 2, tension: 0.3, pointRadius: 3, fill: true },
-          { label: 'Shipped', data: shipArr, borderColor: '#4a90d9', backgroundColor: 'transparent', borderWidth: 2, tension: 0.3, pointRadius: 2, borderDash: [4,2] },
-          { label: 'Delivered', data: delArr, borderColor: '#27ae60', backgroundColor: 'rgba(39,174,96,0.06)', borderWidth: 2, tension: 0.3, pointRadius: 3, fill: true },
+          { label: 'Ship Days', data: shipDaysArr, borderColor: '#4a90d9', backgroundColor: 'rgba(74,144,217,0.08)', borderWidth: 3, pointRadius: 5, tension: 0.3, fill: true, spanGaps: true },
+          { label: 'Deliver Days', data: delDaysArr, borderColor: '#27ae60', backgroundColor: 'rgba(39,174,96,0.08)', borderWidth: 3, pointRadius: 5, tension: 0.3, fill: true, spanGaps: true },
         ]
       },
       options: {
         responsive: true,
-        plugins: { legend: { labels: { color: '#999', font: { size: 11 } } } },
+        plugins: {
+          legend: { labels: { color: '#e8ecf1', usePointStyle: true, padding: 10, font: { size: 10, weight: '600' }, boxWidth: 6 }, position: 'bottom' },
+          annotation: undefined
+        },
         scales: {
-          x: { ticks: { color: '#888', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.04)' } },
-          y: { beginAtZero: true, ticks: { color: '#888', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.06)' } }
+          x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#8a94a6', font: { size: 12, weight: '600' } } },
+          y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#8a94a6', font: { size: 11 }, callback: function(v) { return v + 'd'; } }, suggestedMin: 0, suggestedMax: 8 }
         }
       }
     });
 
-    // Daily Table
+    // ── 4. SKU Breakdown Table ──
+    var skuBody = document.getElementById('srSkuTableBody');
+    var skuArr = Object.entries(allProducts).map(([name, d]) => ({ name, ...d }));
+    skuArr.sort((a, b) => b.value - a.value);
+    var skuHTML = '';
+    skuArr.forEach(s => {
+      var shipCls = s.avgShip > 2 ? 'negative' : s.avgShip > 0 ? 'positive' : '';
+      var delCls = s.avgDel > 4 ? 'negative' : s.avgDel > 0 ? 'positive' : '';
+      var stuckVal = Math.max(0, s.stuckRev);
+      skuHTML += '<tr>';
+      skuHTML += '<td style="font-weight:600;max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + s.name + '</td>';
+      skuHTML += '<td>' + s.orders + '</td>';
+      skuHTML += '<td>' + s.shipped + '</td>';
+      skuHTML += '<td class="positive">' + s.delivered + '</td>';
+      skuHTML += '<td class="' + shipCls + '">' + (s.avgShip > 0 ? s.avgShip + 'd' : '—') + '</td>';
+      skuHTML += '<td class="' + delCls + '">' + (s.avgDel > 0 ? s.avgDel + 'd' : '—') + '</td>';
+      skuHTML += '<td>' + fmt(s.value) + '</td>';
+      skuHTML += '<td style="color:' + (stuckVal > 0 ? 'var(--primary)' : 'var(--muted)') + ';font-weight:600">' + fmt(stuckVal) + '</td>';
+      skuHTML += '</tr>';
+    });
+    skuBody.innerHTML = skuHTML;
+
+    // ── 6. Daily Table (simplified) ──
     const tbody = document.getElementById('srTableBody');
     let tableHTML = '';
     monthDates.slice().reverse().forEach(dt => {
       const day = _srGetDayData(sr[dt], product, category);
-      const tatStr = day.avg_tat_days > 0 ? day.avg_tat_days + 'd' : '—';
-      const tatCls = day.avg_tat_days > 0 ? (day.avg_tat_days <= 5 ? 'positive' : 'negative') : '';
       const shipStr = day.avg_ship_days > 0 ? day.avg_ship_days + 'd' : '—';
-      const shipCls = day.avg_ship_days > 0 ? (day.avg_ship_days <= 2 ? 'positive' : 'negative') : '';
+      const shipCls2 = day.avg_ship_days > 0 ? (day.avg_ship_days <= 2 ? 'positive' : 'negative') : '';
       const delStr = day.avg_deliver_days > 0 ? day.avg_deliver_days + 'd' : '—';
-      const delCls = day.avg_deliver_days > 0 ? (day.avg_deliver_days <= 5 ? 'positive' : 'negative') : '';
+      const delCls2 = day.avg_deliver_days > 0 ? (day.avg_deliver_days <= 4 ? 'positive' : 'negative') : '';
       tableHTML += '<tr>';
       tableHTML += '<td style="font-weight:600">' + dt.split('-').reverse().join('/') + '</td>';
       tableHTML += '<td>' + (day.new_orders||0) + '</td>';
-      tableHTML += '<td>' + Math.max(0, (day.new_orders||0) - (day.shipped||0) - (day.cancelled||0)) + '</td>';
-      tableHTML += '<td>' + fmt(day.new_value||0) + '</td>';
       tableHTML += '<td>' + (day.shipped||0) + '</td>';
       tableHTML += '<td class="positive">' + (day.delivered||0) + '</td>';
-      tableHTML += '<td>' + (day.in_transit||0) + '</td>';
       tableHTML += '<td class="negative">' + (day.rto||0) + '</td>';
-      tableHTML += '<td>' + (day.cancelled||0) + '</td>';
-      tableHTML += '<td class="' + shipCls + '">' + shipStr + '</td>';
-      tableHTML += '<td class="' + delCls + '">' + delStr + '</td>';
-      tableHTML += '<td class="' + tatCls + '">' + tatStr + '</td>';
+      tableHTML += '<td class="' + shipCls2 + '">' + shipStr + '</td>';
+      tableHTML += '<td class="' + delCls2 + '">' + delStr + '</td>';
       tableHTML += '</tr>';
     });
     tbody.innerHTML = tableHTML;
