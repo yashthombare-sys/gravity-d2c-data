@@ -65,11 +65,13 @@ AMZ_HEADER_MAP = {
     "orders":          ["total orders", "orders"],
     "profit":          ["profit"],
     "profit_pct":      ["profit %", "profit%"],
+    "sessions":        ["sessions", "session"],
 }
 
 AMZ_COL_FALLBACK = {
     "date": 0, "revenue": 1, "total_expense": 2, "product_expense": 3,
     "ad_spend": 4, "commissions": 5, "orders": 6, "profit": 7, "profit_pct": 8,
+    "sessions": 11,
 }
 
 
@@ -379,6 +381,7 @@ def read_amazon_daily(sh, month_key, month_tabs):
             "product_expense": round(safe_float(row[col_map["product_expense"]], "product_expense") if len(row) > col_map.get("product_expense", 999) else 0, 2),
             "total_expense": round(safe_float(row[col_map["total_expense"]], "total_expense") if len(row) > col_map.get("total_expense", 999) else 0, 2),
             "profit": round(safe_float(row[col_map["profit"]], "profit") if len(row) > col_map.get("profit", 999) else 0, 2),
+            "sessions": int(safe_float(row[col_map["sessions"]], "sessions")) if col_map.get("sessions") is not None and len(row) > col_map.get("sessions", 999) else 0,
         }
 
     return result
