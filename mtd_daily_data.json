@@ -2643,7 +2643,8 @@
       "commissions": 17333.08,
       "product_expense": 61044.0,
       "total_expense": 106137.76,
-      "profit": 77547.55
+      "profit": 77547.55,
+      "sessions": 2965
     },
     "2026-03-02": {
       "revenue": 155857.24,
@@ -2652,7 +2653,8 @@
       "commissions": 16523.32,
       "product_expense": 54498.0,
       "total_expense": 105054.03,
-      "profit": 50803.21
+      "profit": 50803.21,
+      "sessions": 2874
     },
     "2026-03-03": {
       "revenue": 134521.05,
@@ -2661,7 +2663,8 @@
       "commissions": 17364.13,
       "product_expense": 48421.0,
       "total_expense": 104340.7,
-      "profit": 30180.35
+      "profit": 30180.35,
+      "sessions": 2776
     },
     "2026-03-04": {
       "revenue": 127352.72,
@@ -2670,7 +2673,8 @@
       "commissions": 18561.8,
       "product_expense": 43407.0,
       "total_expense": 92811.63,
-      "profit": 34541.09
+      "profit": 34541.09,
+      "sessions": 2495
     },
     "2026-03-05": {
       "revenue": 141109.06,
@@ -2679,7 +2683,8 @@
       "commissions": 20475.63,
       "product_expense": 49222.0,
       "total_expense": 101695.16,
-      "profit": 39413.9
+      "profit": 39413.9,
+      "sessions": 2533
     },
     "2026-03-06": {
       "revenue": 160256.82,
@@ -2688,7 +2693,8 @@
       "commissions": 24979.17,
       "product_expense": 57841.0,
       "total_expense": 116086.58,
-      "profit": 44170.24
+      "profit": 44170.24,
+      "sessions": 3127
     },
     "2026-03-07": {
       "revenue": 162288.47,
@@ -2697,7 +2703,8 @@
       "commissions": 22075.96,
       "product_expense": 58387.0,
       "total_expense": 110171.97,
-      "profit": 52116.5
+      "profit": 52116.5,
+      "sessions": 3223
     },
     "2026-03-08": {
       "revenue": 151603.47,
@@ -2706,7 +2713,8 @@
       "commissions": 23619.23,
       "product_expense": 56027.0,
       "total_expense": 110197.85,
-      "profit": 41405.62
+      "profit": 41405.62,
+      "sessions": 2888
     },
     "2026-03-09": {
       "revenue": 119756.71,
@@ -2715,7 +2723,8 @@
       "commissions": 30042.83,
       "product_expense": 39669.0,
       "total_expense": 97948.37,
-      "profit": 21808.34
+      "profit": 21808.34,
+      "sessions": 2675
     },
     "2026-03-10": {
       "revenue": 182368.92,
@@ -2724,7 +2733,8 @@
       "commissions": 20766.07,
       "product_expense": 62256.0,
       "total_expense": 123191.09,
-      "profit": 59177.83
+      "profit": 59177.83,
+      "sessions": 3064
     },
     "2026-03-11": {
       "revenue": 150591.13,
@@ -2733,7 +2743,8 @@
       "commissions": 17309.57,
       "product_expense": 51675.0,
       "total_expense": 109595.08,
-      "profit": 40996.05
+      "profit": 40996.05,
+      "sessions": 3141
     },
     "2026-03-12": {
       "revenue": 135514.1,
@@ -2742,7 +2753,8 @@
       "commissions": 25848.45,
       "product_expense": 42028.0,
       "total_expense": 104719.51,
-      "profit": 30794.59
+      "profit": 30794.59,
+      "sessions": 2672
     },
     "2026-03-13": {
       "revenue": 91945.13,
@@ -2751,7 +2763,8 @@
       "commissions": 23161.2,
       "product_expense": 23451.0,
       "total_expense": 72309.13,
-      "profit": 19636.0
+      "profit": 19636.0,
+      "sessions": 2058
     },
     "2026-03-14": {
       "revenue": 86131.57,
@@ -2760,7 +2773,8 @@
       "commissions": 25911.93,
       "product_expense": 27621.0,
       "total_expense": 64163.55,
-      "profit": 21968.02
+      "profit": 21968.02,
+      "sessions": 2034
     },
     "2026-03-15": {
       "revenue": 123983.83,
@@ -2769,7 +2783,8 @@
       "commissions": 20952.14,
       "product_expense": 46207.0,
       "total_expense": 88153.7,
-      "profit": 35830.13
+      "profit": 35830.13,
+      "sessions": 2858
     },
     "2026-03-16": {
       "revenue": 116101.45,
@@ -2778,7 +2793,8 @@
       "commissions": 25775.8,
       "product_expense": 40791.0,
       "total_expense": 85164.78,
-      "profit": 30936.67
+      "profit": 30936.67,
+      "sessions": 2577
     },
     "2026-03-17": {
       "revenue": 115321.64,
@@ -2787,7 +2803,8 @@
       "commissions": 17298.25,
       "product_expense": 43183.0,
       "total_expense": 80807.93,
-      "profit": 34513.71
+      "profit": 34513.71,
+      "sessions": 2590
     },
     "2026-03-18": {
       "revenue": 125647.05,
@@ -2796,7 +2813,8 @@
       "commissions": 19183.94,
       "product_expense": 43365.16,
       "total_expense": 85331.36,
-      "profit": 40315.69
+      "profit": 40315.69,
+      "sessions": 2207
     },
     "2026-03-19": {
       "revenue": 126326.94,
@@ -2805,7 +2823,8 @@
       "commissions": 20495.65,
       "product_expense": 45481.0,
       "total_expense": 101240.95,
-      "profit": 25085.99
+      "profit": 25085.99,
+      "sessions": 3473
     },
     "2026-03-20": {
       "revenue": 95593.41,
@@ -2814,7 +2833,8 @@
       "commissions": 17791.28,
       "product_expense": 33270.0,
       "total_expense": 69206.14,
-      "profit": 26387.27
+      "profit": 26387.27,
+      "sessions": 2412
     },
     "2026-03-21": {
       "revenue": 91575.47,
@@ -2823,7 +2843,8 @@
       "commissions": 15226.23,
       "product_expense": 30118.0,
       "total_expense": 59798.05,
-      "profit": 31777.42
+      "profit": 31777.42,
+      "sessions": 2029
     },
     "2026-03-22": {
       "revenue": 89252.98,
@@ -2832,7 +2853,8 @@
       "commissions": 12842.4,
       "product_expense": 30294.0,
       "total_expense": 60732.56,
-      "profit": 28520.42
+      "profit": 28520.42,
+      "sessions": 2247
     },
     "2026-03-23": {
       "revenue": 99310.55,
@@ -2841,7 +2863,8 @@
       "commissions": 18804.16,
       "product_expense": 35144.0,
       "total_expense": 72290.08,
-      "profit": 27020.47
+      "profit": 27020.47,
+      "sessions": 2147
     },
     "2026-03-24": {
       "revenue": 124291.74,
@@ -2850,7 +2873,8 @@
       "commissions": 19955.39,
       "product_expense": 39056.0,
       "total_expense": 77282.51,
-      "profit": 47009.23
+      "profit": 47009.23,
+      "sessions": 2630
     },
     "2026-03-25": {
       "revenue": 88004.36,
@@ -2859,7 +2883,8 @@
       "commissions": 21439.2,
       "product_expense": 32209.0,
       "total_expense": 67395.2,
-      "profit": 20609.16
+      "profit": 20609.16,
+      "sessions": 2011
     },
     "2026-03-26": {
       "revenue": 111639.52,
@@ -2868,7 +2893,8 @@
       "commissions": 17796.91,
       "product_expense": 40190.23,
       "total_expense": 79025.36,
-      "profit": 32614.16
+      "profit": 32614.16,
+      "sessions": 2366
     },
     "2026-03-27": {
       "revenue": 68410.79,
@@ -2877,7 +2903,8 @@
       "commissions": 18341.0,
       "product_expense": 24627.88,
       "total_expense": 68491.1,
-      "profit": -80.31
+      "profit": -80.31,
+      "sessions": 2379
     },
     "2026-03-28": {
       "revenue": 121751.67,
@@ -2886,7 +2913,8 @@
       "commissions": 17131.46,
       "product_expense": 43830.6,
       "total_expense": 88228.32,
-      "profit": 33523.35
+      "profit": 33523.35,
+      "sessions": 2369
     },
     "2026-03-29": {
       "revenue": 100432.45,
@@ -2895,7 +2923,8 @@
       "commissions": 13718.53,
       "product_expense": 36155.68,
       "total_expense": 76592.95,
-      "profit": 23839.5
+      "profit": 23839.5,
+      "sessions": 2427
     },
     "2026-03-30": {
       "revenue": 92916.51,
@@ -2904,7 +2933,8 @@
       "commissions": 17919.72,
       "product_expense": 33449.94,
       "total_expense": 74987.66,
-      "profit": 17928.85
+      "profit": 17928.85,
+      "sessions": 2527
     },
     "2026-03-31": {
       "revenue": 123504.06,
@@ -2913,7 +2943,8 @@
       "commissions": 15999.72,
       "product_expense": 39528.29,
       "total_expense": 79069.01,
-      "profit": 44435.05
+      "profit": 44435.05,
+      "sessions": 2662
     },
     "2026-04-01": {
       "revenue": 110740.61,
@@ -2922,7 +2953,8 @@
       "commissions": 17553.95,
       "product_expense": 41163.78,
       "total_expense": 84656.49,
-      "profit": 26084.12
+      "profit": 26084.12,
+      "sessions": 2679
     },
     "2026-04-02": {
       "revenue": 118030.16,
@@ -2931,7 +2963,8 @@
       "commissions": 16680.57,
       "product_expense": 47273.9,
       "total_expense": 89641.89,
-      "profit": 28388.27
+      "profit": 28388.27,
+      "sessions": 2676
     },
     "2026-04-03": {
       "revenue": 119937.65,
@@ -2940,7 +2973,8 @@
       "commissions": 13790.19,
       "product_expense": 39330.36,
       "total_expense": 83935.07,
-      "profit": 36002.58
+      "profit": 36002.58,
+      "sessions": 2931
     },
     "2026-04-04": {
       "revenue": 92168.91,
@@ -2949,72 +2983,253 @@
       "commissions": 14302.67,
       "product_expense": 32514.0,
       "total_expense": 71912.67,
-      "profit": 20256.24
+      "profit": 20256.24,
+      "sessions": 2393
     },
     "2026-04-05": {
       "revenue": 98168.96,
       "orders": 111,
       "ad_spend": 25397.0,
       "commissions": 15075.71,
-      "product_expense": 47869.85,
-      "total_expense": 88342.56,
-      "profit": 9826.4
+      "product_expense": 35018.89,
+      "total_expense": 75491.6,
+      "profit": 22677.36,
+      "sessions": 2659
     },
     "2026-04-06": {
       "revenue": 110582.14,
       "orders": 113,
       "ad_spend": 22409.0,
       "commissions": 17073.49,
-      "product_expense": 49594.89,
-      "total_expense": 89077.38,
-      "profit": 21504.76
+      "product_expense": 36280.83,
+      "total_expense": 75763.32,
+      "profit": 34818.82,
+      "sessions": 2623
     },
     "2026-04-07": {
       "revenue": 98852.45,
       "orders": 100,
       "ad_spend": 23209.42,
       "commissions": 15242.86,
-      "product_expense": 43557.25,
-      "total_expense": 82009.53,
-      "profit": 16842.92
+      "product_expense": 31864.03,
+      "total_expense": 70316.31,
+      "profit": 28536.14,
+      "sessions": 2796
     },
     "2026-04-08": {
-      "revenue": 105152.6,
-      "orders": 120,
-      "ad_spend": 0.0,
+      "revenue": 123076.17,
+      "orders": 118,
+      "ad_spend": 22729.16,
       "commissions": 16895.16,
-      "product_expense": 37854.94,
-      "total_expense": 54750.1,
-      "profit": 50402.5
+      "product_expense": 37858.26,
+      "total_expense": 77482.58,
+      "profit": 45593.59,
+      "sessions": 2389
     }
   },
-  "last_synced": "2026-04-09T06:11:04",
+  "last_synced": "2026-04-09T09:52:04",
   "shiprocket": {
-    "2026-04-05": {
-      "new_orders": 75,
-      "new_value": 95346.55,
-      "pending": 6,
-      "pending_value": 7149.05,
-      "shipped": 66,
-      "shipped_value": 84495.45,
-      "delivered": 12,
-      "delivered_value": 19051.4,
-      "in_transit": 54,
-      "rto": 0,
-      "cancelled": 3,
+    "2026-04-01": {
+      "new_orders": 206,
+      "new_value": 258312.59,
+      "pending": 0,
+      "pending_value": 0.0,
+      "shipped": 199,
+      "shipped_value": 248464.54,
+      "delivered": 148,
+      "delivered_value": 186011.39,
+      "in_transit": 44,
+      "rto": 7,
+      "cancelled": 7,
       "avg_tat_days": 0,
-      "avg_ship_days": 2.1,
+      "avg_ship_days": 2.2,
       "avg_deliver_days": 0,
       "products": {
-        "Busy Book Pink": {
-          "new_orders": 1,
-          "new_value": 3548.0,
+        "Car": {
+          "new_orders": 49,
+          "new_value": 63001.0,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 49,
+          "shipped_value": 63001.0,
+          "delivered": 20,
+          "delivered_value": 25380.0,
+          "in_transit": 25,
+          "rto": 4,
+          "cancelled": 0,
+          "avg_tat_days": 0,
+          "avg_ship_days": 2.6,
+          "avg_deliver_days": 0
+        },
+        "V6": {
+          "new_orders": 51,
+          "new_value": 51218.45,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 49,
+          "shipped_value": 49220.45,
+          "delivered": 37,
+          "delivered_value": 37282.4,
+          "in_transit": 11,
+          "rto": 1,
+          "cancelled": 2,
+          "avg_tat_days": 0,
+          "avg_ship_days": 3.1,
+          "avg_deliver_days": 0
+        },
+        "Busy Book Blue": {
+          "new_orders": 2,
+          "new_value": 4456.2,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 2,
+          "shipped_value": 4456.2,
+          "delivered": 1,
+          "delivered_value": 1658.2,
+          "in_transit": 1,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 0,
+          "avg_ship_days": 1.0,
+          "avg_deliver_days": 0
+        },
+        "V2": {
+          "new_orders": 33,
+          "new_value": 33269.69,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 33,
+          "shipped_value": 33269.69,
+          "delivered": 29,
+          "delivered_value": 29323.64,
+          "in_transit": 3,
+          "rto": 1,
+          "cancelled": 0,
+          "avg_tat_days": 0,
+          "avg_ship_days": 1.1,
+          "avg_deliver_days": 0
+        },
+        "V6-V1 Combo": {
+          "new_orders": 3,
+          "new_value": 3797.0,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 3,
+          "shipped_value": 3797.0,
+          "delivered": 3,
+          "delivered_value": 3797.0,
+          "in_transit": 0,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 0,
+          "avg_ship_days": 3.0,
+          "avg_deliver_days": 0
+        },
+        "V4": {
+          "new_orders": 7,
+          "new_value": 6764.85,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 7,
+          "shipped_value": 6764.85,
+          "delivered": 7,
+          "delivered_value": 6764.85,
+          "in_transit": 0,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 0,
+          "avg_ship_days": 1.3,
+          "avg_deliver_days": 0
+        },
+        "V1": {
+          "new_orders": 9,
+          "new_value": 7821.3,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 8,
+          "shipped_value": 6967.25,
+          "delivered": 8,
+          "delivered_value": 6967.25,
+          "in_transit": 0,
+          "rto": 0,
+          "cancelled": 1,
+          "avg_tat_days": 0,
+          "avg_ship_days": 1.0,
+          "avg_deliver_days": 0
+        },
+        "V9": {
+          "new_orders": 23,
+          "new_value": 42812.35,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 21,
+          "shipped_value": 39014.35,
+          "delivered": 20,
+          "delivered_value": 37115.35,
+          "in_transit": 1,
+          "rto": 0,
+          "cancelled": 2,
+          "avg_tat_days": 0,
+          "avg_ship_days": 1.2,
+          "avg_deliver_days": 0
+        },
+        "V2-V4 Combo": {
+          "new_orders": 3,
+          "new_value": 4797.0,
           "pending": 0,
           "pending_value": 0.0,
           "shipped": 1,
-          "shipped_value": 3548.0,
-          "delivered": 1,
-          "delivered_value": 3548.0,
+          "shipped_value": 1599.0,
+          "delivered": 0,
+          "delivered_value": 0.0,
+          "in_transit": 0,
+          "rto": 1,
+          "cancelled": 2,
+          "avg_tat_days": 0,
+          "avg_ship_days": 1.0,
+          "avg_deliver_days": 0
+        },
+        "Krishna": {
+          "new_orders": 14,
+          "new_value": 12406.2,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 14,
+          "shipped_value": 12406.2,
+          "delivered": 11,
+          "delivered_value": 9754.15,
+          "in_transit": 3,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 0,
+          "avg_ship_days": 3.6,
+          "avg_deliver_days": 0
+        },
+        "Busy Book Pink": {
+          "new_orders": 5,
+          "new_value": 18342.0,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 5,
+          "shipped_value": 18342.0,
+          "delivered": 5,
+          "delivered_value": 18342.0,
+          "in_transit": 0,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 0,
+          "avg_ship_days": 1.8,
+          "avg_deliver_days": 0
+        },
+        "V3": {
+          "new_orders": 2,
+          "new_value": 2938.1,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 2,
+          "shipped_value": 2938.1,
+          "delivered": 2,
+          "delivered_value": 2938.1,
           "in_transit": 0,
           "rto": 0,
           "cancelled": 0,
@@ -3022,95 +3237,419 @@
           "avg_ship_days": 1.0,
           "avg_deliver_days": 0
         },
-        "V6": {
-          "new_orders": 8,
-          "new_value": 7692.3,
+        "Hanuman": {
+          "new_orders": 4,
+          "new_value": 4220.25,
           "pending": 0,
           "pending_value": 0.0,
-          "shipped": 7,
-          "shipped_value": 6693.3,
-          "delivered": 0,
-          "delivered_value": 0.0,
-          "in_transit": 7,
-          "rto": 0,
-          "cancelled": 1,
-          "avg_tat_days": 0,
-          "avg_ship_days": 3.0,
-          "avg_deliver_days": 0
-        },
-        "Car": {
-          "new_orders": 17,
-          "new_value": 21983.0,
-          "pending": 2,
-          "pending_value": 2598.0,
-          "shipped": 15,
-          "shipped_value": 19385.0,
-          "delivered": 0,
-          "delivered_value": 0.0,
-          "in_transit": 15,
+          "shipped": 4,
+          "shipped_value": 4220.25,
+          "delivered": 4,
+          "delivered_value": 4220.25,
+          "in_transit": 0,
           "rto": 0,
           "cancelled": 0,
           "avg_tat_days": 0,
-          "avg_ship_days": 3.0,
+          "avg_ship_days": 1.5,
+          "avg_deliver_days": 0
+        },
+        "Tank": {
+          "new_orders": 1,
+          "new_value": 2468.2,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 1,
+          "shipped_value": 2468.2,
+          "delivered": 1,
+          "delivered_value": 2468.2,
+          "in_transit": 0,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 0,
+          "avg_ship_days": 1.0,
+          "avg_deliver_days": 0
+        }
+      }
+    },
+    "2026-04-02": {
+      "new_orders": 175,
+      "new_value": 205533.75,
+      "pending": 2,
+      "pending_value": 2198.0,
+      "shipped": 165,
+      "shipped_value": 193213.55,
+      "delivered": 77,
+      "delivered_value": 88218.95,
+      "in_transit": 86,
+      "rto": 2,
+      "cancelled": 8,
+      "avg_tat_days": 0,
+      "avg_ship_days": 3.1,
+      "avg_deliver_days": 0,
+      "products": {
+        "Krishna": {
+          "new_orders": 35,
+          "new_value": 32224.5,
+          "pending": 1,
+          "pending_value": 899.0,
+          "shipped": 33,
+          "shipped_value": 30426.5,
+          "delivered": 13,
+          "delivered_value": 11552.15,
+          "in_transit": 20,
+          "rto": 0,
+          "cancelled": 1,
+          "avg_tat_days": 0,
+          "avg_ship_days": 4.1,
+          "avg_deliver_days": 0
+        },
+        "V2": {
+          "new_orders": 33,
+          "new_value": 33681.2,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 33,
+          "shipped_value": 33681.2,
+          "delivered": 24,
+          "delivered_value": 24225.75,
+          "in_transit": 8,
+          "rto": 1,
+          "cancelled": 0,
+          "avg_tat_days": 0,
+          "avg_ship_days": 1.0,
+          "avg_deliver_days": 0
+        },
+        "Car": {
+          "new_orders": 27,
+          "new_value": 32825.0,
+          "pending": 1,
+          "pending_value": 1299.0,
+          "shipped": 22,
+          "shipped_value": 26330.0,
+          "delivered": 5,
+          "delivered_value": 4347.0,
+          "in_transit": 17,
+          "rto": 0,
+          "cancelled": 4,
+          "avg_tat_days": 0,
+          "avg_ship_days": 3.6,
+          "avg_deliver_days": 0
+        },
+        "V6": {
+          "new_orders": 37,
+          "new_value": 39641.65,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 36,
+          "shipped_value": 37263.45,
+          "delivered": 1,
+          "delivered_value": 949.05,
+          "in_transit": 35,
+          "rto": 0,
+          "cancelled": 1,
+          "avg_tat_days": 0,
+          "avg_ship_days": 5.8,
           "avg_deliver_days": 0
         },
         "V1": {
-          "new_orders": 3,
-          "new_value": 2607.1,
+          "new_orders": 5,
+          "new_value": 4315.2,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 5,
+          "shipped_value": 4315.2,
+          "delivered": 5,
+          "delivered_value": 4315.2,
+          "in_transit": 0,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 0,
+          "avg_ship_days": 1.0,
+          "avg_deliver_days": 0
+        },
+        "V3": {
+          "new_orders": 2,
+          "new_value": 3248.0,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 1,
+          "shipped_value": 1599.0,
+          "delivered": 1,
+          "delivered_value": 1599.0,
+          "in_transit": 0,
+          "rto": 0,
+          "cancelled": 1,
+          "avg_tat_days": 0,
+          "avg_ship_days": 0.0,
+          "avg_deliver_days": 0
+        },
+        "Tank": {
+          "new_orders": 8,
+          "new_value": 12861.2,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 8,
+          "shipped_value": 12861.2,
+          "delivered": 8,
+          "delivered_value": 12861.2,
+          "in_transit": 0,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 0,
+          "avg_ship_days": 1.4,
+          "avg_deliver_days": 0
+        },
+        "V2-V4 Combo": {
+          "new_orders": 1,
+          "new_value": 1549.0,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 1,
+          "shipped_value": 1549.0,
+          "delivered": 1,
+          "delivered_value": 1549.0,
+          "in_transit": 0,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 0,
+          "avg_ship_days": 1.0,
+          "avg_deliver_days": 0
+        },
+        "V4": {
+          "new_orders": 7,
+          "new_value": 6416.35,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 7,
+          "shipped_value": 6416.35,
+          "delivered": 6,
+          "delivered_value": 4918.35,
+          "in_transit": 0,
+          "rto": 1,
+          "cancelled": 0,
+          "avg_tat_days": 0,
+          "avg_ship_days": 0.9,
+          "avg_deliver_days": 0
+        },
+        "V9": {
+          "new_orders": 12,
+          "new_value": 28793.2,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 12,
+          "shipped_value": 28793.2,
+          "delivered": 10,
+          "delivered_value": 19449.2,
+          "in_transit": 2,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 0,
+          "avg_ship_days": 1.4,
+          "avg_deliver_days": 0
+        },
+        "Busy Book Blue": {
+          "new_orders": 2,
+          "new_value": 2512.25,
           "pending": 0,
           "pending_value": 0.0,
           "shipped": 2,
-          "shipped_value": 1753.05,
+          "shipped_value": 2512.25,
           "delivered": 1,
           "delivered_value": 854.05,
           "in_transit": 1,
           "rto": 0,
-          "cancelled": 1,
+          "cancelled": 0,
           "avg_tat_days": 0,
-          "avg_ship_days": 1.0,
+          "avg_ship_days": 3.5,
           "avg_deliver_days": 0
         },
-        "Krishna": {
-          "new_orders": 13,
-          "new_value": 11552.15,
-          "pending": 3,
-          "pending_value": 2652.05,
-          "shipped": 10,
-          "shipped_value": 8900.1,
+        "Hanuman": {
+          "new_orders": 1,
+          "new_value": 1618.2,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 1,
+          "shipped_value": 1618.2,
           "delivered": 0,
           "delivered_value": 0.0,
-          "in_transit": 10,
+          "in_transit": 1,
           "rto": 0,
           "cancelled": 0,
           "avg_tat_days": 0,
-          "avg_ship_days": 3.0,
+          "avg_ship_days": 4.0,
           "avg_deliver_days": 0
         },
-        "V9": {
-          "new_orders": 11,
-          "new_value": 20988.2,
-          "pending": 1,
-          "pending_value": 1899.0,
-          "shipped": 9,
-          "shipped_value": 17240.2,
-          "delivered": 4,
-          "delivered_value": 7795.2,
-          "in_transit": 5,
+        "Other": {
+          "new_orders": 3,
+          "new_value": 3300.0,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 2,
+          "shipped_value": 3300.0,
+          "delivered": 1,
+          "delivered_value": 300.0,
+          "in_transit": 1,
           "rto": 0,
           "cancelled": 1,
           "avg_tat_days": 0,
-          "avg_ship_days": 1.0,
+          "avg_ship_days": 4.0,
           "avg_deliver_days": 0
         },
         "V6-V1 Combo": {
+          "new_orders": 1,
+          "new_value": 1249.0,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 1,
+          "shipped_value": 1249.0,
+          "delivered": 0,
+          "delivered_value": 0.0,
+          "in_transit": 1,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 0,
+          "avg_ship_days": 6.0,
+          "avg_deliver_days": 0
+        },
+        "V1-V4 Combo": {
           "new_orders": 1,
           "new_value": 1299.0,
           "pending": 0,
           "pending_value": 0.0,
           "shipped": 1,
           "shipped_value": 1299.0,
+          "delivered": 1,
+          "delivered_value": 1299.0,
+          "in_transit": 0,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 0,
+          "avg_ship_days": 1.0,
+          "avg_deliver_days": 0
+        }
+      }
+    },
+    "2026-04-03": {
+      "new_orders": 190,
+      "new_value": 225703.65,
+      "pending": 2,
+      "pending_value": 5636.2,
+      "shipped": 180,
+      "shipped_value": 210092.7,
+      "delivered": 60,
+      "delivered_value": 73358.1,
+      "in_transit": 118,
+      "rto": 2,
+      "cancelled": 8,
+      "avg_tat_days": 1.9,
+      "avg_ship_days": 3.2,
+      "avg_deliver_days": 1.0,
+      "products": {
+        "V6": {
+          "new_orders": 48,
+          "new_value": 47452.5,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 45,
+          "shipped_value": 44505.45,
           "delivered": 0,
           "delivered_value": 0.0,
+          "in_transit": 45,
+          "rto": 0,
+          "cancelled": 3,
+          "avg_tat_days": 2.0,
+          "avg_ship_days": 5.0,
+          "avg_deliver_days": 1.0
+        },
+        "Krishna": {
+          "new_orders": 49,
+          "new_value": 46388.4,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 47,
+          "shipped_value": 43871.2,
+          "delivered": 18,
+          "delivered_value": 16586.55,
+          "in_transit": 29,
+          "rto": 0,
+          "cancelled": 2,
+          "avg_tat_days": 0,
+          "avg_ship_days": 3.0,
+          "avg_deliver_days": 0
+        },
+        "V9": {
+          "new_orders": 12,
+          "new_value": 22488.0,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 12,
+          "shipped_value": 22488.0,
+          "delivered": 8,
+          "delivered_value": 14992.0,
+          "in_transit": 4,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 2.0,
+          "avg_ship_days": 1.8,
+          "avg_deliver_days": 1.0
+        },
+        "Car": {
+          "new_orders": 33,
+          "new_value": 44605.2,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 33,
+          "shipped_value": 44605.2,
+          "delivered": 10,
+          "delivered_value": 12640.0,
+          "in_transit": 22,
+          "rto": 1,
+          "cancelled": 0,
+          "avg_tat_days": 0,
+          "avg_ship_days": 3.3,
+          "avg_deliver_days": 0
+        },
+        "V1": {
+          "new_orders": 7,
+          "new_value": 6158.15,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 7,
+          "shipped_value": 6158.15,
+          "delivered": 5,
+          "delivered_value": 4405.1,
+          "in_transit": 1,
+          "rto": 1,
+          "cancelled": 0,
+          "avg_tat_days": 2.0,
+          "avg_ship_days": 1.4,
+          "avg_deliver_days": 1.0
+        },
+        "V10": {
+          "new_orders": 4,
+          "new_value": 7135.2,
+          "pending": 1,
+          "pending_value": 2288.2,
+          "shipped": 3,
+          "shipped_value": 4847.0,
+          "delivered": 2,
+          "delivered_value": 3298.0,
+          "in_transit": 1,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 0,
+          "avg_ship_days": 2.3,
+          "avg_deliver_days": 0
+        },
+        "Tank": {
+          "new_orders": 2,
+          "new_value": 4297.0,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 2,
+          "shipped_value": 4297.0,
+          "delivered": 1,
+          "delivered_value": 2798.0,
           "in_transit": 1,
           "rto": 0,
           "cancelled": 0,
@@ -3119,20 +3658,552 @@
           "avg_deliver_days": 0
         },
         "V2": {
-          "new_orders": 10,
-          "new_value": 9690.3,
+          "new_orders": 19,
+          "new_value": 19960.6,
           "pending": 0,
           "pending_value": 0.0,
-          "shipped": 10,
-          "shipped_value": 9690.3,
-          "delivered": 2,
-          "delivered_value": 1948.05,
-          "in_transit": 8,
+          "shipped": 19,
+          "shipped_value": 19960.6,
+          "delivered": 13,
+          "delivered_value": 12587.4,
+          "in_transit": 6,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 2.0,
+          "avg_ship_days": 1.3,
+          "avg_deliver_days": 1.0
+        },
+        "Busy Book Pink": {
+          "new_orders": 3,
+          "new_value": 10044.0,
+          "pending": 1,
+          "pending_value": 3348.0,
+          "shipped": 2,
+          "shipped_value": 6696.0,
+          "delivered": 1,
+          "delivered_value": 3548.0,
+          "in_transit": 1,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 0,
+          "avg_ship_days": 4.0,
+          "avg_deliver_days": 0
+        },
+        "V6-V1 Combo": {
+          "new_orders": 5,
+          "new_value": 6345.0,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 5,
+          "shipped_value": 6345.0,
+          "delivered": 0,
+          "delivered_value": 0.0,
+          "in_transit": 5,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 0,
+          "avg_ship_days": 5.0,
+          "avg_deliver_days": 0
+        },
+        "Busy Book Blue": {
+          "new_orders": 1,
+          "new_value": 1898.0,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 1,
+          "shipped_value": 1898.0,
+          "delivered": 0,
+          "delivered_value": 0.0,
+          "in_transit": 1,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 0,
+          "avg_ship_days": 5.0,
+          "avg_deliver_days": 0
+        },
+        "Hanuman": {
+          "new_orders": 2,
+          "new_value": 3146.5,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 1,
+          "shipped_value": 854.05,
+          "delivered": 1,
+          "delivered_value": 854.05,
+          "in_transit": 0,
+          "rto": 0,
+          "cancelled": 1,
+          "avg_tat_days": 2.0,
+          "avg_ship_days": 1.0,
+          "avg_deliver_days": 1.0
+        },
+        "V3": {
+          "new_orders": 2,
+          "new_value": 3298.0,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 1,
+          "shipped_value": 1649.0,
+          "delivered": 1,
+          "delivered_value": 1649.0,
+          "in_transit": 0,
+          "rto": 0,
+          "cancelled": 1,
+          "avg_tat_days": 1.0,
+          "avg_ship_days": 1.0,
+          "avg_deliver_days": 1.0
+        },
+        "V4": {
+          "new_orders": 2,
+          "new_value": 1138.1,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 1,
+          "shipped_value": 569.05,
+          "delivered": 0,
+          "delivered_value": 0.0,
+          "in_transit": 1,
+          "rto": 0,
+          "cancelled": 1,
+          "avg_tat_days": 2.0,
+          "avg_ship_days": 1.0,
+          "avg_deliver_days": 1.0
+        },
+        "V4- P of 3": {
+          "new_orders": 1,
+          "new_value": 1349.0,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 1,
+          "shipped_value": 1349.0,
+          "delivered": 0,
+          "delivered_value": 0.0,
+          "in_transit": 1,
           "rto": 0,
           "cancelled": 0,
           "avg_tat_days": 0,
           "avg_ship_days": 1.0,
           "avg_deliver_days": 0
+        }
+      }
+    },
+    "2026-04-04": {
+      "new_orders": 170,
+      "new_value": 207534.77,
+      "pending": 2,
+      "pending_value": 2198.0,
+      "shipped": 163,
+      "shipped_value": 196041.72,
+      "delivered": 30,
+      "delivered_value": 35810.77,
+      "in_transit": 133,
+      "rto": 0,
+      "cancelled": 5,
+      "avg_tat_days": 2.6,
+      "avg_ship_days": 2.9,
+      "avg_deliver_days": 1.6,
+      "products": {
+        "Tank": {
+          "new_orders": 3,
+          "new_value": 4447.0,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 3,
+          "shipped_value": 4447.0,
+          "delivered": 2,
+          "delivered_value": 2948.0,
+          "in_transit": 1,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 2.0,
+          "avg_ship_days": 2.0,
+          "avg_deliver_days": 1.0
+        },
+        "V6": {
+          "new_orders": 38,
+          "new_value": 37012.95,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 37,
+          "shipped_value": 36063.9,
+          "delivered": 0,
+          "delivered_value": 0.0,
+          "in_transit": 37,
+          "rto": 0,
+          "cancelled": 1,
+          "avg_tat_days": 0,
+          "avg_ship_days": 4.0,
+          "avg_deliver_days": 0
+        },
+        "V2": {
+          "new_orders": 15,
+          "new_value": 14395.5,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 15,
+          "shipped_value": 14395.5,
+          "delivered": 6,
+          "delivered_value": 5604.3,
+          "in_transit": 9,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 2.6,
+          "avg_ship_days": 2.2,
+          "avg_deliver_days": 1.6
+        },
+        "Car": {
+          "new_orders": 52,
+          "new_value": 67098.0,
+          "pending": 1,
+          "pending_value": 1299.0,
+          "shipped": 51,
+          "shipped_value": 65799.0,
+          "delivered": 5,
+          "delivered_value": 5496.0,
+          "in_transit": 46,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 3.0,
+          "avg_ship_days": 3.2,
+          "avg_deliver_days": 2.0
+        },
+        "V1": {
+          "new_orders": 7,
+          "new_value": 6827.35,
+          "pending": 1,
+          "pending_value": 899.0,
+          "shipped": 5,
+          "shipped_value": 5029.35,
+          "delivered": 2,
+          "delivered_value": 2422.25,
+          "in_transit": 3,
+          "rto": 0,
+          "cancelled": 1,
+          "avg_tat_days": 2.5,
+          "avg_ship_days": 2.0,
+          "avg_deliver_days": 1.5
+        },
+        "Krishna": {
+          "new_orders": 23,
+          "new_value": 21765.9,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 23,
+          "shipped_value": 21765.9,
+          "delivered": 5,
+          "delivered_value": 5169.25,
+          "in_transit": 18,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 0,
+          "avg_ship_days": 2.0,
+          "avg_deliver_days": 0
+        },
+        "V9": {
+          "new_orders": 12,
+          "new_value": 24636.87,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 11,
+          "shipped_value": 22337.87,
+          "delivered": 4,
+          "delivered_value": 7536.67,
+          "in_transit": 7,
+          "rto": 0,
+          "cancelled": 1,
+          "avg_tat_days": 2.5,
+          "avg_ship_days": 1.8,
+          "avg_deliver_days": 1.5
+        },
+        "V9-V10 Combo": {
+          "new_orders": 1,
+          "new_value": 2831.7,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 1,
+          "shipped_value": 2831.7,
+          "delivered": 0,
+          "delivered_value": 0.0,
+          "in_transit": 1,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 0,
+          "avg_ship_days": 2.0,
+          "avg_deliver_days": 0
+        },
+        "Hanuman": {
+          "new_orders": 3,
+          "new_value": 2607.1,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 3,
+          "shipped_value": 2607.1,
+          "delivered": 0,
+          "delivered_value": 0.0,
+          "in_transit": 3,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 0,
+          "avg_ship_days": 2.0,
+          "avg_deliver_days": 0
+        },
+        "Busy Book Pink": {
+          "new_orders": 4,
+          "new_value": 11099.05,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 3,
+          "shipped_value": 7550.05,
+          "delivered": 1,
+          "delivered_value": 854.05,
+          "in_transit": 2,
+          "rto": 0,
+          "cancelled": 1,
+          "avg_tat_days": 3.0,
+          "avg_ship_days": 2.7,
+          "avg_deliver_days": 2.0
+        },
+        "Busy Book Blue": {
+          "new_orders": 1,
+          "new_value": 1658.2,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 1,
+          "shipped_value": 1658.2,
+          "delivered": 1,
+          "delivered_value": 1658.2,
+          "in_transit": 0,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 2.5,
+          "avg_ship_days": 2.0,
+          "avg_deliver_days": 1.5
+        },
+        "V6- P of 2": {
+          "new_orders": 2,
+          "new_value": 3798.0,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 2,
+          "shipped_value": 3798.0,
+          "delivered": 0,
+          "delivered_value": 0.0,
+          "in_transit": 2,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 0,
+          "avg_ship_days": 4.0,
+          "avg_deliver_days": 0
+        },
+        "V10": {
+          "new_orders": 2,
+          "new_value": 3448.0,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 2,
+          "shipped_value": 3448.0,
+          "delivered": 2,
+          "delivered_value": 3448.0,
+          "in_transit": 0,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 0,
+          "avg_ship_days": 2.0,
+          "avg_deliver_days": 0
+        },
+        "V6-V1 Combo": {
+          "new_orders": 2,
+          "new_value": 2498.0,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 2,
+          "shipped_value": 2498.0,
+          "delivered": 0,
+          "delivered_value": 0.0,
+          "in_transit": 2,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 0,
+          "avg_ship_days": 4.0,
+          "avg_deliver_days": 0
+        },
+        "V3": {
+          "new_orders": 2,
+          "new_value": 1799.0,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 1,
+          "shipped_value": 200.0,
+          "delivered": 1,
+          "delivered_value": 200.0,
+          "in_transit": 0,
+          "rto": 0,
+          "cancelled": 1,
+          "avg_tat_days": 3.0,
+          "avg_ship_days": 2.0,
+          "avg_deliver_days": 2.0
+        },
+        "V4": {
+          "new_orders": 3,
+          "new_value": 1612.15,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 3,
+          "shipped_value": 1612.15,
+          "delivered": 1,
+          "delivered_value": 474.05,
+          "in_transit": 2,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 2.7,
+          "avg_ship_days": 1.3,
+          "avg_deliver_days": 1.7
+        }
+      }
+    },
+    "2026-04-05": {
+      "new_orders": 202,
+      "new_value": 247066.85,
+      "pending": 6,
+      "pending_value": 7149.05,
+      "shipped": 191,
+      "shipped_value": 232867.75,
+      "delivered": 29,
+      "delivered_value": 42822.3,
+      "in_transit": 162,
+      "rto": 0,
+      "cancelled": 5,
+      "avg_tat_days": 3.6,
+      "avg_ship_days": 2.1,
+      "avg_deliver_days": 2.4,
+      "products": {
+        "Busy Book Pink": {
+          "new_orders": 3,
+          "new_value": 10543.0,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 3,
+          "shipped_value": 10543.0,
+          "delivered": 1,
+          "delivered_value": 3548.0,
+          "in_transit": 2,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 0,
+          "avg_ship_days": 2.3,
+          "avg_deliver_days": 0
+        },
+        "V6": {
+          "new_orders": 34,
+          "new_value": 33721.1,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 33,
+          "shipped_value": 32722.1,
+          "delivered": 0,
+          "delivered_value": 0.0,
+          "in_transit": 33,
+          "rto": 0,
+          "cancelled": 1,
+          "avg_tat_days": 3.8,
+          "avg_ship_days": 3.0,
+          "avg_deliver_days": 1.2
+        },
+        "Car": {
+          "new_orders": 38,
+          "new_value": 48912.0,
+          "pending": 2,
+          "pending_value": 2598.0,
+          "shipped": 36,
+          "shipped_value": 46314.0,
+          "delivered": 0,
+          "delivered_value": 0.0,
+          "in_transit": 36,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 4.0,
+          "avg_ship_days": 3.0,
+          "avg_deliver_days": 2.5
+        },
+        "V1": {
+          "new_orders": 4,
+          "new_value": 3461.15,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 3,
+          "shipped_value": 2607.1,
+          "delivered": 1,
+          "delivered_value": 854.05,
+          "in_transit": 2,
+          "rto": 0,
+          "cancelled": 1,
+          "avg_tat_days": 4.0,
+          "avg_ship_days": 1.0,
+          "avg_deliver_days": 3.0
+        },
+        "Krishna": {
+          "new_orders": 47,
+          "new_value": 44711.1,
+          "pending": 3,
+          "pending_value": 2652.05,
+          "shipped": 44,
+          "shipped_value": 42059.05,
+          "delivered": 1,
+          "delivered_value": 1568.2,
+          "in_transit": 43,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 0,
+          "avg_ship_days": 2.2,
+          "avg_deliver_days": 0
+        },
+        "V9": {
+          "new_orders": 23,
+          "new_value": 43036.3,
+          "pending": 1,
+          "pending_value": 1899.0,
+          "shipped": 20,
+          "shipped_value": 37439.3,
+          "delivered": 8,
+          "delivered_value": 15191.2,
+          "in_transit": 12,
+          "rto": 0,
+          "cancelled": 2,
+          "avg_tat_days": 3.9,
+          "avg_ship_days": 1.0,
+          "avg_deliver_days": 2.9
+        },
+        "V6-V1 Combo": {
+          "new_orders": 3,
+          "new_value": 4476.2,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 3,
+          "shipped_value": 4476.2,
+          "delivered": 0,
+          "delivered_value": 0.0,
+          "in_transit": 3,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 0,
+          "avg_ship_days": 3.0,
+          "avg_deliver_days": 0
+        },
+        "V2": {
+          "new_orders": 24,
+          "new_value": 23226.75,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 24,
+          "shipped_value": 23226.75,
+          "delivered": 8,
+          "delivered_value": 7742.25,
+          "in_transit": 16,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 3.5,
+          "avg_ship_days": 1.0,
+          "avg_deliver_days": 2.6
         },
         "Hanuman": {
           "new_orders": 2,
@@ -3151,52 +4222,52 @@
           "avg_deliver_days": 0
         },
         "Ganesha": {
-          "new_orders": 3,
-          "new_value": 4085.4,
+          "new_orders": 11,
+          "new_value": 11856.7,
           "pending": 0,
           "pending_value": 0.0,
-          "shipped": 3,
-          "shipped_value": 4085.4,
-          "delivered": 0,
-          "delivered_value": 0.0,
-          "in_transit": 3,
+          "shipped": 11,
+          "shipped_value": 11856.7,
+          "delivered": 3,
+          "delivered_value": 2607.1,
+          "in_transit": 8,
           "rto": 0,
           "cancelled": 0,
           "avg_tat_days": 0,
-          "avg_ship_days": 1.7,
+          "avg_ship_days": 1.5,
           "avg_deliver_days": 0
         },
         "V4": {
-          "new_orders": 1,
-          "new_value": 599.0,
+          "new_orders": 2,
+          "new_value": 1168.05,
           "pending": 0,
           "pending_value": 0.0,
-          "shipped": 1,
-          "shipped_value": 599.0,
+          "shipped": 2,
+          "shipped_value": 1168.05,
           "delivered": 0,
           "delivered_value": 0.0,
-          "in_transit": 1,
+          "in_transit": 2,
           "rto": 0,
           "cancelled": 0,
-          "avg_tat_days": 0,
+          "avg_tat_days": 2.5,
           "avg_ship_days": 1.0,
-          "avg_deliver_days": 0
+          "avg_deliver_days": 2.0
         },
         "Tank": {
-          "new_orders": 1,
-          "new_value": 1499.0,
+          "new_orders": 3,
+          "new_value": 4497.0,
           "pending": 0,
           "pending_value": 0.0,
-          "shipped": 1,
-          "shipped_value": 1499.0,
+          "shipped": 2,
+          "shipped_value": 2998.0,
           "delivered": 1,
           "delivered_value": 1499.0,
-          "in_transit": 0,
+          "in_transit": 1,
           "rto": 0,
-          "cancelled": 0,
-          "avg_tat_days": 0,
+          "cancelled": 1,
+          "avg_tat_days": 3.0,
           "avg_ship_days": 1.0,
-          "avg_deliver_days": 0
+          "avg_deliver_days": 2.0
         },
         "V10": {
           "new_orders": 2,
@@ -3229,24 +4300,104 @@
           "avg_tat_days": 0,
           "avg_ship_days": 3.0,
           "avg_deliver_days": 0
+        },
+        "V1-V4 Combo": {
+          "new_orders": 1,
+          "new_value": 1249.0,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 1,
+          "shipped_value": 1249.0,
+          "delivered": 0,
+          "delivered_value": 0.0,
+          "in_transit": 1,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 0,
+          "avg_ship_days": 1.0,
+          "avg_deliver_days": 0
+        },
+        "V3": {
+          "new_orders": 1,
+          "new_value": 1649.0,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 1,
+          "shipped_value": 1649.0,
+          "delivered": 1,
+          "delivered_value": 1649.0,
+          "in_transit": 0,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 0,
+          "avg_ship_days": 1.0,
+          "avg_deliver_days": 0
+        },
+        "Busy Book Blue": {
+          "new_orders": 2,
+          "new_value": 4756.4,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 2,
+          "shipped_value": 4756.4,
+          "delivered": 2,
+          "delivered_value": 4756.4,
+          "in_transit": 0,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 0,
+          "avg_ship_days": 1.0,
+          "avg_deliver_days": 0
+        },
+        "V2-V4 Combo": {
+          "new_orders": 0,
+          "new_value": 0.0,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 0,
+          "shipped_value": 0.0,
+          "delivered": 0,
+          "delivered_value": 0.0,
+          "in_transit": 0,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 3.0,
+          "avg_ship_days": 0,
+          "avg_deliver_days": 2.0
+        },
+        "Other": {
+          "new_orders": 0,
+          "new_value": 0.0,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 0,
+          "shipped_value": 0.0,
+          "delivered": 0,
+          "delivered_value": 0.0,
+          "in_transit": 0,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 3.0,
+          "avg_ship_days": 0,
+          "avg_deliver_days": 2.0
         }
       }
     },
     "2026-04-06": {
-      "new_orders": 232,
-      "new_value": 262596.05,
+      "new_orders": 231,
+      "new_value": 261697.05,
       "pending": 59,
       "pending_value": 59390.35,
-      "shipped": 162,
-      "shipped_value": 193159.65,
+      "shipped": 161,
+      "shipped_value": 192260.65,
       "delivered": 11,
       "delivered_value": 15989.05,
-      "in_transit": 151,
+      "in_transit": 150,
       "rto": 0,
       "cancelled": 11,
-      "avg_tat_days": 0,
+      "avg_tat_days": 4.4,
       "avg_ship_days": 1.6,
-      "avg_deliver_days": 0,
+      "avg_deliver_days": 2.7,
       "products": {
         "Car": {
           "new_orders": 30,
@@ -3260,9 +4411,9 @@
           "in_transit": 28,
           "rto": 0,
           "cancelled": 1,
-          "avg_tat_days": 0,
+          "avg_tat_days": 4.9,
           "avg_ship_days": 2.0,
-          "avg_deliver_days": 0
+          "avg_deliver_days": 2.1
         },
         "V6": {
           "new_orders": 52,
@@ -3276,9 +4427,9 @@
           "in_transit": 1,
           "rto": 0,
           "cancelled": 1,
-          "avg_tat_days": 0,
+          "avg_tat_days": 5.0,
           "avg_ship_days": 1.0,
-          "avg_deliver_days": 0
+          "avg_deliver_days": 2.0
         },
         "V9": {
           "new_orders": 22,
@@ -3292,25 +4443,25 @@
           "in_transit": 17,
           "rto": 0,
           "cancelled": 1,
-          "avg_tat_days": 0,
+          "avg_tat_days": 3.6,
           "avg_ship_days": 1.0,
-          "avg_deliver_days": 0
+          "avg_deliver_days": 2.7
         },
         "Krishna": {
-          "new_orders": 86,
-          "new_value": 77608.45,
+          "new_orders": 85,
+          "new_value": 76709.45,
           "pending": 6,
           "pending_value": 5394.0,
-          "shipped": 76,
-          "shipped_value": 68618.45,
+          "shipped": 75,
+          "shipped_value": 67719.45,
           "delivered": 0,
           "delivered_value": 0.0,
-          "in_transit": 76,
+          "in_transit": 75,
           "rto": 0,
           "cancelled": 4,
-          "avg_tat_days": 0,
+          "avg_tat_days": 5.0,
           "avg_ship_days": 2.0,
-          "avg_deliver_days": 0
+          "avg_deliver_days": 2.0
         },
         "V1": {
           "new_orders": 9,
@@ -3324,9 +4475,9 @@
           "in_transit": 7,
           "rto": 0,
           "cancelled": 1,
-          "avg_tat_days": 0,
+          "avg_tat_days": 4.0,
           "avg_ship_days": 1.5,
-          "avg_deliver_days": 0
+          "avg_deliver_days": 3.0
         },
         "Busy Book Blue": {
           "new_orders": 1,
@@ -3356,9 +4507,9 @@
           "in_transit": 1,
           "rto": 0,
           "cancelled": 0,
-          "avg_tat_days": 0,
+          "avg_tat_days": 3.0,
           "avg_ship_days": 2.0,
-          "avg_deliver_days": 0
+          "avg_deliver_days": 2.0
         },
         "V9-V2 Combo": {
           "new_orders": 1,
@@ -3388,9 +4539,9 @@
           "in_transit": 1,
           "rto": 0,
           "cancelled": 0,
-          "avg_tat_days": 0,
+          "avg_tat_days": 4.0,
           "avg_ship_days": 2.0,
-          "avg_deliver_days": 0
+          "avg_deliver_days": 3.0
         },
         "Hanuman": {
           "new_orders": 1,
@@ -3404,9 +4555,9 @@
           "in_transit": 1,
           "rto": 0,
           "cancelled": 0,
-          "avg_tat_days": 0,
+          "avg_tat_days": 5.0,
           "avg_ship_days": 2.0,
-          "avg_deliver_days": 0
+          "avg_deliver_days": 4.0
         },
         "Tank": {
           "new_orders": 6,
@@ -3420,9 +4571,9 @@
           "in_transit": 5,
           "rto": 0,
           "cancelled": 1,
-          "avg_tat_days": 0,
+          "avg_tat_days": 4.2,
           "avg_ship_days": 1.0,
-          "avg_deliver_days": 0
+          "avg_deliver_days": 3.2
         },
         "Other": {
           "new_orders": 4,
@@ -3452,9 +4603,9 @@
           "in_transit": 8,
           "rto": 0,
           "cancelled": 0,
-          "avg_tat_days": 0,
+          "avg_tat_days": 4.1,
           "avg_ship_days": 0.6,
-          "avg_deliver_days": 0
+          "avg_deliver_days": 3.1
         },
         "Busy Book Pink": {
           "new_orders": 2,
@@ -3468,9 +4619,9 @@
           "in_transit": 1,
           "rto": 0,
           "cancelled": 0,
-          "avg_tat_days": 0,
+          "avg_tat_days": 5.0,
           "avg_ship_days": 1.0,
-          "avg_deliver_days": 0
+          "avg_deliver_days": 3.3
         },
         "Ganesha": {
           "new_orders": 2,
@@ -3500,9 +4651,9 @@
           "in_transit": 0,
           "rto": 0,
           "cancelled": 0,
-          "avg_tat_days": 0,
+          "avg_tat_days": 5.0,
           "avg_ship_days": 0,
-          "avg_deliver_days": 0
+          "avg_deliver_days": 2.0
         },
         "V4": {
           "new_orders": 1,
@@ -3516,27 +4667,27 @@
           "in_transit": 0,
           "rto": 0,
           "cancelled": 0,
-          "avg_tat_days": 0,
+          "avg_tat_days": 4.5,
           "avg_ship_days": 0.0,
-          "avg_deliver_days": 0
+          "avg_deliver_days": 3.2
         }
       }
     },
     "2026-04-07": {
       "new_orders": 285,
       "new_value": 337792.89,
-      "pending": 71,
-      "pending_value": 76410.05,
+      "pending": 70,
+      "pending_value": 75461.0,
       "shipped": 205,
       "shipped_value": 252691.84,
       "delivered": 4,
       "delivered_value": 4697.0,
       "in_transit": 201,
       "rto": 0,
-      "cancelled": 9,
-      "avg_tat_days": 1.4,
+      "cancelled": 10,
+      "avg_tat_days": 4.6,
       "avg_ship_days": 0.8,
-      "avg_deliver_days": 1.0,
+      "avg_deliver_days": 2.4,
       "products": {
         "Krishna": {
           "new_orders": 91,
@@ -3550,9 +4701,9 @@
           "in_transit": 83,
           "rto": 0,
           "cancelled": 5,
-          "avg_tat_days": 0,
+          "avg_tat_days": 5.2,
           "avg_ship_days": 0.3,
-          "avg_deliver_days": 0
+          "avg_deliver_days": 1.8
         },
         "Ganesha": {
           "new_orders": 7,
@@ -3566,9 +4717,9 @@
           "in_transit": 6,
           "rto": 0,
           "cancelled": 0,
-          "avg_tat_days": 0,
+          "avg_tat_days": 2.0,
           "avg_ship_days": 0.3,
-          "avg_deliver_days": 0
+          "avg_deliver_days": 1.0
         },
         "Car": {
           "new_orders": 46,
@@ -3582,25 +4733,25 @@
           "in_transit": 40,
           "rto": 0,
           "cancelled": 1,
-          "avg_tat_days": 0,
+          "avg_tat_days": 5.2,
           "avg_ship_days": 0.9,
-          "avg_deliver_days": 0
+          "avg_deliver_days": 2.3
         },
         "V6": {
           "new_orders": 58,
           "new_value": 57497.25,
-          "pending": 57,
-          "pending_value": 56498.25,
+          "pending": 56,
+          "pending_value": 55549.2,
           "shipped": 0,
           "shipped_value": 0.0,
           "delivered": 0,
           "delivered_value": 0.0,
           "in_transit": 0,
           "rto": 0,
-          "cancelled": 1,
-          "avg_tat_days": 0,
+          "cancelled": 2,
+          "avg_tat_days": 6.0,
           "avg_ship_days": 0,
-          "avg_deliver_days": 0
+          "avg_deliver_days": 2.9
         },
         "V1": {
           "new_orders": 9,
@@ -3614,9 +4765,9 @@
           "in_transit": 8,
           "rto": 0,
           "cancelled": 1,
-          "avg_tat_days": 2.0,
+          "avg_tat_days": 4.3,
           "avg_ship_days": 1.0,
-          "avg_deliver_days": 1.0
+          "avg_deliver_days": 3.0
         },
         "V1-V4 Combo": {
           "new_orders": 1,
@@ -3646,9 +4797,9 @@
           "in_transit": 3,
           "rto": 0,
           "cancelled": 0,
-          "avg_tat_days": 0,
+          "avg_tat_days": 3.0,
           "avg_ship_days": 0,
-          "avg_deliver_days": 0
+          "avg_deliver_days": 1.0
         },
         "V1- P of 2": {
           "new_orders": 1,
@@ -3678,9 +4829,9 @@
           "in_transit": 20,
           "rto": 0,
           "cancelled": 1,
-          "avg_tat_days": 0,
+          "avg_tat_days": 4.3,
           "avg_ship_days": 1.0,
-          "avg_deliver_days": 0
+          "avg_deliver_days": 3.1
         },
         "Tank": {
           "new_orders": 8,
@@ -3694,9 +4845,9 @@
           "in_transit": 7,
           "rto": 0,
           "cancelled": 0,
-          "avg_tat_days": 0,
+          "avg_tat_days": 3.7,
           "avg_ship_days": 0.7,
-          "avg_deliver_days": 0
+          "avg_deliver_days": 1.0
         },
         "Hanuman": {
           "new_orders": 5,
@@ -3710,9 +4861,9 @@
           "in_transit": 5,
           "rto": 0,
           "cancelled": 0,
-          "avg_tat_days": 0,
+          "avg_tat_days": 5.0,
           "avg_ship_days": 0.0,
-          "avg_deliver_days": 0
+          "avg_deliver_days": 3.0
         },
         "V9": {
           "new_orders": 16,
@@ -3726,9 +4877,9 @@
           "in_transit": 16,
           "rto": 0,
           "cancelled": 0,
-          "avg_tat_days": 1.3,
+          "avg_tat_days": 3.6,
           "avg_ship_days": 1.0,
-          "avg_deliver_days": 1.0
+          "avg_deliver_days": 2.2
         },
         "V4": {
           "new_orders": 4,
@@ -3742,9 +4893,9 @@
           "in_transit": 4,
           "rto": 0,
           "cancelled": 0,
-          "avg_tat_days": 1.0,
+          "avg_tat_days": 3.0,
           "avg_ship_days": 1.0,
-          "avg_deliver_days": 1.0
+          "avg_deliver_days": 2.5
         },
         "V2- P of 2": {
           "new_orders": 2,
@@ -3806,9 +4957,9 @@
           "in_transit": 2,
           "rto": 0,
           "cancelled": 0,
-          "avg_tat_days": 0,
+          "avg_tat_days": 3.0,
           "avg_ship_days": 1.0,
-          "avg_deliver_days": 0
+          "avg_deliver_days": 1.0
         },
         "Busy Book Pink": {
           "new_orders": 2,
@@ -3822,9 +4973,9 @@
           "in_transit": 2,
           "rto": 0,
           "cancelled": 0,
-          "avg_tat_days": 0,
+          "avg_tat_days": 6.0,
           "avg_ship_days": 1.0,
-          "avg_deliver_days": 0
+          "avg_deliver_days": 3.0
         },
         "Other": {
           "new_orders": 1,
@@ -3872,9 +5023,9 @@
       "in_transit": 144,
       "rto": 0,
       "cancelled": 9,
-      "avg_tat_days": 2.2,
+      "avg_tat_days": 4.5,
       "avg_ship_days": 1.0,
-      "avg_deliver_days": 1.6,
+      "avg_deliver_days": 2.4,
       "products": {
         "Krishna": {
           "new_orders": 82,
@@ -3888,9 +5039,9 @@
           "in_transit": 13,
           "rto": 0,
           "cancelled": 2,
-          "avg_tat_days": 0,
+          "avg_tat_days": 5.2,
           "avg_ship_days": 0,
-          "avg_deliver_days": 0
+          "avg_deliver_days": 2.0
         },
         "V6": {
           "new_orders": 68,
@@ -3904,9 +5055,9 @@
           "in_transit": 1,
           "rto": 0,
           "cancelled": 3,
-          "avg_tat_days": 0,
+          "avg_tat_days": 7.0,
           "avg_ship_days": 1.0,
-          "avg_deliver_days": 0
+          "avg_deliver_days": 4.0
         },
         "V4": {
           "new_orders": 7,
@@ -3920,9 +5071,9 @@
           "in_transit": 6,
           "rto": 0,
           "cancelled": 0,
-          "avg_tat_days": 0,
+          "avg_tat_days": 6.0,
           "avg_ship_days": 0,
-          "avg_deliver_days": 0
+          "avg_deliver_days": 5.0
         },
         "Car": {
           "new_orders": 48,
@@ -3936,9 +5087,9 @@
           "in_transit": 47,
           "rto": 0,
           "cancelled": 1,
-          "avg_tat_days": 1.5,
+          "avg_tat_days": 4.5,
           "avg_ship_days": 1.0,
-          "avg_deliver_days": 1.0
+          "avg_deliver_days": 1.7
         },
         "V2": {
           "new_orders": 27,
@@ -3952,9 +5103,9 @@
           "in_transit": 26,
           "rto": 0,
           "cancelled": 0,
-          "avg_tat_days": 2.4,
+          "avg_tat_days": 4.4,
           "avg_ship_days": 0,
-          "avg_deliver_days": 1.8
+          "avg_deliver_days": 3.1
         },
         "V6-V1 Combo": {
           "new_orders": 7,
@@ -3968,9 +5119,9 @@
           "in_transit": 0,
           "rto": 0,
           "cancelled": 0,
-          "avg_tat_days": 0,
+          "avg_tat_days": 7.0,
           "avg_ship_days": 0,
-          "avg_deliver_days": 0
+          "avg_deliver_days": 4.0
         },
         "Tank": {
           "new_orders": 4,
@@ -3984,9 +5135,9 @@
           "in_transit": 4,
           "rto": 0,
           "cancelled": 0,
-          "avg_tat_days": 2.0,
+          "avg_tat_days": 3.0,
           "avg_ship_days": 0,
-          "avg_deliver_days": 1.5
+          "avg_deliver_days": 1.7
         },
         "V9": {
           "new_orders": 17,
@@ -4000,9 +5151,9 @@
           "in_transit": 17,
           "rto": 0,
           "cancelled": 0,
-          "avg_tat_days": 2.6,
+          "avg_tat_days": 3.7,
           "avg_ship_days": 1.0,
-          "avg_deliver_days": 1.8
+          "avg_deliver_days": 2.3
         },
         "V1": {
           "new_orders": 11,
@@ -4016,9 +5167,9 @@
           "in_transit": 9,
           "rto": 0,
           "cancelled": 0,
-          "avg_tat_days": 2.0,
+          "avg_tat_days": 3.8,
           "avg_ship_days": 0,
-          "avg_deliver_days": 1.0
+          "avg_deliver_days": 2.5
         },
         "V9-V2 Combo": {
           "new_orders": 1,
@@ -4064,9 +5215,9 @@
           "in_transit": 11,
           "rto": 0,
           "cancelled": 0,
-          "avg_tat_days": 1.0,
+          "avg_tat_days": 2.3,
           "avg_ship_days": 0,
-          "avg_deliver_days": 1.0
+          "avg_deliver_days": 1.7
         },
         "Other": {
           "new_orders": 3,
@@ -4096,9 +5247,9 @@
           "in_transit": 1,
           "rto": 0,
           "cancelled": 0,
-          "avg_tat_days": 0,
+          "avg_tat_days": 4.3,
           "avg_ship_days": 1.0,
-          "avg_deliver_days": 0
+          "avg_deliver_days": 2.0
         },
         "V2- P of 2": {
           "new_orders": 1,
@@ -4128,9 +5279,9 @@
           "in_transit": 2,
           "rto": 0,
           "cancelled": 0,
-          "avg_tat_days": 0,
+          "avg_tat_days": 3.0,
           "avg_ship_days": 0,
-          "avg_deliver_days": 0
+          "avg_deliver_days": 2.0
         },
         "Busy Book Blue": {
           "new_orders": 1,
@@ -4144,9 +5295,9 @@
           "in_transit": 1,
           "rto": 0,
           "cancelled": 0,
-          "avg_tat_days": 0,
+          "avg_tat_days": 3.0,
           "avg_ship_days": 0,
-          "avg_deliver_days": 0
+          "avg_deliver_days": 2.0
         },
         "Busy Book Pink": {
           "new_orders": 0,
@@ -4160,33 +5311,81 @@
           "in_transit": 0,
           "rto": 0,
           "cancelled": 0,
-          "avg_tat_days": 3.0,
+          "avg_tat_days": 4.0,
           "avg_ship_days": 0,
           "avg_deliver_days": 2.0
         }
       }
     },
     "2026-04-09": {
-      "new_orders": 90,
-      "new_value": 113153.45,
-      "pending": 47,
-      "pending_value": 47846.2,
-      "shipped": 41,
-      "shipped_value": 62859.25,
+      "new_orders": 146,
+      "new_value": 180598.35,
+      "pending": 74,
+      "pending_value": 75578.0,
+      "shipped": 66,
+      "shipped_value": 97617.15,
       "delivered": 0,
       "delivered_value": 0.0,
-      "in_transit": 41,
+      "in_transit": 66,
       "rto": 0,
-      "cancelled": 2,
-      "avg_tat_days": 0,
+      "cancelled": 6,
+      "avg_tat_days": 6.0,
       "avg_ship_days": 1.0,
-      "avg_deliver_days": 0,
+      "avg_deliver_days": 4.0,
       "products": {
+        "Car": {
+          "new_orders": 30,
+          "new_value": 39559.2,
+          "pending": 1,
+          "pending_value": 1299.0,
+          "shipped": 28,
+          "shipped_value": 36961.2,
+          "delivered": 0,
+          "delivered_value": 0.0,
+          "in_transit": 28,
+          "rto": 0,
+          "cancelled": 1,
+          "avg_tat_days": 0,
+          "avg_ship_days": 0,
+          "avg_deliver_days": 0
+        },
+        "V9": {
+          "new_orders": 11,
+          "new_value": 21348.2,
+          "pending": 4,
+          "pending_value": 8205.2,
+          "shipped": 7,
+          "shipped_value": 13143.0,
+          "delivered": 0,
+          "delivered_value": 0.0,
+          "in_transit": 7,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 0,
+          "avg_ship_days": 0,
+          "avg_deliver_days": 0
+        },
+        "V2": {
+          "new_orders": 18,
+          "new_value": 19800.8,
+          "pending": 1,
+          "pending_value": 949.05,
+          "shipped": 15,
+          "shipped_value": 16194.55,
+          "delivered": 0,
+          "delivered_value": 0.0,
+          "in_transit": 15,
+          "rto": 0,
+          "cancelled": 2,
+          "avg_tat_days": 4.0,
+          "avg_ship_days": 0,
+          "avg_deliver_days": 3.0
+        },
         "Krishna": {
-          "new_orders": 27,
-          "new_value": 24722.5,
-          "pending": 27,
-          "pending_value": 24722.5,
+          "new_orders": 45,
+          "new_value": 41259.05,
+          "pending": 45,
+          "pending_value": 41259.05,
           "shipped": 0,
           "shipped_value": 0.0,
           "delivered": 0,
@@ -4194,20 +5393,68 @@
           "in_transit": 0,
           "rto": 0,
           "cancelled": 0,
+          "avg_tat_days": 7.0,
+          "avg_ship_days": 0,
+          "avg_deliver_days": 3.0
+        },
+        "V1": {
+          "new_orders": 2,
+          "new_value": 1708.1,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 2,
+          "shipped_value": 1708.1,
+          "delivered": 0,
+          "delivered_value": 0.0,
+          "in_transit": 2,
+          "rto": 0,
+          "cancelled": 0,
           "avg_tat_days": 0,
           "avg_ship_days": 0,
           "avg_deliver_days": 0
         },
-        "Car": {
-          "new_orders": 18,
-          "new_value": 24121.2,
-          "pending": 2,
-          "pending_value": 2548.0,
-          "shipped": 16,
-          "shipped_value": 21573.2,
+        "V6": {
+          "new_orders": 23,
+          "new_value": 22677.3,
+          "pending": 21,
+          "pending_value": 20679.3,
+          "shipped": 0,
+          "shipped_value": 0.0,
           "delivered": 0,
           "delivered_value": 0.0,
-          "in_transit": 16,
+          "in_transit": 0,
+          "rto": 0,
+          "cancelled": 2,
+          "avg_tat_days": 0,
+          "avg_ship_days": 0,
+          "avg_deliver_days": 0
+        },
+        "Busy Book Blue": {
+          "new_orders": 1,
+          "new_value": 2468.2,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 1,
+          "shipped_value": 2468.2,
+          "delivered": 0,
+          "delivered_value": 0.0,
+          "in_transit": 1,
+          "rto": 0,
+          "cancelled": 0,
+          "avg_tat_days": 0,
+          "avg_ship_days": 0,
+          "avg_deliver_days": 0
+        },
+        "V3": {
+          "new_orders": 2,
+          "new_value": 3348.0,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 2,
+          "shipped_value": 3348.0,
+          "delivered": 0,
+          "delivered_value": 0.0,
+          "in_transit": 2,
           "rto": 0,
           "cancelled": 0,
           "avg_tat_days": 0,
@@ -4215,15 +5462,15 @@
           "avg_deliver_days": 0
         },
         "Tank": {
-          "new_orders": 4,
-          "new_value": 6865.2,
+          "new_orders": 5,
+          "new_value": 11571.8,
           "pending": 0,
           "pending_value": 0.0,
-          "shipped": 3,
-          "shipped_value": 5416.2,
+          "shipped": 4,
+          "shipped_value": 10122.8,
           "delivered": 0,
           "delivered_value": 0.0,
-          "in_transit": 3,
+          "in_transit": 4,
           "rto": 0,
           "cancelled": 1,
           "avg_tat_days": 0,
@@ -4233,13 +5480,13 @@
         "Hanuman": {
           "new_orders": 3,
           "new_value": 4176.3,
-          "pending": 1,
-          "pending_value": 854.05,
-          "shipped": 2,
-          "shipped_value": 3322.25,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 3,
+          "shipped_value": 4176.3,
           "delivered": 0,
           "delivered_value": 0.0,
-          "in_transit": 2,
+          "in_transit": 3,
           "rto": 0,
           "cancelled": 0,
           "avg_tat_days": 0,
@@ -4258,38 +5505,6 @@
           "in_transit": 1,
           "rto": 0,
           "cancelled": 0,
-          "avg_tat_days": 0,
-          "avg_ship_days": 0,
-          "avg_deliver_days": 0
-        },
-        "V2": {
-          "new_orders": 10,
-          "new_value": 12008.6,
-          "pending": 0,
-          "pending_value": 0.0,
-          "shipped": 10,
-          "shipped_value": 12008.6,
-          "delivered": 0,
-          "delivered_value": 0.0,
-          "in_transit": 10,
-          "rto": 0,
-          "cancelled": 0,
-          "avg_tat_days": 0,
-          "avg_ship_days": 0,
-          "avg_deliver_days": 0
-        },
-        "V6": {
-          "new_orders": 14,
-          "new_value": 13736.25,
-          "pending": 13,
-          "pending_value": 12737.25,
-          "shipped": 0,
-          "shipped_value": 0.0,
-          "delivered": 0,
-          "delivered_value": 0.0,
-          "in_transit": 0,
-          "rto": 0,
-          "cancelled": 1,
           "avg_tat_days": 0,
           "avg_ship_days": 0,
           "avg_deliver_days": 0
@@ -4326,37 +5541,21 @@
           "avg_ship_days": 0,
           "avg_deliver_days": 0
         },
-        "V9": {
-          "new_orders": 7,
-          "new_value": 13143.0,
-          "pending": 2,
-          "pending_value": 3798.0,
-          "shipped": 5,
-          "shipped_value": 9345.0,
-          "delivered": 0,
-          "delivered_value": 0.0,
-          "in_transit": 5,
-          "rto": 0,
-          "cancelled": 0,
-          "avg_tat_days": 0,
-          "avg_ship_days": 0,
-          "avg_deliver_days": 0
-        },
-        "V3": {
-          "new_orders": 1,
-          "new_value": 1699.0,
+        "V1-V4 Combo": {
+          "new_orders": 0,
+          "new_value": 0.0,
           "pending": 0,
           "pending_value": 0.0,
-          "shipped": 1,
-          "shipped_value": 1699.0,
+          "shipped": 0,
+          "shipped_value": 0.0,
           "delivered": 0,
           "delivered_value": 0.0,
-          "in_transit": 1,
+          "in_transit": 0,
           "rto": 0,
           "cancelled": 0,
-          "avg_tat_days": 0,
+          "avg_tat_days": 7.0,
           "avg_ship_days": 0,
-          "avg_deliver_days": 0
+          "avg_deliver_days": 6.0
         }
       }
     },
@@ -90061,671 +91260,7 @@
           "avg_tat": 3
         }
       }
-    },
-    "2026-04-01": {
-      "new_orders": 206,
-      "new_value": 258312.59,
-      "pending": 0,
-      "pending_value": 0.0,
-      "shipped": 199,
-      "shipped_value": 248464.54,
-      "delivered": 142,
-      "delivered_value": 179409.7,
-      "in_transit": 50,
-      "rto": 7,
-      "cancelled": 7,
-      "avg_tat_days": 4.7,
-      "products": {
-        "Car": {
-          "new_orders": 49,
-          "shipped": 49,
-          "delivered": 20,
-          "in_transit": 25,
-          "rto": 4,
-          "pending": 0,
-          "cancelled": 0,
-          "avg_tat": 5.2
-        },
-        "V6": {
-          "new_orders": 51,
-          "shipped": 49,
-          "delivered": 34,
-          "in_transit": 14,
-          "rto": 1,
-          "pending": 0,
-          "cancelled": 2,
-          "avg_tat": 5.2
-        },
-        "Busy Book Blue": {
-          "new_orders": 2,
-          "shipped": 2,
-          "delivered": 1,
-          "in_transit": 1,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 0,
-          "avg_tat": 3
-        },
-        "V2": {
-          "new_orders": 33,
-          "shipped": 33,
-          "delivered": 28,
-          "in_transit": 4,
-          "rto": 1,
-          "pending": 0,
-          "cancelled": 0,
-          "avg_tat": 4.3
-        },
-        "V6-V1 Combo": {
-          "new_orders": 3,
-          "shipped": 3,
-          "delivered": 3,
-          "in_transit": 0,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 0,
-          "avg_tat": 5.7
-        },
-        "V4": {
-          "new_orders": 7,
-          "shipped": 7,
-          "delivered": 7,
-          "in_transit": 0,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 0,
-          "avg_tat": 3.9
-        },
-        "V1": {
-          "new_orders": 9,
-          "shipped": 8,
-          "delivered": 8,
-          "in_transit": 0,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 1,
-          "avg_tat": 3.8
-        },
-        "V9": {
-          "new_orders": 23,
-          "shipped": 21,
-          "delivered": 19,
-          "in_transit": 2,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 2,
-          "avg_tat": 3.8
-        },
-        "V2-V4 Combo": {
-          "new_orders": 3,
-          "shipped": 1,
-          "delivered": 0,
-          "in_transit": 0,
-          "rto": 1,
-          "pending": 0,
-          "cancelled": 2,
-          "avg_tat": 0
-        },
-        "Krishna": {
-          "new_orders": 14,
-          "shipped": 14,
-          "delivered": 10,
-          "in_transit": 4,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 0,
-          "avg_tat": 5.7
-        },
-        "Busy Book Pink": {
-          "new_orders": 5,
-          "shipped": 5,
-          "delivered": 5,
-          "in_transit": 0,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 0,
-          "avg_tat": 4.8
-        },
-        "V3": {
-          "new_orders": 2,
-          "shipped": 2,
-          "delivered": 2,
-          "in_transit": 0,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 0,
-          "avg_tat": 4
-        },
-        "Hanuman": {
-          "new_orders": 4,
-          "shipped": 4,
-          "delivered": 4,
-          "in_transit": 0,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 0,
-          "avg_tat": 4.5
-        },
-        "Tank": {
-          "new_orders": 1,
-          "shipped": 1,
-          "delivered": 1,
-          "in_transit": 0,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 0,
-          "avg_tat": 5
-        }
-      }
-    },
-    "2026-04-02": {
-      "new_orders": 174,
-      "new_value": 204679.7,
-      "pending": 2,
-      "pending_value": 2198.0,
-      "shipped": 164,
-      "shipped_value": 192359.5,
-      "delivered": 74,
-      "delivered_value": 85211.85,
-      "in_transit": 88,
-      "rto": 2,
-      "cancelled": 8,
-      "avg_tat_days": 4.1,
-      "products": {
-        "Krishna": {
-          "new_orders": 35,
-          "shipped": 33,
-          "delivered": 12,
-          "in_transit": 21,
-          "rto": 0,
-          "pending": 1,
-          "cancelled": 1,
-          "avg_tat": 5.8
-        },
-        "V2": {
-          "new_orders": 33,
-          "shipped": 33,
-          "delivered": 24,
-          "in_transit": 8,
-          "rto": 1,
-          "pending": 0,
-          "cancelled": 0,
-          "avg_tat": 3.9
-        },
-        "Car": {
-          "new_orders": 27,
-          "shipped": 22,
-          "delivered": 5,
-          "in_transit": 17,
-          "rto": 0,
-          "pending": 1,
-          "cancelled": 4,
-          "avg_tat": 4.8
-        },
-        "V6": {
-          "new_orders": 37,
-          "shipped": 36,
-          "delivered": 1,
-          "in_transit": 35,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 1,
-          "avg_tat": 3
-        },
-        "V1": {
-          "new_orders": 4,
-          "shipped": 4,
-          "delivered": 4,
-          "in_transit": 0,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 0,
-          "avg_tat": 3.8
-        },
-        "V3": {
-          "new_orders": 2,
-          "shipped": 1,
-          "delivered": 1,
-          "in_transit": 0,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 1,
-          "avg_tat": 1
-        },
-        "Tank": {
-          "new_orders": 8,
-          "shipped": 8,
-          "delivered": 8,
-          "in_transit": 0,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 0,
-          "avg_tat": 3.3
-        },
-        "V2-V4 Combo": {
-          "new_orders": 1,
-          "shipped": 1,
-          "delivered": 1,
-          "in_transit": 0,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 0,
-          "avg_tat": 3
-        },
-        "V4": {
-          "new_orders": 7,
-          "shipped": 7,
-          "delivered": 6,
-          "in_transit": 0,
-          "rto": 1,
-          "pending": 0,
-          "cancelled": 0,
-          "avg_tat": 4.2
-        },
-        "V9": {
-          "new_orders": 12,
-          "shipped": 12,
-          "delivered": 10,
-          "in_transit": 2,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 0,
-          "avg_tat": 3.4
-        },
-        "Busy Book Blue": {
-          "new_orders": 2,
-          "shipped": 2,
-          "delivered": 1,
-          "in_transit": 1,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 0,
-          "avg_tat": 2
-        },
-        "Hanuman": {
-          "new_orders": 1,
-          "shipped": 1,
-          "delivered": 0,
-          "in_transit": 1,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 0,
-          "avg_tat": 0
-        },
-        "Other": {
-          "new_orders": 3,
-          "shipped": 2,
-          "delivered": 1,
-          "in_transit": 1,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 1,
-          "avg_tat": 3
-        },
-        "V6-V1 Combo": {
-          "new_orders": 1,
-          "shipped": 1,
-          "delivered": 0,
-          "in_transit": 1,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 0,
-          "avg_tat": 0
-        },
-        "V1-V4 Combo": {
-          "new_orders": 1,
-          "shipped": 1,
-          "delivered": 0,
-          "in_transit": 1,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 0,
-          "avg_tat": 0
-        }
-      }
-    },
-    "2026-04-03": {
-      "new_orders": 190,
-      "new_value": 225703.65,
-      "pending": 2,
-      "pending_value": 5636.2,
-      "shipped": 180,
-      "shipped_value": 210092.7,
-      "delivered": 60,
-      "delivered_value": 73358.1,
-      "in_transit": 118,
-      "rto": 2,
-      "cancelled": 8,
-      "avg_tat_days": 4.3,
-      "products": {
-        "V6": {
-          "new_orders": 48,
-          "shipped": 45,
-          "delivered": 0,
-          "in_transit": 45,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 3,
-          "avg_tat": 0
-        },
-        "Krishna": {
-          "new_orders": 49,
-          "shipped": 47,
-          "delivered": 18,
-          "in_transit": 29,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 2,
-          "avg_tat": 4.8
-        },
-        "V9": {
-          "new_orders": 12,
-          "shipped": 12,
-          "delivered": 8,
-          "in_transit": 4,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 0,
-          "avg_tat": 3.5
-        },
-        "Car": {
-          "new_orders": 33,
-          "shipped": 33,
-          "delivered": 10,
-          "in_transit": 22,
-          "rto": 1,
-          "pending": 0,
-          "cancelled": 0,
-          "avg_tat": 4.7
-        },
-        "V1": {
-          "new_orders": 7,
-          "shipped": 7,
-          "delivered": 5,
-          "in_transit": 1,
-          "rto": 1,
-          "pending": 0,
-          "cancelled": 0,
-          "avg_tat": 4
-        },
-        "V10": {
-          "new_orders": 4,
-          "shipped": 3,
-          "delivered": 2,
-          "in_transit": 1,
-          "rto": 0,
-          "pending": 1,
-          "cancelled": 0,
-          "avg_tat": 4
-        },
-        "Tank": {
-          "new_orders": 2,
-          "shipped": 2,
-          "delivered": 1,
-          "in_transit": 1,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 0,
-          "avg_tat": 5
-        },
-        "V2": {
-          "new_orders": 19,
-          "shipped": 19,
-          "delivered": 13,
-          "in_transit": 6,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 0,
-          "avg_tat": 3.8
-        },
-        "Busy Book Pink": {
-          "new_orders": 3,
-          "shipped": 2,
-          "delivered": 1,
-          "in_transit": 1,
-          "rto": 0,
-          "pending": 1,
-          "cancelled": 0,
-          "avg_tat": 5
-        },
-        "V6-V1 Combo": {
-          "new_orders": 5,
-          "shipped": 5,
-          "delivered": 0,
-          "in_transit": 5,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 0,
-          "avg_tat": 0
-        },
-        "Busy Book Blue": {
-          "new_orders": 1,
-          "shipped": 1,
-          "delivered": 0,
-          "in_transit": 1,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 0,
-          "avg_tat": 0
-        },
-        "Hanuman": {
-          "new_orders": 2,
-          "shipped": 1,
-          "delivered": 1,
-          "in_transit": 0,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 1,
-          "avg_tat": 4
-        },
-        "V3": {
-          "new_orders": 2,
-          "shipped": 1,
-          "delivered": 1,
-          "in_transit": 0,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 1,
-          "avg_tat": 3
-        },
-        "V4": {
-          "new_orders": 2,
-          "shipped": 1,
-          "delivered": 0,
-          "in_transit": 1,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 1,
-          "avg_tat": 0
-        },
-        "V4- P of 3": {
-          "new_orders": 1,
-          "shipped": 1,
-          "delivered": 0,
-          "in_transit": 1,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 0,
-          "avg_tat": 0
-        }
-      }
-    },
-    "2026-04-04": {
-      "new_orders": 170,
-      "new_value": 207534.77,
-      "pending": 2,
-      "pending_value": 2198.0,
-      "shipped": 163,
-      "shipped_value": 196041.72,
-      "delivered": 30,
-      "delivered_value": 35810.77,
-      "in_transit": 133,
-      "rto": 0,
-      "cancelled": 5,
-      "avg_tat_days": 3.6,
-      "products": {
-        "Tank": {
-          "new_orders": 3,
-          "shipped": 3,
-          "delivered": 2,
-          "in_transit": 1,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 0,
-          "avg_tat": 3
-        },
-        "V6": {
-          "new_orders": 38,
-          "shipped": 37,
-          "delivered": 0,
-          "in_transit": 37,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 1,
-          "avg_tat": 0
-        },
-        "V2": {
-          "new_orders": 15,
-          "shipped": 15,
-          "delivered": 6,
-          "in_transit": 9,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 0,
-          "avg_tat": 3.5
-        },
-        "Car": {
-          "new_orders": 52,
-          "shipped": 51,
-          "delivered": 5,
-          "in_transit": 46,
-          "rto": 0,
-          "pending": 1,
-          "cancelled": 0,
-          "avg_tat": 4
-        },
-        "V1": {
-          "new_orders": 7,
-          "shipped": 5,
-          "delivered": 2,
-          "in_transit": 3,
-          "rto": 0,
-          "pending": 1,
-          "cancelled": 1,
-          "avg_tat": 4
-        },
-        "Krishna": {
-          "new_orders": 23,
-          "shipped": 23,
-          "delivered": 5,
-          "in_transit": 18,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 0,
-          "avg_tat": 3.8
-        },
-        "V9": {
-          "new_orders": 12,
-          "shipped": 11,
-          "delivered": 4,
-          "in_transit": 7,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 1,
-          "avg_tat": 3.5
-        },
-        "V9-V10 Combo": {
-          "new_orders": 1,
-          "shipped": 1,
-          "delivered": 0,
-          "in_transit": 1,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 0,
-          "avg_tat": 0
-        },
-        "Hanuman": {
-          "new_orders": 3,
-          "shipped": 3,
-          "delivered": 0,
-          "in_transit": 3,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 0,
-          "avg_tat": 0
-        },
-        "Busy Book Pink": {
-          "new_orders": 4,
-          "shipped": 3,
-          "delivered": 1,
-          "in_transit": 2,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 1,
-          "avg_tat": 4
-        },
-        "Busy Book Blue": {
-          "new_orders": 1,
-          "shipped": 1,
-          "delivered": 1,
-          "in_transit": 0,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 0,
-          "avg_tat": 3
-        },
-        "V6- P of 2": {
-          "new_orders": 2,
-          "shipped": 2,
-          "delivered": 0,
-          "in_transit": 2,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 0,
-          "avg_tat": 0
-        },
-        "V10": {
-          "new_orders": 2,
-          "shipped": 2,
-          "delivered": 2,
-          "in_transit": 0,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 0,
-          "avg_tat": 4
-        },
-        "V6-V1 Combo": {
-          "new_orders": 2,
-          "shipped": 2,
-          "delivered": 0,
-          "in_transit": 2,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 0,
-          "avg_tat": 0
-        },
-        "V3": {
-          "new_orders": 2,
-          "shipped": 1,
-          "delivered": 1,
-          "in_transit": 0,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 1,
-          "avg_tat": 3
-        },
-        "V4": {
-          "new_orders": 3,
-          "shipped": 3,
-          "delivered": 1,
-          "in_transit": 2,
-          "rto": 0,
-          "pending": 0,
-          "cancelled": 0,
-          "avg_tat": 1
-        }
-      }
     }
   },
-  "shiprocket_synced": "2026-04-09T06:12"
+  "shiprocket_synced": "2026-04-09T09:54"
 }
