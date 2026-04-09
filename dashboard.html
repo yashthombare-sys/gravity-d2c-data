@@ -554,6 +554,19 @@
     </div>
   </div>
 
+  <!-- Daily Profit Trend (collapsible) -->
+  <div class="section">
+    <div class="section-title" style="cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px;" onclick="toggleSection('profitChartCollapse','profitChartChevron')">
+      Daily Profit Trend by Category
+      <svg id="profitChartChevron" width="16" height="16" viewBox="0 0 16 16" fill="none" style="transition:transform 0.3s ease;transform:rotate(0deg);">
+        <path d="M4 6l4 4 4-4" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div id="profitChartCollapse" style="max-height:0;overflow:hidden;transition:max-height 0.4s ease;">
+      <div class="chart-card" style="margin-top:8px;"><canvas id="mtdProfitTrendChart" height="120"></canvas></div>
+    </div>
+  </div>
+
   <!-- Daily Table (collapsible) -->
   <div class="section">
     <div class="section-title" style="cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px;" onclick="toggleSection('tableCollapse','tableChevron')">
@@ -2676,6 +2689,37 @@ function renderMTD() {
       }
     });
   } catch(e) { console.error('MTD Rev/Profit chart error:', e); }
+
+  // ── MTD Profit Trend Chart (stacked by category) ──
+  try {
+    if (window._mtdCharts['mtdProfitTrendChart']) { window._mtdCharts['mtdProfitTrendChart'].destroy(); window._mtdCharts['mtdProfitTrendChart'] = null; }
+    const ptLabels = monthDates.map(d => parseInt(d.split('-')[2]));
+    const bbProfTrend = monthDates.map(d => Math.round((d2c_bb[d]||{}).profit||0));
+    const stemProfTrend = monthDates.map(d => Math.round((d2c_stem[d]||{}).profit||0));
+    const softProfTrend = monthDates.map(d => Math.round((d2c_soft[d]||{}).profit||0));
+    const amzProfTrend = monthDates.map(d => Math.round((amz[d]||{}).profit||0));
+    const ptDatasets = [
+      { label: 'Busy Board', data: bbProfTrend, backgroundColor: '#FCBB13', borderRadius: 2 },
+      { label: 'STEM', data: stemProfTrend, backgroundColor: '#22c55e', borderRadius: 2 },
+      { label: 'Soft Toy', data: softProfTrend, backgroundColor: '#a78bfa', borderRadius: 2 },
+    ];
+    if (channel === 'combined') ptDatasets.push({ label: 'Amazon', data: amzProfTrend, backgroundColor: '#3b82f6', borderRadius: 2 });
+    window._mtdCharts['mtdProfitTrendChart'] = new Chart(document.getElementById('mtdProfitTrendChart'), {
+      type: 'bar',
+      data: { labels: ptLabels, datasets: ptDatasets },
+      options: {
+        responsive: true,
+        scales: {
+          x: { stacked: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8a94a6' } },
+          y: { stacked: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8a94a6', callback: function(v) { return v >= 100000 ? '₹'+(v/100000).toFixed(1)+'L' : v <= -100000 ? '-₹'+(-v/100000).toFixed(1)+'L' : '₹'+(v/1000).toFixed(0)+'K'; } } }
+        },
+        plugins: {
+          legend: { labels: { color: '#e8ecf1', usePointStyle: true, pointStyle: 'circle' } },
+          tooltip: { callbacks: { label: function(ctx) { return ctx.dataset.label + ': ₹' + (Math.abs(ctx.raw) >= 100000 ? (ctx.raw/100000).toFixed(2)+'L' : (ctx.raw/1000).toFixed(1)+'K'); } } }
+        }
+      }
+    });
+  } catch(e) { console.error('MTD Profit Trend chart error:', e); }
 
   // ── Daily Table ──
   const tbody = document.getElementById('mtdTableBody');
