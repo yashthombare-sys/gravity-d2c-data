@@ -541,6 +541,11 @@
     <div class="chart-card"><h3 id="mtdChartTitle"></h3><canvas id="mtdTrendChart" height="80"></canvas></div>
   </div>
 
+  <!-- MTD Revenue & Profit Chart -->
+  <div class="section">
+    <div class="section-title">MTD Revenue & Profit</div>
+    <div class="chart-card"><canvas id="mtdRevProfitChart" height="120"></canvas></div>
+  </div>
 
   <!-- Daily Table -->
   <div class="section">
@@ -2612,7 +2617,36 @@ function renderMTD() {
       (channel==='combined' ? '<span><span class="sub-label">Amazon</span><span class="sub-val">' + amzRoas + '</span></span>' : ''));
   // (old hidden chart removed)
 
-  // Category Analytics Charts removed
+  // ── MTD Revenue & Profit Chart ──
+  try {
+    if (!window._mtdCharts) window._mtdCharts = {};
+    if (window._mtdCharts['mtdRevProfitChart']) { window._mtdCharts['mtdRevProfitChart'].destroy(); window._mtdCharts['mtdRevProfitChart'] = null; }
+    const rpLabels = monthDates.map(d => parseInt(d.split('-')[2]));
+    const rpRevData = monthDates.map(d => Math.round(getDay(d).revenue));
+    const rpProfData = monthDates.map(d => Math.round(getDay(d).profit));
+    const rpProfColors = rpProfData.map(v => v >= 0 ? '#22c55e' : '#ef4444');
+    window._mtdCharts['mtdRevProfitChart'] = new Chart(document.getElementById('mtdRevProfitChart'), {
+      type: 'bar',
+      data: {
+        labels: rpLabels,
+        datasets: [
+          { label: 'Revenue', data: rpRevData, backgroundColor: '#FCBB13', borderRadius: 3, order: 2 },
+          { label: 'Profit', data: rpProfData, backgroundColor: rpProfColors, borderRadius: 3, order: 1 }
+        ]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8a94a6' } },
+          y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8a94a6', callback: function(v) { return v >= 100000 ? '₹'+(v/100000).toFixed(1)+'L' : '₹'+(v/1000).toFixed(0)+'K'; } } }
+        },
+        plugins: {
+          legend: { labels: { color: '#e8ecf1', usePointStyle: true, pointStyle: 'circle' } },
+          tooltip: { callbacks: { label: function(ctx) { return ctx.dataset.label + ': ₹' + (ctx.raw >= 100000 ? (ctx.raw/100000).toFixed(2)+'L' : (ctx.raw/1000).toFixed(1)+'K'); } } }
+        }
+      }
+    });
+  } catch(e) { console.error('MTD Rev/Profit chart error:', e); }
 
   // ── Daily Table ──
   const tbody = document.getElementById('mtdTableBody');
