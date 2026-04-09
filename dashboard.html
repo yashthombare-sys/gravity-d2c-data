@@ -3269,13 +3269,14 @@ function renderShiprocket() {
 
     const allDates = Object.keys(sr).sort();
 
-    // Initialize SR calendar with latest month's range (once)
+    // Initialize SR calendar with last 30 days (once)
     if (!_srMonthInit) {
-      const latestMonth = [...new Set(allDates.map(d => d.substring(0,7)))].sort().pop();
-      const latestDates = allDates.filter(d => d.startsWith(latestMonth));
-      srCalStart = latestDates[0];
-      srCalEnd = latestDates[latestDates.length - 1];
-      const sd = new Date(srCalStart + 'T00:00:00');
+      srCalEnd = allDates[allDates.length - 1];
+      var last30 = new Date(srCalEnd + 'T00:00:00');
+      last30.setDate(last30.getDate() - 29);
+      srCalStart = last30.toISOString().split('T')[0];
+      if (srCalStart < allDates[0]) srCalStart = allDates[0];
+      var sd = new Date(srCalEnd + 'T00:00:00');
       srCalYear = sd.getFullYear();
       srCalMonth = sd.getMonth();
       document.getElementById('srDateFrom').value = srCalStart;
