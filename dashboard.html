@@ -783,15 +783,24 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 
   <!-- Urgent Ship Now Alert -->
-  <div id="srUrgentAlert" style="display:none;margin-bottom:16px;padding:16px 18px;background:rgba(239,68,68,0.05);border:1.5px solid rgba(239,68,68,0.25);border-radius:14px;">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-      <span style="font-size:13px;font-weight:800;color:#ef4444;text-transform:uppercase;letter-spacing:0.8px;">Urgent: Ship Now</span>
-      <span id="srUrgentTotal" style="font-size:13px;font-weight:800;color:var(--primary);margin-left:auto;"></span>
+  <div id="srUrgentAlert" style="display:none;margin-bottom:16px;background:var(--card);border:1px solid var(--border);border-left:4px solid #ef4444;border-radius:12px;overflow:hidden;">
+    <div style="padding:14px 16px 10px;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-size:12px;font-weight:800;color:#ef4444;text-transform:uppercase;letter-spacing:1px;">Urgent: Ship Now</div>
+      </div>
+      <span id="srUrgentTotal" style="font-size:12px;font-weight:700;color:var(--primary);background:rgba(252,187,19,0.1);padding:4px 10px;border-radius:6px;"></span>
     </div>
-    <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:2px 12px;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;padding-bottom:6px;border-bottom:1px solid rgba(239,68,68,0.15);margin-bottom:4px;">
-      <span>Product</span><span style="text-align:right;">Ship Days</span><span style="text-align:right;">Units</span><span style="text-align:right;">Stuck Rev</span>
+    <div style="padding:0 16px 12px;">
+      <table style="width:100%;font-size:11px;">
+        <thead><tr style="border-bottom:1px solid var(--border);">
+          <th style="text-align:left;padding:6px 0;font-size:9px;">Product</th>
+          <th style="text-align:right;padding:6px 0;font-size:9px;">Ship</th>
+          <th style="text-align:right;padding:6px 0;font-size:9px;">Units</th>
+          <th style="text-align:right;padding:6px 0;font-size:9px;">Stuck</th>
+        </tr></thead>
+        <tbody id="srUrgentProducts"></tbody>
+      </table>
     </div>
-    <div id="srUrgentProducts" style="font-size:12px;"></div>
   </div>
 
   <!-- 2. Slow SKUs Alert -->
@@ -3448,12 +3457,12 @@ function renderShiprocket() {
       urgentSkus.forEach(s => {
         var shipDayStr = s.avgShip > 0 ? s.avgShip + 'd' : '—';
         var shipDayColor = s.avgShip > 2 ? '#ef4444' : '#4ade80';
-        urgentHTML += '<div style="display:grid;grid-template-columns:1fr auto auto auto;gap:2px 12px;align-items:center;padding:6px 0;border-bottom:1px solid rgba(239,68,68,0.08);">';
-        urgentHTML += '<span style="color:#ef4444;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + s.name + '</span>';
-        urgentHTML += '<span style="text-align:right;color:' + shipDayColor + ';font-weight:700;">' + shipDayStr + '</span>';
-        urgentHTML += '<span style="text-align:right;color:var(--muted);font-weight:600;">' + s.unshipped + '</span>';
-        urgentHTML += '<span style="text-align:right;color:var(--primary);font-weight:700;">' + fmt(s.stuckRev) + '</span>';
-        urgentHTML += '</div>';
+        urgentHTML += '<tr style="border-bottom:1px solid var(--border);">';
+        urgentHTML += '<td style="padding:8px 0;font-weight:600;color:var(--text);max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + s.name + '</td>';
+        urgentHTML += '<td style="padding:8px 4px;text-align:right;color:' + shipDayColor + ';font-weight:700;">' + shipDayStr + '</td>';
+        urgentHTML += '<td style="padding:8px 4px;text-align:right;color:var(--muted);font-weight:600;">' + s.unshipped + '</td>';
+        urgentHTML += '<td style="padding:8px 0;text-align:right;color:var(--primary);font-weight:700;">' + fmt(s.stuckRev) + '</td>';
+        urgentHTML += '</tr>';
       });
       document.getElementById('srUrgentProducts').innerHTML = urgentHTML;
       urgentEl.style.display = '';
