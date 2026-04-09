@@ -11,6 +11,9 @@ from datetime import datetime, timedelta, date
 from collections import defaultdict
 from calendar import monthrange
 
+import gspread
+from google.oauth2.service_account import Credentials
+
 # Force unbuffered output (for GitHub Actions log visibility)
 sys.stdout.reconfigure(line_buffering=True)
 
@@ -23,6 +26,22 @@ from config import classify_status, classify_product, is_spare_part, CATS, load_
 API_BASE = "https://apiv2.shiprocket.in/v1/external"
 OUTPUT_FILE = os.path.join(BASE, "mtd_daily_data.json")
 DASHBOARD = os.path.join(BASE, "dashboard.html")
+
+# Google Sheets config
+CREDS_FILE = os.path.join(BASE, "shiproket-mis-70c28ae6e7fb.json")
+D2C_SHEET_URL = "https://docs.google.com/spreadsheets/d/1LfLi67xq8P1bxEAmJysQuci7vOOuqxEoYxTrYEab0yA/"
+FULFILLMENT_TAB = "Fulfillment"
+GSHEET_SCOPES = [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive",
+]
+
+FULFILLMENT_HEADERS = [
+    "Date", "New Orders", "New Value", "Pending", "Pending Value",
+    "Shipped", "Shipped Value", "Delivered", "Delivered Value",
+    "In Transit", "RTO", "Cancelled", "Avg TAT Days",
+    "Avg Ship Days", "Avg Deliver Days", "Products JSON",
+]
 
 
 def get_credentials():
@@ -391,6 +410,69 @@ def build_daily_data(orders, month_start, today):
     return result
 
 
+def _day_to_row(date_str, day_data):
+    """Convert a day's finalized data dict to a flat row for Google Sheets."""
+    return [
+        date_str,
+        day_data["new_orders"],
+        round(day_data["new_value"], 2),
+        day_data.get("pending", 0),
+        round(day_data.get("pending_value", 0), 2),
+        day_data["shipped"],
+        round(day_data.get("shipped_value", 0), 2),
+        day_data["delivered"],
+        round(day_data.get("delivered_value", 0), 2),
+        day_data.get("in_transit", 0),
+        day_data.get("rto", 0),
+        day_data.get("cancelled", 0),
+        day_data.get("avg_tat_days", 0),
+        day_data.get("avg_ship_days", 0),
+        day_data.get("avg_deliver_days", 0),
+        json.dumps(day_data.get("products", {})),
+    ]
+
+
+def write_to_fulfillment_sheet(all_daily_data):
+    """Write fulfillment data to the Fulfillment tab in Google Sheets."""
+    print("\n  Writing to Google Sheet (Fulfillment tab)...")
+    creds = Credentials.from_service_account_file(CREDS_FILE, scopes=GSHEET_SCOPES)
+    gc = gspread.authorize(creds)
+    sh = gc.open_by_url(D2C_SHEET_URL)
+
+    # Get or create Fulfillment tab
+    try:
+        ws = sh.worksheet(FULFILLMENT_TAB)
+    except gspread.exceptions.WorksheetNotFound:
+        ws = sh.add_worksheet(title=FULFILLMENT_TAB, rows=100, cols=len(FULFILLMENT_HEADERS))
+        print(f"  Created new '{FULFILLMENT_TAB}' tab")
+
+    # Read existing data to preserve dates not in current fetch
+    existing = ws.get_all_values()
+    existing_dates = {}
+    if len(existing) > 1:
+        for i, row in enumerate(existing[1:], start=2):  # 1-indexed, skip header
+            if row and row[0]:
+                existing_dates[row[0]] = i
+
+    # Build rows from API data
+    sorted_dates = sorted(all_daily_data.keys())
+    rows_to_write = [FULFILLMENT_HEADERS]
+    # Keep existing dates not covered by API
+    for row in existing[1:]:
+        if row and row[0] and row[0] not in all_daily_data:
+            rows_to_write.append(row)
+    # Add API data
+    for d in sorted_dates:
+        rows_to_write.append(_day_to_row(d, all_daily_data[d]))
+    # Sort all rows by date (skip header)
+    rows_to_write[1:] = sorted(rows_to_write[1:], key=lambda r: r[0])
+
+    # Clear and rewrite
+    ws.clear()
+    ws.update(range_name='A1', values=rows_to_write)
+    print(f"  Written {len(rows_to_write)-1} days to Fulfillment tab")
+
+
 def inject_into_dashboard(data):
     """Update MTD_DATA in dashboard.html to include shiprocket key."""
     if not os.path.exists(DASHBOARD):
@@ -474,16 +556,6 @@ def main():
     headers = build_headers(token)
     today = date.today()
 
-    # Load existing data (preserve old months)
-    if os.path.exists(OUTPUT_FILE):
-        with open(OUTPUT_FILE, "r") as f:
-            mtd_json = json.load(f)
-    else:
-        mtd_json = {}
-    # Save sheet-sourced fulfillment data (written by sync_mtd.py from Fulfillment tab)
-    # This serves as fallback if the Shiprocket API doesn't cover certain dates
-    sheet_sr = dict(mtd_json.get("shiprocket", {}))
-
     # Build list of months to fetch
     months_to_fetch = []
     if args.historical > 0:
@@ -523,42 +595,12 @@ def main():
         # Merge into all_daily_data (overwrite days in this month)
         all_daily_data.update(month_data)
 
-    # Merge: API data takes priority, sheet data (from sync_mtd.py) fills gaps
-    # This gives dual-source reliability — if API misses dates, sheet data survives
-    sheet_only = 0
-    for date_str, sheet_day in sheet_sr.items():
-        if date_str not in all_daily_data:
-            all_daily_data[date_str] = sheet_day
-            sheet_only += 1
-    if sheet_only:
-        print(f"\n  Merged {sheet_only} dates from Fulfillment sheet (not covered by API)")
-
-    # Safety check: prevent data loss if new data has far fewer dates than existing
-    existing_count = len(sheet_sr)
-    new_count = len(all_daily_data)
-    if existing_count > 10 and new_count < existing_count * 0.8:
-        print(f"\n  WARNING: Shiprocket dates reduced from {existing_count} to {new_count}")
-        print("   Keeping existing data to prevent loss.")
-        all_daily_data = sheet_sr  # fallback to sheet data entirely
-
-    # Add sync timestamp
-    mtd_json["shiprocket"] = all_daily_data
-    mtd_json["shiprocket_synced"] = datetime.now().strftime("%Y-%m-%dT%H:%M")
-
-    # Create backup before writing
-    if os.path.exists(OUTPUT_FILE):
-        shutil.copy2(OUTPUT_FILE, OUTPUT_FILE + ".bak")
-        print(f"  Backup saved to {OUTPUT_FILE}.bak")
-
-    with open(OUTPUT_FILE, "w") as f:
-        json.dump(mtd_json, f, indent=2)
+    # Write to Google Sheet (single source of truth)
+    write_to_fulfillment_sheet(all_daily_data)
 
     total_days = len(all_daily_data)
     months_covered = sorted(set(k[:7] for k in all_daily_data.keys()))
-    print(f"\n  Saved {total_days} days ({len(months_covered)} months) to {OUTPUT_FILE}")
-
-    # Inject into dashboard.html
-    inject_into_dashboard(all_daily_data)
+    print(f"\n  {total_days} days ({len(months_covered)} months) written to Google Sheet")
 
     print("\nDone.\n")
 
