@@ -2530,7 +2530,10 @@ function renderMTD() {
   }
 
   // MTD RTO calculations (RTO only applies to D2C categories, not Amazon)
-  const mtdRtoRevLoss = mtd.bb_rev*0.10 + mtd.stem_rev*0.20 + mtd.soft_rev*0.15;
+  const mtdRtoRevLoss = category === 'busyboard' ? mtd.bb_rev*0.10
+    : category === 'stem' ? mtd.stem_rev*0.20
+    : category === 'softtoy' ? mtd.soft_rev*0.15
+    : mtd.bb_rev*0.10 + mtd.stem_rev*0.20 + mtd.soft_rev*0.15;
   const mtdD2cRev = (mtd.bb_rev||0) + (mtd.stem_rev||0) + (mtd.soft_rev||0);
   const mtdD2cCogsPct = mtdD2cRev > 0 ? (mtd.cogs||0) / (channel==='combined' ? mtdD2cRev : mtd.revenue) : 0;
   const mtdRtoCogsSaved = mtdRtoRevLoss * mtdD2cCogsPct;
@@ -2607,7 +2610,10 @@ function renderMTD() {
   const dayEl = document.getElementById('mtdDayKpis');
   // RTO-adjusted profit: deduct revenue loss + shipping cost, add back COGS saved
   const RTO_RATES = { bb: 0.10, stem: 0.20, soft: 0.15 };
-  const selRtoRevLoss = sel.bb_rev * RTO_RATES.bb + sel.stem_rev * RTO_RATES.stem + sel.soft_rev * RTO_RATES.soft;
+  const selRtoRevLoss = category === 'busyboard' ? sel.bb_rev * RTO_RATES.bb
+    : category === 'stem' ? sel.stem_rev * RTO_RATES.stem
+    : category === 'softtoy' ? sel.soft_rev * RTO_RATES.soft
+    : sel.bb_rev * RTO_RATES.bb + sel.stem_rev * RTO_RATES.stem + sel.soft_rev * RTO_RATES.soft;
   const selCogsPct = sel.revenue > 0 ? (sel.cogs||0) / sel.revenue : 0;
   const selRtoCogsSaved = selRtoRevLoss * selCogsPct;
   const selAdjRev = sel.revenue - selRtoRevLoss;
@@ -2623,7 +2629,10 @@ function renderMTD() {
   // (for Combined: sel.revenue = D2C+Amz, RTO only deducts D2C categories)
 
   // Previous period RTO-adjusted profit
-  const prevRtoRevLoss = (prev.bb_rev||0) * RTO_RATES.bb + (prev.stem_rev||0) * RTO_RATES.stem + (prev.soft_rev||0) * RTO_RATES.soft;
+  const prevRtoRevLoss = category === 'busyboard' ? (prev.bb_rev||0) * RTO_RATES.bb
+    : category === 'stem' ? (prev.stem_rev||0) * RTO_RATES.stem
+    : category === 'softtoy' ? (prev.soft_rev||0) * RTO_RATES.soft
+    : (prev.bb_rev||0) * RTO_RATES.bb + (prev.stem_rev||0) * RTO_RATES.stem + (prev.soft_rev||0) * RTO_RATES.soft;
   const prevCogsPct = prev.revenue > 0 ? (prev.cogs||0) / prev.revenue : 0;
   const prevRtoCogsSaved = prevRtoRevLoss * prevCogsPct;
   const prevAdjProfit = prev.profit - prevRtoRevLoss + prevRtoCogsSaved;
