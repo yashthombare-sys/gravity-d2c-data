@@ -2522,7 +2522,7 @@ function renderMTD() {
       '<span><span class="sub-label">Busy Board</span><span class="sub-val">'+(mtd.bb_sessions||0).toLocaleString()+'</span></span>' +
       '<span><span class="sub-label">STEM</span><span class="sub-val">'+(mtd.stem_sessions||0).toLocaleString()+'</span></span>' +
       '<span><span class="sub-label">Soft Toy</span><span class="sub-val">'+(mtd.soft_sessions||0).toLocaleString()+'</span></span>') : '') +
-    mkMtdKpi('rev', 'MTD Revenue', fmt(mtd.revenue), '', monthDates.length+' days | '+fmt(mtd.revenue/n)+'/day', mtdBk('rev')) +
+    mkMtdKpi('rev', 'MTD Revenue', fmt(mtd.revenue), '', monthDates.length+' days | '+fmt(mtd.revenue/n)+'/day | <span style="font-size:8px;color:var(--muted)">MRR: '+fmt(mtd.revenue/n*30)+'</span>', mtdBk('rev')) +
     mkMtdKpi('orders', 'MTD Units', mtd.orders.toLocaleString(), '', Math.round(mtd.orders/n)+' units/day', mtdBk('orders', numFmtM)) +
     mkMtdKpi('ads', 'MTD Ad Spend <span style="font-size:8px;color:var(--muted);font-weight:400">(inc GST)</span>', fmt(mtd.ad_spend), '', fmt(mtd.ad_spend/n)+'/day | ROAS: '+mtdRoas, mtdBk('ads')) +
     mkMtdKpi('aov', 'MTD AOV', mtdAov, '', mtd.orders.toLocaleString()+' units',
