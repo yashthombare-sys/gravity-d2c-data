@@ -280,6 +280,31 @@ document.addEventListener('DOMContentLoaded', function() {
     .mtd-filters .filter-group:nth-child(4) { grid-column: 1 / -1; }
     .mtd-filters .filter-group:nth-child(4) .filter-label { font-size: 9px; text-align: center; opacity: 0.5; }
 
+    /* ── D2C Fulfillment TAT — mobile ── */
+    .sr-filters {
+      display: grid !important;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      align-items: end;
+    }
+    .sr-filters .filter-group { display: flex; flex-direction: column; gap: 3px; }
+    /* Product filter — full width */
+    .sr-filters .filter-group:nth-child(4) { grid-column: 1 / -1; }
+
+    /* TAT Overview cards */
+    #srTatOverview { gap: 8px !important; }
+    #srTatOverview > div { padding: 14px !important; border-radius: 12px !important; }
+    #srTatOverview [id$="Val"] { font-size: 28px !important; }
+
+    /* Urgent alert */
+    #srUrgentAlert { border-radius: 10px !important; }
+    #srUrgentAlert table { font-size: 10px; }
+    #srUrgentAlert th { font-size: 8px !important; }
+    #srUrgentAlert td { padding: 6px 0 !important; font-size: 11px; }
+
+    /* Sync bar */
+    #srSyncBar { font-size: 10px; padding: 6px 10px; gap: 8px; border-radius: 8px; }
+
     /* Calendar popup */
     .cal-popup { left: 0; right: 0; width: auto; max-width: 95vw; }
   }
@@ -697,7 +722,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- ═══════ FULFILLMENT VIEW ═══════ -->
 <div class="container" id="srView" style="display:none;">
   <!-- Filters -->
-  <div class="filter-bar">
+  <div class="filter-bar sr-filters">
     <div class="filter-group" style="position:relative;">
       <span class="filter-label">Select Date</span>
       <button class="filter-select" id="srDateBtn" onclick="toggleSrCalendar()" style="cursor:pointer;min-width:140px;text-align:left;">—</button>
