@@ -2664,7 +2664,7 @@ function renderMTD() {
       rpDatasets.push(Object.assign({ label: 'Profit', data: monthDates.map(d => Math.round((d2c_bb[d]||{}).profit||0)) }, profitLine));
       rpDatasets.push(Object.assign({ label: 'Ad Spend', data: monthDates.map(d => Math.round((d2c_bb[d]||{}).ad_spend||0)) }, adSpendLine));
     } else if (category === 'stem') {
-      rpDatasets.push({ label: 'Revenue', data: monthDates.map(d => Math.round((d2c_stem[d]||{}).revenue||0)), backgroundColor: '#22c55e', borderRadius: 2, order: 2 });
+      rpDatasets.push({ label: 'Revenue', data: monthDates.map(d => Math.round((d2c_stem[d]||{}).revenue||0)), backgroundColor: '#3b82f6', borderRadius: 2, order: 2 });
       rpDatasets.push(Object.assign({ label: 'Profit', data: monthDates.map(d => Math.round((d2c_stem[d]||{}).profit||0)) }, profitLine));
       rpDatasets.push(Object.assign({ label: 'Ad Spend', data: monthDates.map(d => Math.round((d2c_stem[d]||{}).ad_spend||0)) }, adSpendLine));
     } else if (category === 'softtoy') {
@@ -2673,7 +2673,7 @@ function renderMTD() {
       rpDatasets.push(Object.assign({ label: 'Ad Spend', data: monthDates.map(d => Math.round((d2c_soft[d]||{}).ad_spend||0)) }, adSpendLine));
     } else {
       rpDatasets.push({ label: 'Busy Board', data: monthDates.map(d => Math.round((d2c_bb[d]||{}).revenue||0)), backgroundColor: '#FCBB13', borderRadius: 2 });
-      rpDatasets.push({ label: 'STEM', data: monthDates.map(d => Math.round((d2c_stem[d]||{}).revenue||0)), backgroundColor: '#22c55e', borderRadius: 2 });
+      rpDatasets.push({ label: 'STEM', data: monthDates.map(d => Math.round((d2c_stem[d]||{}).revenue||0)), backgroundColor: '#3b82f6', borderRadius: 2 });
       rpDatasets.push({ label: 'Soft Toy', data: monthDates.map(d => Math.round((d2c_soft[d]||{}).revenue||0)), backgroundColor: '#a78bfa', borderRadius: 2 });
       if (channel === 'combined') rpDatasets.push({ label: 'Amazon', data: monthDates.map(d => Math.round((amz[d]||{}).revenue||0)), backgroundColor: '#3b82f6', borderRadius: 2 });
     }
@@ -2704,12 +2704,12 @@ function renderMTD() {
     } else if (category === 'busyboard') {
       ptDatasets.push({ label: 'Busy Board', data: monthDates.map(d => Math.round((d2c_bb[d]||{}).profit||0)), backgroundColor: '#FCBB13', borderRadius: 2 });
     } else if (category === 'stem') {
-      ptDatasets.push({ label: 'STEM', data: monthDates.map(d => Math.round((d2c_stem[d]||{}).profit||0)), backgroundColor: '#22c55e', borderRadius: 2 });
+      ptDatasets.push({ label: 'STEM', data: monthDates.map(d => Math.round((d2c_stem[d]||{}).profit||0)), backgroundColor: '#3b82f6', borderRadius: 2 });
     } else if (category === 'softtoy') {
       ptDatasets.push({ label: 'Soft Toy', data: monthDates.map(d => Math.round((d2c_soft[d]||{}).profit||0)), backgroundColor: '#a78bfa', borderRadius: 2 });
     } else {
       ptDatasets.push({ label: 'Busy Board', data: monthDates.map(d => Math.round((d2c_bb[d]||{}).profit||0)), backgroundColor: '#FCBB13', borderRadius: 2 });
-      ptDatasets.push({ label: 'STEM', data: monthDates.map(d => Math.round((d2c_stem[d]||{}).profit||0)), backgroundColor: '#22c55e', borderRadius: 2 });
+      ptDatasets.push({ label: 'STEM', data: monthDates.map(d => Math.round((d2c_stem[d]||{}).profit||0)), backgroundColor: '#3b82f6', borderRadius: 2 });
       ptDatasets.push({ label: 'Soft Toy', data: monthDates.map(d => Math.round((d2c_soft[d]||{}).profit||0)), backgroundColor: '#a78bfa', borderRadius: 2 });
       if (channel === 'combined') ptDatasets.push({ label: 'Amazon', data: monthDates.map(d => Math.round((amz[d]||{}).profit||0)), backgroundColor: '#3b82f6', borderRadius: 2 });
     }
