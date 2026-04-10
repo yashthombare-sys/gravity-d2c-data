@@ -329,7 +329,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   /* Filter Dropdowns */
-  .filter-bar { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; }
+  .filter-bar { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; position: relative; z-index: 100; }
   .filter-group { display: flex; align-items: center; gap: 6px; position: relative; z-index: 10; }
   .filter-label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; white-space: nowrap; }
   .filter-select {
@@ -508,7 +508,7 @@ document.addEventListener('DOMContentLoaded', function() {
   .vt-btn:hover:not(.active) { background: rgba(252,187,19,0.1); color: var(--text); }
 
   /* MTD View */
-  .mtd-header { margin-bottom: 20px; }
+  .mtd-header { margin-bottom: 20px; position: relative; z-index: 100; }
   .mtd-filters { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
   .mtd-filters .filter-group { display: flex; align-items: center; gap: 6px; }
   /* Custom Calendar Popup */
