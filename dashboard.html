@@ -88,11 +88,10 @@ document.addEventListener('DOMContentLoaded', function() {
   .kpi-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-bottom: 24px; }
   .kpi {
     background: var(--card); border-radius: 12px; padding: 14px 12px;
-    border: 1px solid var(--border); transition: all 0.2s;
+    border: 1px solid var(--border); transition: all 0.25s cubic-bezier(0.22,1,0.36,1);
     min-height: 110px; display: flex; flex-direction: column; justify-content: center;
     position: relative; z-index: 1;
   }
-  .kpi:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(252,187,19,0.08); }
   .kpi.clickable { cursor: pointer; }
   .kpi.clickable .kpi-label::after { content: ' ⇄'; font-size: 8px; opacity: 0.4; }
   .kpi.clickable:active { transform: scale(0.97); }
@@ -220,7 +219,7 @@ document.addEventListener('DOMContentLoaded', function() {
       -webkit-tap-highlight-color: transparent;
       box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     }
-    .kpi:hover { transform: none; }
+    .kpi:hover { transform: none !important; box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important; }
     .kpi-value { font-size: 24px; font-weight: 800; line-height: 1.1; }
     .kpi-label { font-size: 10px; letter-spacing: 1px; margin-bottom: 5px; }
     .kpi-per { font-size: 10px; margin-top: 5px; line-height: 1.4; }
@@ -555,10 +554,6 @@ document.addEventListener('DOMContentLoaded', function() {
     from { opacity: 0; transform: translateY(18px); }
     to   { opacity: 1; transform: translateY(0); }
   }
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-  }
   @keyframes slideDown {
     from { opacity: 0; transform: translateY(-12px); }
     to   { opacity: 1; transform: translateY(0); }
@@ -578,13 +573,15 @@ document.addEventListener('DOMContentLoaded', function() {
   .kpi-row.anim-visible .kpi:nth-child(7) { animation-delay: 0.36s; }
   .kpi-row.anim-visible .kpi:nth-child(8) { animation-delay: 0.42s; }
 
-  /* KPI hover: scale + gold glow */
-  .kpi:hover {
-    transform: translateY(-3px) scale(1.025) !important;
-    box-shadow: 0 8px 28px rgba(252,187,19,0.15), 0 0 12px rgba(252,187,19,0.08) !important;
-    border-color: var(--primary) !important;
+  /* KPI hover: scale + gold glow (only for pointer devices) */
+  @media (hover: hover) {
+    .kpi:hover {
+      transform: translateY(-3px) scale(1.025);
+      box-shadow: 0 8px 28px rgba(252,187,19,0.15), 0 0 12px rgba(252,187,19,0.08);
+      border-color: var(--primary);
+    }
   }
-  .kpi { transition: all 0.25s cubic-bezier(0.22,1,0.36,1) !important; }
+  .kpi.clickable:active { transform: scale(0.97) !important; }
 
   /* Scroll-triggered: table rows */
   .table-wrap tbody tr { transition: opacity 0.35s ease, transform 0.35s ease; }
@@ -606,22 +603,27 @@ document.addEventListener('DOMContentLoaded', function() {
   .chart-card.anim-pending { opacity: 0; }
   .chart-card.anim-visible { animation: fadeSlideUp 0.5s cubic-bezier(0.22,1,0.36,1) both; }
 
-  /* Scroll-triggered: section cards (urgent alert, TAT overview, etc.) */
+  /* Scroll-triggered: section cards */
   .section { transition: opacity 0.45s ease, transform 0.45s ease; }
   .section.anim-pending { opacity: 0; transform: translateY(14px); }
   .section.anim-visible { opacity: 1; transform: translateY(0); }
 
-  /* Filter bar: slide down on load */
-  .mtd-filters { animation: slideDown 0.5s cubic-bezier(0.22,1,0.36,1) 0.1s both; }
-  .sr-filters  { animation: slideDown 0.5s cubic-bezier(0.22,1,0.36,1) 0.1s both; }
+  /* Filter bar: slide down (triggered by JS class, not unconditional) */
+  .filters-animate { animation: slideDown 0.5s cubic-bezier(0.22,1,0.36,1) 0.1s both; }
 
   /* Collapsible sections: smooth height + content fade */
   [id$="Collapse"] { transition: max-height 0.4s cubic-bezier(0.22,1,0.36,1), opacity 0.3s ease; }
-  [id$="Collapse"][style*="max-height: 0"] { opacity: 0; }
-  [id$="Collapse"][style*="max-height: 0px"] { opacity: 0; }
+  [id$="Collapse"][style*="max-height:0"],
+  [id$="Collapse"][style*="max-height: 0"],
+  [id$="Collapse"][style*="max-height: 0px"],
+  [id$="Collapse"][style*="max-height:0px"] { opacity: 0; }
 
   /* Chevron rotation smoothing */
   [id$="Chevron"] { transition: transform 0.35s cubic-bezier(0.22,1,0.36,1) !important; }
+
+  /* Suppress tap highlight on all interactive elements */
+  .kpi, .tab-btn, .vt-btn, .filter-select, .cal-day, .cal-preset,
+  .month-multi-btn, .cal-btn, .section-title { -webkit-tap-highlight-color: transparent; }
 
   /* Reduce motion for accessibility */
   @media (prefers-reduced-motion: reduce) {
@@ -751,7 +753,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <path d="M4 6l4 4 4-4" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
-    <div id="dayKpiCollapse" style="overflow:hidden;transition:max-height 0.4s ease;max-height:none;">
+    <div id="dayKpiCollapse" style="overflow:hidden;max-height:none;">
       <div class="kpi-row" id="mtdDayKpis" style="grid-template-columns:repeat(7,1fr);gap:8px;padding-top:8px;"></div>
     </div>
   </div>
@@ -764,7 +766,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <path d="M4 6l4 4 4-4" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
-    <div id="mtdKpiCollapse" style="max-height:0;overflow:hidden;transition:max-height 0.4s ease;">
+    <div id="mtdKpiCollapse" style="max-height:0;overflow:hidden;">
       <div class="kpi-row" id="mtdKpiRow" style="grid-template-columns:repeat(8,1fr);gap:8px;padding-top:8px;"></div>
     </div>
   </div>
@@ -777,7 +779,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <path d="M4 6l4 4 4-4" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
-    <div id="chartCollapse" style="max-height:0;overflow:hidden;transition:max-height 0.4s ease;">
+    <div id="chartCollapse" style="max-height:0;overflow:hidden;">
       <div class="chart-card" style="margin-top:8px;"><canvas id="mtdRevProfitChart" height="120"></canvas></div>
     </div>
   </div>
@@ -790,7 +792,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <path d="M4 6l4 4 4-4" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
-    <div id="tableCollapse" style="max-height:0;overflow:hidden;transition:max-height 0.4s ease;">
+    <div id="tableCollapse" style="max-height:0;overflow:hidden;">
       <div class="table-wrap" style="margin-top:8px;">
         <table><thead><tr>
           <th>Date</th><th>D2C Rev</th><th>D2C Units</th><th>D2C Ads</th>
@@ -919,7 +921,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <path d="M4 6l4 4 4-4" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
-    <div id="srSlowSkuCollapse" style="overflow:hidden;transition:max-height 0.4s ease;max-height:0;">
+    <div id="srSlowSkuCollapse" style="overflow:hidden;max-height:0;">
       <div class="table-wrap" style="margin-top:8px;">
         <table><thead><tr>
           <th>Product</th><th>Ship Days</th><th>Del Days</th><th>Unshipped</th><th>Stuck Revenue</th>
@@ -936,7 +938,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <path d="M4 6l4 4 4-4" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
-    <div id="srTatTrendCollapse" style="max-height:0;overflow:hidden;transition:max-height 0.4s ease;">
+    <div id="srTatTrendCollapse" style="max-height:0;overflow:hidden;">
       <div class="chart-card" style="margin-top:8px;"><canvas id="srTatTrendChart" height="120"></canvas></div>
     </div>
   </div>
@@ -949,7 +951,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <path d="M4 6l4 4 4-4" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
-    <div id="srSkuTableCollapse" style="max-height:0;overflow:hidden;transition:max-height 0.4s ease;">
+    <div id="srSkuTableCollapse" style="max-height:0;overflow:hidden;">
       <div class="table-wrap" style="margin-top:8px;">
         <table><thead><tr>
           <th>Product</th><th>Orders</th><th>Shipped</th><th>Delivered</th><th>Ship Days</th><th>Del Days</th><th>Revenue</th><th>Stuck Rev</th>
@@ -966,7 +968,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <path d="M4 6l4 4 4-4" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
-    <div id="srPipeCollapse" style="max-height:0;overflow:hidden;transition:max-height 0.4s ease;">
+    <div id="srPipeCollapse" style="max-height:0;overflow:hidden;">
       <div id="srPipeline" style="display:flex;align-items:center;justify-content:center;gap:0;margin:12px 0 18px;flex-wrap:wrap;"></div>
       <div class="kpi-row" id="srKpiRow" style="grid-template-columns:repeat(2,1fr);gap:8px;"></div>
     </div>
@@ -980,7 +982,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <path d="M4 6l4 4 4-4" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
-    <div id="srDailyTableCollapse" style="max-height:0;overflow:hidden;transition:max-height 0.4s ease;">
+    <div id="srDailyTableCollapse" style="max-height:0;overflow:hidden;">
       <div class="table-wrap" style="margin-top:8px;">
         <table><thead><tr>
           <th>Date</th><th>Orders</th><th>Shipped</th><th>Delivered</th><th>RTO</th><th>Ship Days</th><th>Del Days</th>
@@ -2622,7 +2624,10 @@ function toggleMtdKpis() {
   if (mtdKpisOpen) {
     el.style.maxHeight = el.scrollHeight + 'px';
     chevron.style.transform = 'rotate(180deg)';
+    setTimeout(function() { if (mtdKpisOpen) el.style.maxHeight = 'none'; }, 450);
   } else {
+    el.style.maxHeight = el.scrollHeight + 'px';
+    el.offsetHeight; // force reflow
     el.style.maxHeight = '0';
     chevron.style.transform = 'rotate(0deg)';
   }
@@ -2634,16 +2639,18 @@ function toggleSection(collapseId, chevronId) {
   const el = document.getElementById(collapseId);
   const chevron = document.getElementById(chevronId);
   if (_sectionState[collapseId]) {
-    // If currently none, set explicit height first for transition
-    if (el.style.maxHeight === 'none' || el.style.maxHeight === '') {
-      el.style.maxHeight = el.scrollHeight + 'px';
-    }
+    // Expand: animate from current height to scrollHeight
     el.style.maxHeight = el.scrollHeight + 'px';
     chevron.style.transform = 'rotate(180deg)';
-    // After transition, switch to none for dynamic content
-    setTimeout(function() { if (_sectionState[collapseId]) el.style.maxHeight = 'none'; }, 400);
+    // After transition, switch to none for dynamic content; re-observe animations inside
+    setTimeout(function() {
+      if (_sectionState[collapseId]) {
+        el.style.maxHeight = 'none';
+        if (window._animObserveElements) window._animObserveElements();
+      }
+    }, 450);
   } else {
-    // Set explicit height first so transition works from none
+    // Collapse: set explicit height first so transition works from none
     el.style.maxHeight = el.scrollHeight + 'px';
     el.offsetHeight; // force reflow
     el.style.maxHeight = '0';
@@ -2659,8 +2666,14 @@ function switchView(view) {
   document.getElementById('vtMIS').classList.toggle('active', view === 'mis');
   document.getElementById('vtMTD').classList.toggle('active', view === 'mtd');
   document.getElementById('vtSR').classList.toggle('active', view === 'sr');
+  if (view === 'mis') { render(); }
   if (view === 'mtd') renderMTD();
   if (view === 'sr') renderShiprocket();
+  // Re-trigger filter bar slide animation for newly visible view
+  var filters = document.querySelector('#' + (view === 'mtd' ? 'mtdView' : view === 'sr' ? 'srView' : 'misView') + ' .mtd-filters, #' + (view === 'sr' ? 'srView' : 'x') + ' .sr-filters');
+  if (filters) { filters.classList.remove('filters-animate'); filters.offsetHeight; filters.classList.add('filters-animate'); }
+  // Re-observe animations for newly visible elements
+  setTimeout(function() { if (window._animObserveElements) window._animObserveElements(); }, 60);
 }
 
 // fmt() already defined above — reuse it
@@ -3879,49 +3892,54 @@ renderMTD();
         observer.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+  }, { threshold: 0.05 });
+
+  function isElementVisible(el) {
+    // Skip elements inside display:none views or max-height:0 collapse containers
+    var parent = el.parentElement;
+    while (parent) {
+      if (parent.style && parent.style.display === 'none') return false;
+      if (parent.id && parent.id.endsWith('Collapse') && (parent.style.maxHeight === '0' || parent.style.maxHeight === '0px')) return false;
+      parent = parent.parentElement;
+    }
+    return true;
+  }
 
   function observeElements() {
-    // KPI rows
-    document.querySelectorAll('.kpi-row').forEach(function(el) {
-      if (!el.classList.contains('anim-visible')) { el.classList.add('anim-pending'); observer.observe(el); }
-    });
-    // Chart cards
-    document.querySelectorAll('.chart-card').forEach(function(el) {
-      if (!el.classList.contains('anim-visible')) { el.classList.add('anim-pending'); observer.observe(el); }
-    });
-    // Table wraps
-    document.querySelectorAll('.table-wrap').forEach(function(el) {
-      if (!el.classList.contains('anim-visible')) { el.classList.add('anim-pending'); observer.observe(el); }
-    });
-    // Sections
-    document.querySelectorAll('.section').forEach(function(el) {
-      if (!el.classList.contains('anim-visible')) { el.classList.add('anim-pending'); observer.observe(el); }
+    var selectors = ['.kpi-row', '.chart-card', '.table-wrap', '.section'];
+    selectors.forEach(function(sel) {
+      document.querySelectorAll(sel).forEach(function(el) {
+        if (el.classList.contains('anim-visible')) return;
+        if (!isElementVisible(el)) { el.classList.remove('anim-pending'); return; }
+        el.classList.add('anim-pending');
+        observer.observe(el);
+      });
     });
   }
 
-  // Observe on load and after dynamic renders
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', observeElements);
-  } else {
-    observeElements();
-  }
+  // Expose globally so toggleSection and switchView can call it
+  window._animObserveElements = observeElements;
 
-  // Re-observe after renders (KPIs/tables are built dynamically)
-  var _origRenderMTD = window.renderMTD;
-  if (_origRenderMTD) {
-    window.renderMTD = function() {
-      _origRenderMTD.apply(this, arguments);
-      setTimeout(observeElements, 50);
-    };
+  // Trigger filter bar slide on the visible view
+  var mtdFilters = document.querySelector('.mtd-filters');
+  if (mtdFilters) mtdFilters.classList.add('filters-animate');
+
+  // Initial observe after a short delay (let first render complete)
+  setTimeout(observeElements, 100);
+
+  // Wrap render functions to re-observe after dynamic content changes
+  function wrapRender(name) {
+    var orig = window[name];
+    if (orig) {
+      window[name] = function() {
+        orig.apply(this, arguments);
+        setTimeout(observeElements, 50);
+      };
+    }
   }
-  var _origRenderSR = window.renderShiprocket;
-  if (_origRenderSR) {
-    window.renderShiprocket = function() {
-      _origRenderSR.apply(this, arguments);
-      setTimeout(observeElements, 50);
-    };
-  }
+  wrapRender('renderMTD');
+  wrapRender('renderShiprocket');
+  wrapRender('render');
 })();
 </script>
 </body>
