@@ -90,6 +90,7 @@ document.addEventListener('DOMContentLoaded', function() {
     background: var(--card); border-radius: 12px; padding: 14px 12px;
     border: 1px solid var(--border); transition: all 0.2s;
     min-height: 110px; display: flex; flex-direction: column; justify-content: center;
+    position: relative; z-index: 1;
   }
   .kpi:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(252,187,19,0.08); }
   .kpi.clickable { cursor: pointer; }
@@ -330,7 +331,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   /* Filter Dropdowns */
   .filter-bar { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; }
-  .filter-group { display: flex; align-items: center; gap: 6px; }
+  .filter-group { display: flex; align-items: center; gap: 6px; position: relative; z-index: 10; }
   .filter-label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; white-space: nowrap; }
   .filter-select {
     appearance: none; -webkit-appearance: none;
@@ -513,7 +514,7 @@ document.addEventListener('DOMContentLoaded', function() {
   .mtd-filters .filter-group { display: flex; align-items: center; gap: 6px; }
   /* Custom Calendar Popup */
   .cal-popup {
-    display: none; position: absolute; top: 100%; left: 0; z-index: 999;
+    display: none; position: absolute; top: 100%; left: 0; z-index: 9999;
     background: #fff; border-radius: 14px; box-shadow: 0 8px 32px rgba(0,0,0,0.25);
     padding: 20px; min-width: 300px; margin-top: 6px; color: #111;
     font-family: 'Inter', sans-serif;
@@ -564,7 +565,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   /* Scroll-triggered: KPI cards */
-  .kpi-row .kpi { opacity: 0; }
+  .kpi-row.anim-pending .kpi { opacity: 0; }
   .kpi-row.anim-visible .kpi {
     animation: fadeSlideUp 0.45s cubic-bezier(0.22,1,0.36,1) both;
   }
@@ -586,7 +587,8 @@ document.addEventListener('DOMContentLoaded', function() {
   .kpi { transition: all 0.25s cubic-bezier(0.22,1,0.36,1) !important; }
 
   /* Scroll-triggered: table rows */
-  .table-wrap tbody tr { opacity: 0; transform: translateY(8px); transition: opacity 0.35s ease, transform 0.35s ease; }
+  .table-wrap tbody tr { transition: opacity 0.35s ease, transform 0.35s ease; }
+  .table-wrap.anim-pending tbody tr { opacity: 0; transform: translateY(8px); }
   .table-wrap.anim-visible tbody tr { opacity: 1; transform: translateY(0); }
   .table-wrap.anim-visible tbody tr:nth-child(1)  { transition-delay: 0s; }
   .table-wrap.anim-visible tbody tr:nth-child(2)  { transition-delay: 0.03s; }
@@ -601,11 +603,12 @@ document.addEventListener('DOMContentLoaded', function() {
   .table-wrap.anim-visible tbody tr:nth-child(n+11) { transition-delay: 0.30s; }
 
   /* Scroll-triggered: chart cards */
-  .chart-card { opacity: 0; }
+  .chart-card.anim-pending { opacity: 0; }
   .chart-card.anim-visible { animation: fadeSlideUp 0.5s cubic-bezier(0.22,1,0.36,1) both; }
 
   /* Scroll-triggered: section cards (urgent alert, TAT overview, etc.) */
-  .section { opacity: 0; transform: translateY(14px); transition: opacity 0.45s ease, transform 0.45s ease; }
+  .section { transition: opacity 0.45s ease, transform 0.45s ease; }
+  .section.anim-pending { opacity: 0; transform: translateY(14px); }
   .section.anim-visible { opacity: 1; transform: translateY(0); }
 
   /* Filter bar: slide down on load */
@@ -3871,6 +3874,7 @@ renderMTD();
   var observer = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {
       if (entry.isIntersecting) {
+        entry.target.classList.remove('anim-pending');
         entry.target.classList.add('anim-visible');
         observer.unobserve(entry.target);
       }
@@ -3880,19 +3884,19 @@ renderMTD();
   function observeElements() {
     // KPI rows
     document.querySelectorAll('.kpi-row').forEach(function(el) {
-      if (!el.classList.contains('anim-visible')) observer.observe(el);
+      if (!el.classList.contains('anim-visible')) { el.classList.add('anim-pending'); observer.observe(el); }
     });
     // Chart cards
     document.querySelectorAll('.chart-card').forEach(function(el) {
-      if (!el.classList.contains('anim-visible')) observer.observe(el);
+      if (!el.classList.contains('anim-visible')) { el.classList.add('anim-pending'); observer.observe(el); }
     });
     // Table wraps
     document.querySelectorAll('.table-wrap').forEach(function(el) {
-      if (!el.classList.contains('anim-visible')) observer.observe(el);
+      if (!el.classList.contains('anim-visible')) { el.classList.add('anim-pending'); observer.observe(el); }
     });
     // Sections
     document.querySelectorAll('.section').forEach(function(el) {
-      if (!el.classList.contains('anim-visible')) observer.observe(el);
+      if (!el.classList.contains('anim-visible')) { el.classList.add('anim-pending'); observer.observe(el); }
     });
   }
 
