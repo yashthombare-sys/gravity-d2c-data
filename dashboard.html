@@ -548,6 +548,86 @@ document.addEventListener('DOMContentLoaded', function() {
   .cal-preset:hover { background: #222; color: #fff; border-color: #222; }
   .cal-preset.active { background: #222; color: #fff; border-color: #222; }
   .cal-divider { height: 1px; background: #eee; margin: 12px 0; }
+
+  /* ── Animations ── */
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Scroll-triggered: KPI cards */
+  .kpi-row .kpi { opacity: 0; }
+  .kpi-row.anim-visible .kpi {
+    animation: fadeSlideUp 0.45s cubic-bezier(0.22,1,0.36,1) both;
+  }
+  .kpi-row.anim-visible .kpi:nth-child(1) { animation-delay: 0s; }
+  .kpi-row.anim-visible .kpi:nth-child(2) { animation-delay: 0.06s; }
+  .kpi-row.anim-visible .kpi:nth-child(3) { animation-delay: 0.12s; }
+  .kpi-row.anim-visible .kpi:nth-child(4) { animation-delay: 0.18s; }
+  .kpi-row.anim-visible .kpi:nth-child(5) { animation-delay: 0.24s; }
+  .kpi-row.anim-visible .kpi:nth-child(6) { animation-delay: 0.30s; }
+  .kpi-row.anim-visible .kpi:nth-child(7) { animation-delay: 0.36s; }
+  .kpi-row.anim-visible .kpi:nth-child(8) { animation-delay: 0.42s; }
+
+  /* KPI hover: scale + gold glow */
+  .kpi:hover {
+    transform: translateY(-3px) scale(1.025) !important;
+    box-shadow: 0 8px 28px rgba(252,187,19,0.15), 0 0 12px rgba(252,187,19,0.08) !important;
+    border-color: var(--primary) !important;
+  }
+  .kpi { transition: all 0.25s cubic-bezier(0.22,1,0.36,1) !important; }
+
+  /* Scroll-triggered: table rows */
+  .table-wrap tbody tr { opacity: 0; transform: translateY(8px); transition: opacity 0.35s ease, transform 0.35s ease; }
+  .table-wrap.anim-visible tbody tr { opacity: 1; transform: translateY(0); }
+  .table-wrap.anim-visible tbody tr:nth-child(1)  { transition-delay: 0s; }
+  .table-wrap.anim-visible tbody tr:nth-child(2)  { transition-delay: 0.03s; }
+  .table-wrap.anim-visible tbody tr:nth-child(3)  { transition-delay: 0.06s; }
+  .table-wrap.anim-visible tbody tr:nth-child(4)  { transition-delay: 0.09s; }
+  .table-wrap.anim-visible tbody tr:nth-child(5)  { transition-delay: 0.12s; }
+  .table-wrap.anim-visible tbody tr:nth-child(6)  { transition-delay: 0.15s; }
+  .table-wrap.anim-visible tbody tr:nth-child(7)  { transition-delay: 0.18s; }
+  .table-wrap.anim-visible tbody tr:nth-child(8)  { transition-delay: 0.21s; }
+  .table-wrap.anim-visible tbody tr:nth-child(9)  { transition-delay: 0.24s; }
+  .table-wrap.anim-visible tbody tr:nth-child(10) { transition-delay: 0.27s; }
+  .table-wrap.anim-visible tbody tr:nth-child(n+11) { transition-delay: 0.30s; }
+
+  /* Scroll-triggered: chart cards */
+  .chart-card { opacity: 0; }
+  .chart-card.anim-visible { animation: fadeSlideUp 0.5s cubic-bezier(0.22,1,0.36,1) both; }
+
+  /* Scroll-triggered: section cards (urgent alert, TAT overview, etc.) */
+  .section { opacity: 0; transform: translateY(14px); transition: opacity 0.45s ease, transform 0.45s ease; }
+  .section.anim-visible { opacity: 1; transform: translateY(0); }
+
+  /* Filter bar: slide down on load */
+  .mtd-filters { animation: slideDown 0.5s cubic-bezier(0.22,1,0.36,1) 0.1s both; }
+  .sr-filters  { animation: slideDown 0.5s cubic-bezier(0.22,1,0.36,1) 0.1s both; }
+
+  /* Collapsible sections: smooth height + content fade */
+  [id$="Collapse"] { transition: max-height 0.4s cubic-bezier(0.22,1,0.36,1), opacity 0.3s ease; }
+  [id$="Collapse"][style*="max-height: 0"] { opacity: 0; }
+  [id$="Collapse"][style*="max-height: 0px"] { opacity: 0; }
+
+  /* Chevron rotation smoothing */
+  [id$="Chevron"] { transition: transform 0.35s cubic-bezier(0.22,1,0.36,1) !important; }
+
+  /* Reduce motion for accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-delay: 0s !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
 </style>
 </head>
 <body>
@@ -3783,5 +3863,62 @@ renderMTD();
   <div class="pdm-card" id="pdmCard"></div>
 </div>
 
+<script>
+// ── Scroll-triggered animations via IntersectionObserver ──
+(function() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('anim-visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+  function observeElements() {
+    // KPI rows
+    document.querySelectorAll('.kpi-row').forEach(function(el) {
+      if (!el.classList.contains('anim-visible')) observer.observe(el);
+    });
+    // Chart cards
+    document.querySelectorAll('.chart-card').forEach(function(el) {
+      if (!el.classList.contains('anim-visible')) observer.observe(el);
+    });
+    // Table wraps
+    document.querySelectorAll('.table-wrap').forEach(function(el) {
+      if (!el.classList.contains('anim-visible')) observer.observe(el);
+    });
+    // Sections
+    document.querySelectorAll('.section').forEach(function(el) {
+      if (!el.classList.contains('anim-visible')) observer.observe(el);
+    });
+  }
+
+  // Observe on load and after dynamic renders
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', observeElements);
+  } else {
+    observeElements();
+  }
+
+  // Re-observe after renders (KPIs/tables are built dynamically)
+  var _origRenderMTD = window.renderMTD;
+  if (_origRenderMTD) {
+    window.renderMTD = function() {
+      _origRenderMTD.apply(this, arguments);
+      setTimeout(observeElements, 50);
+    };
+  }
+  var _origRenderSR = window.renderShiprocket;
+  if (_origRenderSR) {
+    window.renderShiprocket = function() {
+      _origRenderSR.apply(this, arguments);
+      setTimeout(observeElements, 50);
+    };
+  }
+})();
+</script>
 </body>
 </html>
