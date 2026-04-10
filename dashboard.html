@@ -3449,9 +3449,10 @@ function renderShiprocket() {
       if (!sr[d].products) return;
       for (var [p, pd] of Object.entries(sr[d].products)) {
         if (category !== 'all' && (SR_CATS[p]||'') !== category) continue;
-        if (!allProducts[p]) allProducts[p] = { orders:0, shipped:0, delivered:0, value:0, shippedVal:0, unshipped:0, stuckRev:0, _shipSum:0, _shipN:0, _delSum:0, _delN:0 };
+        if (!allProducts[p]) allProducts[p] = { orders:0, shipped:0, delivered:0, pending:0, pendingVal:0, value:0, shippedVal:0, unshipped:0, stuckRev:0, _shipSum:0, _shipN:0, _delSum:0, _delN:0 };
         var ap = allProducts[p];
         ap.orders += pd.new_orders||0; ap.shipped += pd.shipped||0; ap.delivered += pd.delivered||0;
+        ap.pending += pd.pending||0; ap.pendingVal += pd.pending_value||0;
         ap.value += pd.new_value||0; ap.shippedVal += pd.shipped_value||0;
         if (pd.avg_ship_days > 0) { ap._shipSum += pd.avg_ship_days; ap._shipN++; }
         if (pd.avg_deliver_days > 0) { ap._delSum += pd.avg_deliver_days; ap._delN++; }
@@ -3462,15 +3463,15 @@ function renderShiprocket() {
     for (var [pName, pData] of Object.entries(allProducts)) {
       pData.avgShip = pData._shipN > 0 ? +(pData._shipSum / pData._shipN).toFixed(1) : 0;
       pData.avgDel = pData._delN > 0 ? +(pData._delSum / pData._delN).toFixed(1) : 0;
-      pData.unshipped = Math.max(0, pData.orders - pData.shipped - (pData.cancelled||0));
-      pData.stuckRev = pData.value - pData.shippedVal;
+      pData.unshipped = pData.pending;
+      pData.stuckRev = pData.pendingVal;
       if (pData.avgShip > 2 || pData.unshipped > 0) slowSkus.push({ name: pName, ...pData });
     }
     slowSkus.sort((a, b) => b.avgShip - a.avgShip);
 
     // Urgent Ship Now alert (products with unshipped orders, sorted by stuck revenue)
     var urgentSkus = Object.entries(allProducts)
-      .map(([name, d]) => ({ name, unshipped: Math.max(0, d.orders - d.shipped), stuckRev: Math.max(0, d.value - d.shippedVal), avgShip: d._shipN > 0 ? +(d._shipSum/d._shipN).toFixed(1) : 0 }))
+      .map(([name, d]) => ({ name, unshipped: d.pending, stuckRev: d.pendingVal, avgShip: d._shipN > 0 ? +(d._shipSum/d._shipN).toFixed(1) : 0 }))
       .filter(s => s.unshipped > 0 || s.avgShip > 2)
       .sort((a, b) => b.stuckRev - a.stuckRev)
       .slice(0, 6);
