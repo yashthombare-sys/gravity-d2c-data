@@ -3203,9 +3203,9 @@
       "orders": 120,
       "ad_spend": 25844.36,
       "commissions": 18844.21,
-      "product_expense": 50135.65,
-      "total_expense": 94824.22,
-      "profit": 22212.07,
+      "product_expense": 39762.76,
+      "total_expense": 84451.33,
+      "profit": 32584.96,
       "sessions": 2861
     },
     "2026-04-10": {
@@ -3213,9 +3213,9 @@
       "orders": 113,
       "ad_spend": 24161.68,
       "commissions": 18880.5,
-      "product_expense": 48046.67,
-      "total_expense": 91088.85,
-      "profit": 15201.37,
+      "product_expense": 38105.98,
+      "total_expense": 81148.16,
+      "profit": 25142.06,
       "sessions": 2510
     },
     "2026-04-11": {
@@ -3223,23 +3223,23 @@
       "orders": 106,
       "ad_spend": 0.0,
       "commissions": 12750.73,
-      "product_expense": 45957.68,
-      "total_expense": 58708.41,
-      "profit": 51739.9,
+      "product_expense": 36449.2,
+      "total_expense": 49199.93,
+      "profit": 61248.38,
       "sessions": 2419
     },
     "2026-04-12": {
-      "revenue": 74566.26,
+      "revenue": 85816.45,
       "orders": 90,
       "ad_spend": 0.0,
       "commissions": 14051.54,
-      "product_expense": 26843.85,
-      "total_expense": 40895.39,
-      "profit": 33670.87,
-      "sessions": 0
+      "product_expense": 29822.07,
+      "total_expense": 43873.61,
+      "profit": 41942.84,
+      "sessions": 2306
     }
   },
-  "last_synced": "2026-04-13T06:30:55",
+  "last_synced": "2026-04-13T13:43:31",
   "shiprocket": {
     "2025-04-01": {
       "new_orders": 263,
