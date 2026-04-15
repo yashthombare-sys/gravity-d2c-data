@@ -3307,45 +3307,45 @@
     "2026-04-11": {
       "revenue": 110448.31,
       "orders": 106,
-      "ad_spend": 0.0,
+      "ad_spend": 22194.62,
       "commissions": 12750.73,
       "product_expense": 39116.15,
-      "total_expense": 51866.88,
-      "profit": 58581.43,
+      "total_expense": 74061.5,
+      "profit": 36386.81,
       "sessions": 2419
     },
     "2026-04-12": {
       "revenue": 85816.45,
       "orders": 90,
-      "ad_spend": 0.0,
+      "ad_spend": 22554.52,
       "commissions": 14051.54,
       "product_expense": 32004.12,
-      "total_expense": 46055.66,
-      "profit": 39760.79,
+      "total_expense": 68610.18,
+      "profit": 17206.27,
       "sessions": 2306
     },
     "2026-04-13": {
       "revenue": 97638.54,
       "orders": 90,
-      "ad_spend": 0.0,
+      "ad_spend": 22307.9,
       "commissions": 11910.75,
       "product_expense": 32359.73,
-      "total_expense": 44270.48,
-      "profit": 53368.06,
+      "total_expense": 66578.38,
+      "profit": 31060.16,
       "sessions": 2178
     },
     "2026-04-14": {
       "revenue": 61131.5,
       "orders": 87,
-      "ad_spend": 0.0,
+      "ad_spend": 23716.82,
       "commissions": 11760.84,
       "product_expense": 22007.34,
-      "total_expense": 33768.18,
-      "profit": 27363.32,
+      "total_expense": 57485.0,
+      "profit": 3646.5,
       "sessions": 0
     }
   },
-  "last_synced": "2026-04-15T00:41:20",
+  "last_synced": "2026-04-15T00:59:38",
   "shiprocket": {
     "2025-04-01": {
       "new_orders": 263,
@@ -93282,26 +93282,26 @@
       }
     },
     "2026-04-15": {
-      "new_orders": 21,
-      "new_value": 21894.15,
-      "pending": 12,
-      "pending_value": 10653.15,
+      "new_orders": 23,
+      "new_value": 22718.15,
+      "pending": 13,
+      "pending_value": 11477.15,
       "shipped": 9,
       "shipped_value": 11241.0,
       "delivered": 0,
       "delivered_value": 0.0,
       "in_transit": 9,
       "rto": 0,
-      "cancelled": 0,
+      "cancelled": 1,
       "avg_tat_days": 0.0,
       "avg_ship_days": 0.0,
       "avg_deliver_days": 0.0,
       "products": {
         "Krishna": {
-          "new_orders": 12,
-          "new_value": 10653.15,
-          "pending": 12,
-          "pending_value": 10653.15,
+          "new_orders": 13,
+          "new_value": 11477.15,
+          "pending": 13,
+          "pending_value": 11477.15,
           "shipped": 0,
           "shipped_value": 0.0,
           "delivered": 0,
@@ -93309,6 +93309,22 @@
           "in_transit": 0,
           "rto": 0,
           "cancelled": 0,
+          "avg_tat_days": 0,
+          "avg_ship_days": 0,
+          "avg_deliver_days": 0
+        },
+        "Other": {
+          "new_orders": 1,
+          "new_value": 0.0,
+          "pending": 0,
+          "pending_value": 0.0,
+          "shipped": 0,
+          "shipped_value": 0.0,
+          "delivered": 0,
+          "delivered_value": 0.0,
+          "in_transit": 0,
+          "rto": 0,
+          "cancelled": 1,
           "avg_tat_days": 0,
           "avg_ship_days": 0,
           "avg_deliver_days": 0
@@ -93348,5 +93364,5 @@
       }
     }
   },
-  "shiprocket_synced": "2026-04-15T00:41"
+  "shiprocket_synced": "2026-04-15T00:59"
 }
