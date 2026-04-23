@@ -3759,17 +3759,17 @@
       "sessions": 1820
     },
     "2026-04-22": {
-      "revenue": 56163.87,
+      "revenue": 62028.84,
       "orders": 82,
       "ad_spend": 0.0,
       "commissions": 13500.97,
-      "product_expense": 20218.99,
-      "total_expense": 33719.96,
-      "profit": 22443.91,
+      "product_expense": 22330.38,
+      "total_expense": 35831.35,
+      "profit": 26197.49,
       "sessions": 0
     }
   },
-  "last_synced": "2026-04-23T06:23:13",
+  "last_synced": "2026-04-23T12:56:14",
   "shiprocket": {
     "2025-04-01": {
       "new_orders": 263,
