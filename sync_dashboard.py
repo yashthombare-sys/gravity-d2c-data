@@ -17,20 +17,8 @@ SHEET_URL = "https://docs.google.com/spreadsheets/d/1-aln640f4OxRmoS9R5EBvnQACp6
 CREDS_FILE = os.path.join(BASE, "shiproket-mis-70c28ae6e7fb.json")
 DASHBOARD = os.path.join(BASE, "dashboard.html")
 
-# All months (FY 2024-25 + FY 2025-26) — actively synced from Google Sheet
+# FY 2025-26 months — actively synced from Google Sheet
 MONTHS = {
-    "Apr 2024": "April 2024 MIS",
-    "May 2024": "May 2024 MIS",
-    "Jun 2024": "June 2024 MIS",
-    "Jul 2024": "July 2024 MIS",
-    "Aug 2024": "August 2024 MIS",
-    "Sep 2024": "September 2024 MIS",
-    "Oct 2024": "October 2024 MIS",
-    "Nov 2024": "November 2024 MIS",
-    "Dec 2024": "December 2024 MIS",
-    "Jan 2025": "January 2025 MIS",
-    "Feb 2025": "February 2025 MIS",
-    "Mar 2025": "March 2025 MIS",
     "Apr 2025": "April 2025 MIS",
     "May 2025": "May 2025 MIS",
     "Jun 2025": "June 2025 MIS",
@@ -46,11 +34,26 @@ MONTHS = {
     "Apr 2026": "April 2026 MIS",
 }
 
-# FY 2024-25 months — now fetched fresh (no longer frozen)
-FY24_25_MONTHS = []
+# FY 2024-25 months — Google Sheet tabs no longer exist; data read from local backup JSON
+FY24_25_MONTHS_MAP = {
+    "Apr 2024": "April 2024 MIS",
+    "May 2024": "May 2024 MIS",
+    "Jun 2024": "June 2024 MIS",
+    "Jul 2024": "July 2024 MIS",
+    "Aug 2024": "August 2024 MIS",
+    "Sep 2024": "September 2024 MIS",
+    "Oct 2024": "October 2024 MIS",
+    "Nov 2024": "November 2024 MIS",
+    "Dec 2024": "December 2024 MIS",
+    "Jan 2025": "January 2025 MIS",
+    "Feb 2025": "February 2025 MIS",
+    "Mar 2025": "March 2025 MIS",
+}
+FY24_25_MONTHS = []  # empty — FY24-25 data injected from JSON, not from frozen HTML
+FY24_25_JSON = os.path.join(BASE, "fy2024_25_data.json")
 
 # Full list for dashboard output (both FYs)
-ALL_MONTHS = list(MONTHS.keys())
+ALL_MONTHS = list(FY24_25_MONTHS_MAP.keys()) + list(MONTHS.keys())
 
 # ── Column indices for Shiprocket section (0-based) ──
 # A=Products, B=Revenue, C=TotalExpense, D=P/L, E=Profit%, F=P/pcs,
@@ -495,6 +498,128 @@ def read_cred_section(rows, col_map=None):
             "freight": 0,
         }
     return data
+
+
+def _find_sections_and_parse(all_values, month_key, d2c_data, amz_data, amz_ad_map,
+                              fk_data, fk_ad_map, fc_data, bk_data, bk_ad_map,
+                              im_data, im_ad_map, cred_data):
+    """Shared section-finding + parsing logic for both Google Sheets and JSON data."""
+    sr_grand_total = amz_start = amz_grand_total = None
+    fk_start = fk_grand_total = fc_start = fc_grand_total = None
+    bk_start = bk_total = im_start = im_grand_total = cred_start = cred_grand_total = None
+
+    for i, row in enumerate(all_values):
+        cell = str(row[0]).strip() if row else ""
+        if cell in ("GRAND TOTAL", "D2C GRAND TOTAL") and sr_grand_total is None:
+            sr_grand_total = i
+        if cell == "AMAZON MIS" and amz_start is None:
+            amz_start = i
+        if cell == "GRAND TOTAL" and amz_start is not None and i > amz_start and amz_grand_total is None:
+            amz_grand_total = i
+        if cell == "FLIPKART MIS" and fk_start is None:
+            fk_start = i
+        if cell == "GRAND TOTAL" and fk_start is not None and i > fk_start and fk_grand_total is None:
+            fk_grand_total = i
+        if cell == "FIRSTCRY MIS" and fc_start is None:
+            fc_start = i
+        if cell == "GRAND TOTAL" and fc_start is not None and i > fc_start and fc_grand_total is None:
+            fc_grand_total = i
+        if cell in ("BLINKIT", "BLINKIT MIS") and bk_start is None:
+            bk_start = i
+        if cell == "Blinkit Total" and bk_start is not None and bk_total is None:
+            bk_total = i
+        if cell == "INSTAMART MIS" and im_start is None:
+            im_start = i
+        if cell == "GRAND TOTAL" and im_start is not None and i > im_start and im_grand_total is None:
+            im_grand_total = i
+        if cell == "CRED MIS" and cred_start is None:
+            cred_start = i
+        if cell == "GRAND TOTAL" and cred_start is not None and i > cred_start and cred_grand_total is None:
+            cred_grand_total = i
+
+    sr_header = all_values[1] if len(all_values) > 1 else []
+    sr_col_map = find_cols(sr_header, SR_HEADER_MAP, SR_COL)
+
+    def _header(start):
+        idx = start + 1 if start is not None else None
+        return all_values[idx] if idx is not None and idx < len(all_values) else []
+
+    amz_col_map  = find_cols(_header(amz_start),  AMZ_HEADER_MAP,  AMZ_COL)
+    fk_col_map   = find_cols(_header(fk_start),   FK_HEADER_MAP,   FK_COL)
+    fc_col_map   = find_cols(_header(fc_start),   FC_HEADER_MAP,   FC_COL)
+    bk_col_map   = find_cols(_header(bk_start),   BK_HEADER_MAP,   BK_COL)
+    im_col_map   = find_cols(_header(im_start),   IM_HEADER_MAP,   IM_COL)
+    cred_col_map = find_cols(_header(cred_start), CRED_HEADER_MAP, CRED_COL)
+
+    if sr_grand_total:
+        d2c_data[month_key] = read_shiprocket_section(all_values[2:sr_grand_total], sr_col_map)
+    else:
+        d2c_data[month_key] = {}
+
+    if amz_start is not None:
+        end = amz_grand_total if amz_grand_total else len(all_values)
+        amz_data[month_key], amz_ad_map[month_key] = read_amazon_section(all_values[amz_start + 2:end], amz_col_map)
+    else:
+        amz_data[month_key] = {}; amz_ad_map[month_key] = 0
+
+    if fk_start is not None:
+        end = fk_grand_total if fk_grand_total else len(all_values)
+        fk_data[month_key], fk_ad_map[month_key] = read_flipkart_section(all_values[fk_start + 2:end], fk_col_map)
+    else:
+        fk_data[month_key] = {}; fk_ad_map[month_key] = 0
+
+    if fc_start is not None:
+        end = fc_grand_total if fc_grand_total else len(all_values)
+        fc_data[month_key] = read_firstcry_section(all_values[fc_start + 2:end], fc_col_map)
+    else:
+        fc_data[month_key] = {}
+
+    if bk_start is not None:
+        end = bk_total if bk_total else len(all_values)
+        bk_data[month_key], bk_ad_map[month_key] = read_blinkit_section(all_values[bk_start + 2:end], bk_col_map)
+    else:
+        bk_data[month_key] = {}; bk_ad_map[month_key] = 0
+
+    if im_start is not None:
+        end = im_grand_total if im_grand_total else len(all_values)
+        im_data[month_key], im_ad_map[month_key] = read_instamart_section(all_values[im_start + 2:end], im_col_map)
+    else:
+        im_data[month_key] = {}; im_ad_map[month_key] = 0
+
+    cred_data[month_key] = {}
+
+
+def fetch_fy24_25_from_json():
+    """Read FY24-25 MIS data from fy2024_25_data.json (Google Sheet tabs no longer exist)."""
+    d2c_data = {}; amz_data = {}; amz_ad_map = {}
+    fk_data = {};  fk_ad_map = {}; fc_data = {}
+    bk_data = {};  bk_ad_map = {}; im_data = {}; im_ad_map = {}; cred_data = {}
+
+    if not os.path.exists(FY24_25_JSON):
+        print(f"  Warning: {FY24_25_JSON} not found — FY24-25 data will be empty")
+        for mk in FY24_25_MONTHS_MAP:
+            d2c_data[mk] = {}; amz_data[mk] = {}; amz_ad_map[mk] = 0
+            fk_data[mk] = {}; fk_ad_map[mk] = 0; fc_data[mk] = {}
+            bk_data[mk] = {}; bk_ad_map[mk] = 0; im_data[mk] = {}; im_ad_map[mk] = 0; cred_data[mk] = {}
+        return d2c_data, amz_data, amz_ad_map, fk_data, fk_ad_map, fc_data, bk_data, bk_ad_map, im_data, im_ad_map, cred_data
+
+    with open(FY24_25_JSON) as f:
+        backup = json.load(f)
+
+    for month_key, tab_name in FY24_25_MONTHS_MAP.items():
+        if tab_name not in backup:
+            print(f"  FY24-25 {tab_name}: missing from backup JSON")
+            d2c_data[month_key] = {}; amz_data[month_key] = {}; amz_ad_map[month_key] = 0
+            fk_data[month_key] = {}; fk_ad_map[month_key] = 0; fc_data[month_key] = {}
+            bk_data[month_key] = {}; bk_ad_map[month_key] = 0; im_data[month_key] = {}; im_ad_map[month_key] = 0; cred_data[month_key] = {}
+            continue
+        all_values = backup[tab_name]
+        _find_sections_and_parse(all_values, month_key, d2c_data, amz_data, amz_ad_map,
+                                 fk_data, fk_ad_map, fc_data, bk_data, bk_ad_map,
+                                 im_data, im_ad_map, cred_data)
+        print(f"  FY24-25 {tab_name}: D2C={len(d2c_data[month_key])} prods, AMZ={len(amz_data[month_key])} prods")
+
+    return d2c_data, amz_data, amz_ad_map, fk_data, fk_ad_map, fc_data, bk_data, bk_ad_map, im_data, im_ad_map, cred_data
 
 
 def fetch_all_months(sh):
@@ -998,7 +1123,21 @@ def main():
 
     d2c_data, amz_data, amz_ad_map, fk_data, fk_ad_map, fc_data, bk_data, bk_ad_map, im_data, im_ad_map, cred_data = fetch_all_months(sh)
 
-    print("\n📝 Updating dashboard.html...")
+    print("\nLoading FY24-25 data from backup JSON...")
+    fy24_d2c, fy24_amz, fy24_amz_ad, fy24_fk, fy24_fk_ad, fy24_fc, fy24_bk, fy24_bk_ad, fy24_im, fy24_im_ad, fy24_cred = fetch_fy24_25_from_json()
+    d2c_data.update(fy24_d2c)
+    amz_data.update(fy24_amz)
+    amz_ad_map.update(fy24_amz_ad)
+    fk_data.update(fy24_fk)
+    fk_ad_map.update(fy24_fk_ad)
+    fc_data.update(fy24_fc)
+    bk_data.update(fy24_bk)
+    bk_ad_map.update(fy24_bk_ad)
+    im_data.update(fy24_im)
+    im_ad_map.update(fy24_im_ad)
+    cred_data.update(fy24_cred)
+
+    print("\nUpdating dashboard.html...")
     if update_dashboard(d2c_data, amz_data, amz_ad_map, fk_data, fk_ad_map, fc_data, bk_data, bk_ad_map, im_data, im_ad_map, cred_data):
         total_d2c = sum(len(v) for v in d2c_data.values())
         total_amz = sum(len(v) for v in amz_data.values())
@@ -1007,7 +1146,7 @@ def main():
         total_bk = sum(len(v) for v in bk_data.values())
         total_im = sum(len(v) for v in im_data.values())
         total_cred = sum(len(v) for v in cred_data.values())
-        print(f"\n✅ Dashboard synced! {total_d2c} D2C + {total_amz} Amazon + {total_fk} Flipkart + {total_fc} FirstCry + {total_bk} Blinkit + {total_im} Instamart + {total_cred} Cred products across {len(MONTHS)} months")
+        print(f"\nDashboard synced! {total_d2c} D2C + {total_amz} Amazon + {total_fk} Flipkart + {total_fc} FirstCry + {total_bk} Blinkit + {total_im} Instamart + {total_cred} Cred products across {len(ALL_MONTHS)} months")
         print(f"   Open dashboard.html in browser to see updated data")
     else:
         print("\n❌ Failed to update dashboard")
