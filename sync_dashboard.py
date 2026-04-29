@@ -113,6 +113,107 @@ IM_COL = {
     "cogs": 5, "cogs_unit": 6, "ad_spend": 13, "profit": 14,
 }
 
+# ── Header aliases for dynamic column detection ──────────────────────────────
+# Converts section header rows → column indices. First matching alias wins.
+# Falls back to the *_COL hardcoded dicts above if no header match is found.
+SR_HEADER_MAP = {
+    "revenue":    ["revenue", "net revenue", "total revenue"],
+    "orders":     ["total orders", "new orders", "orders", "total product orders"],
+    "shipped":    ["shipped", "total shipped", "dispatched"],
+    "delivered":  ["delivered", "total delivered", "net delivered"],
+    "rto":        ["rto", "total rto", "returned", "returns"],
+    "in_transit": ["in transit", "in-transit", "in_transit", "transit"],
+    "freight":    ["shipping charges", "freight", "logistics", "shipping cost", "logistic", "delivery charges"],
+}
+AMZ_HEADER_MAP = {
+    "revenue":     ["revenue", "net revenue", "total revenue", "sales"],
+    "orders":      ["orders", "total orders", "gross orders", "ordered units"],
+    "delivered":   ["delivered", "units delivered", "total delivered", "shipped"],
+    "cogs":        ["cogs", "total cogs", "product cost", "cost of goods"],
+    "cogs_unit":   ["cogs/unit", "cogs per unit", "unit cogs", "cost per unit"],
+    "commission":  ["commission", "commissions", "referral fee", "marketplace commission"],
+    "fba_fees":    ["fba fees", "fba fee", "fulfillment fees", "fulfillment fee", "amazon fulfillment"],
+    "closing_fee": ["closing fee", "closing fees", "variable closing"],
+    "promos":      ["promos", "promotions", "promotion", "coupon"],
+    "refund_amt":  ["refund", "refunds", "refund amount", "refund amt", "return amount"],
+    "amazon_fees": ["total amazon fees", "amazon fees", "total fees", "platform fees"],
+    "ad_spend":    ["ad spend", "ad spent", "advertising", "total ad spend", "sponsored"],
+    "profit":      ["profit", "net profit", "p/l", "profit/loss"],
+    "profit_pct":  ["profit %", "profit%", "p/l %", "margin %", "net margin"],
+}
+FK_HEADER_MAP = {
+    "revenue":          ["revenue", "net revenue", "total revenue", "sales"],
+    "orders":           ["orders", "total orders", "gross orders"],
+    "delivered":        ["delivered", "total delivered", "net delivered"],
+    "returned":         ["returned", "returns", "total returned", "rto"],
+    "cogs":             ["cogs", "total cogs", "product cost"],
+    "cogs_unit":        ["cogs/unit", "cogs per unit", "unit cogs"],
+    "commission":       ["commission", "commissions", "tech fee", "marketplace commission"],
+    "fixed_fee":        ["fixed fee", "fixed fees", "collection fee", "pickup fee"],
+    "shipping_fee":     ["shipping fee", "forward shipping", "forward freight", "forward logistic"],
+    "reverse_shipping": ["reverse shipping", "return shipping", "reverse logistic"],
+    "refund_amt":       ["refund", "refunds", "refund amount", "refund amt"],
+    "fk_fees":          ["total flipkart fees", "total fk fees", "platform fees"],
+    "ad_spend":         ["ad spend", "ad spent", "advertising", "marketing spend"],
+    "profit":           ["profit", "net profit", "p/l"],
+}
+FC_HEADER_MAP = {
+    "revenue":   ["revenue", "net revenue", "total revenue", "sales"],
+    "orders":    ["orders", "total orders", "gross orders"],
+    "delivered": ["delivered", "total delivered", "net delivered"],
+    "returned":  ["returned", "returns", "total returned"],
+    "cogs":      ["cogs", "total cogs", "product cost"],
+    "cogs_unit": ["cogs/unit", "cogs per unit"],
+    "ad_spend":  ["ad spend", "ad spent", "advertising", "marketing"],
+    "profit":    ["profit", "net profit", "p/l"],
+}
+BK_HEADER_MAP = {
+    "revenue":    ["revenue", "net revenue", "sales"],
+    "orders":     ["orders", "total orders"],
+    "cogs":       ["cogs", "product cost"],
+    "cogs_unit":  ["cogs/unit", "cogs per unit"],
+    "ads":        ["ads", "ad spend", "advertising", "blended ads", "marketing"],
+    "logistics":  ["logistics", "delivery", "freight", "logistic cost"],
+    "profit":     ["profit", "net profit", "p/l"],
+    "profit_pct": ["profit %", "profit%", "margin", "margin %"],
+}
+IM_HEADER_MAP = {
+    "revenue":   ["revenue", "net revenue", "sales"],
+    "orders":    ["orders", "total orders"],
+    "delivered": ["delivered", "total delivered"],
+    "returned":  ["returned", "returns", "total returned"],
+    "cogs":      ["cogs", "product cost"],
+    "cogs_unit": ["cogs/unit", "cogs per unit"],
+    "ad_spend":  ["ad spend", "ad spent", "advertising", "marketing"],
+    "profit":    ["profit", "net profit", "p/l"],
+}
+CRED_HEADER_MAP = {
+    "revenue":   ["revenue", "net revenue", "sales"],
+    "expense":   ["total expense", "expense", "total expenses", "total spend"],
+    "delivered": ["delivered", "total delivered"],
+}
+
+
+def find_cols(header_row, header_map, fallback):
+    """Detect column indices from a section's header row using alias matching.
+    Falls back to hardcoded fallback dict for any field whose header isn't found."""
+    col_map = {"product": 0}  # product name always in col A
+    header_lower = [str(h).strip().lower() for h in header_row]
+    for field, candidates in header_map.items():
+        found = False
+        for candidate in candidates:
+            cl = candidate.lower()
+            for idx, h in enumerate(header_lower):
+                if cl == h or cl in h:
+                    col_map[field] = idx
+                    found = True
+                    break
+            if found:
+                break
+        if not found:
+            col_map[field] = fallback.get(field, 0)
+    return col_map
+
 
 def safe_float(val):
     """Parse a cell value to float, handling ₹, commas, formulas, blanks."""
@@ -131,24 +232,26 @@ def safe_int(val):
     return int(safe_float(val))
 
 
-def read_shiprocket_section(rows):
+def read_shiprocket_section(rows, col_map=None):
     """Parse Shiprocket rows into dashboard DATA format."""
+    if col_map is None:
+        col_map = SR_COL
     data = {}
     for row in rows:
-        product = str(row[SR_COL["product"]]).strip()
+        product = str(row[col_map["product"]]).strip()
         if not product or product in SKIP_LABELS:
             continue
         if "Subtotal" in product or "CATEGORY" in product:
             continue
-        rev = safe_float(row[SR_COL["revenue"]])
-        orders = safe_int(row[SR_COL["orders"]])
+        rev = safe_float(row[col_map["revenue"]])
+        orders = safe_int(row[col_map["orders"]])
         if orders == 0 and rev == 0:
             continue
-        shipped = safe_int(row[SR_COL["shipped"]]) if len(row) > SR_COL["shipped"] else 0
-        delivered = safe_int(row[SR_COL["delivered"]]) if len(row) > SR_COL["delivered"] else 0
-        rto = safe_int(row[SR_COL["rto"]]) if len(row) > SR_COL["rto"] else 0
-        in_transit = safe_int(row[SR_COL["in_transit"]]) if len(row) > SR_COL["in_transit"] else 0
-        freight = safe_float(row[SR_COL["freight"]]) if len(row) > SR_COL["freight"] else 0.0
+        shipped = safe_int(row[col_map["shipped"]]) if len(row) > col_map["shipped"] else 0
+        delivered = safe_int(row[col_map["delivered"]]) if len(row) > col_map["delivered"] else 0
+        rto = safe_int(row[col_map["rto"]]) if len(row) > col_map["rto"] else 0
+        in_transit = safe_int(row[col_map["in_transit"]]) if len(row) > col_map["in_transit"] else 0
+        freight = safe_float(row[col_map["freight"]]) if len(row) > col_map["freight"] else 0.0
         cancelled = orders - shipped  # no explicit column
         data[product] = {
             "total_orders": orders,
@@ -164,139 +267,148 @@ def read_shiprocket_section(rows):
     return data
 
 
-def read_amazon_section(rows):
+def read_amazon_section(rows, col_map=None):
     """Parse Amazon rows into dashboard AMZ_DATA format."""
+    if col_map is None:
+        col_map = AMZ_COL
     data = {}
     total_ad_spend = 0.0
     for row in rows:
-        if len(row) < 13:
+        if len(row) < 5:
             continue
-        product = str(row[AMZ_COL["product"]]).strip()
+        product = str(row[col_map["product"]]).strip()
         if not product or product in SKIP_LABELS:
             continue
         if "Subtotal" in product or "CATEGORY" in product or "no Amazon" in product:
             continue
-        rev = safe_float(row[AMZ_COL["revenue"]])
-        orders = safe_int(row[AMZ_COL["orders"]])
+        rev = safe_float(row[col_map["revenue"]]) if len(row) > col_map["revenue"] else 0
+        orders = safe_int(row[col_map["orders"]]) if len(row) > col_map["orders"] else 0
         if orders == 0 and rev == 0:
             continue
-        ad = safe_float(row[AMZ_COL["ad_spend"]])
+        ad = safe_float(row[col_map["ad_spend"]]) if len(row) > col_map["ad_spend"] else 0
         total_ad_spend += ad
+        delivered_idx = col_map["delivered"]
         data[product] = {
             "total_orders": orders,
-            "shipped": safe_int(row[AMZ_COL["delivered"]]),  # FBA: delivered = shipped
-            "delivered": safe_int(row[AMZ_COL["delivered"]]),
+            "shipped": safe_int(row[delivered_idx]) if len(row) > delivered_idx else 0,
+            "delivered": safe_int(row[delivered_idx]) if len(row) > delivered_idx else 0,
             "rto": 0,
             "in_transit": 0,
             "cancelled": 0,
             "lost": 0,
             "revenue": round(rev, 2),
-            "freight": 0,  # Amazon has no freight — fees are in commission/fba/closing
+            "freight": 0,
             "ad_spend": round(ad, 2),
-            "commission": round(safe_float(row[AMZ_COL["commission"]]) if len(row) > AMZ_COL["commission"] else 0, 2),
-            "fba_fees": round(safe_float(row[AMZ_COL["fba_fees"]]) if len(row) > AMZ_COL["fba_fees"] else 0, 2),
-            "closing_fee": round(safe_float(row[AMZ_COL["closing_fee"]]) if len(row) > AMZ_COL["closing_fee"] else 0, 2),
-            "promos": round(safe_float(row[AMZ_COL["promos"]]) if len(row) > AMZ_COL["promos"] else 0, 2),
-            "refund_amt": round(safe_float(row[AMZ_COL["refund_amt"]]) if len(row) > AMZ_COL["refund_amt"] else 0, 2),
+            "commission": round(safe_float(row[col_map["commission"]]) if len(row) > col_map["commission"] else 0, 2),
+            "fba_fees": round(safe_float(row[col_map["fba_fees"]]) if len(row) > col_map["fba_fees"] else 0, 2),
+            "closing_fee": round(safe_float(row[col_map["closing_fee"]]) if len(row) > col_map["closing_fee"] else 0, 2),
+            "promos": round(safe_float(row[col_map["promos"]]) if len(row) > col_map["promos"] else 0, 2),
+            "refund_amt": round(safe_float(row[col_map["refund_amt"]]) if len(row) > col_map["refund_amt"] else 0, 2),
         }
     return data, round(total_ad_spend)
 
 
-def read_flipkart_section(rows):
+def read_flipkart_section(rows, col_map=None):
     """Parse Flipkart rows into dashboard FK_DATA format."""
+    if col_map is None:
+        col_map = FK_COL
     data = {}
     total_ad_spend = 0.0
     for row in rows:
-        if len(row) < 13:
+        if len(row) < 5:
             continue
-        product = str(row[FK_COL["product"]]).strip()
+        product = str(row[col_map["product"]]).strip()
         if not product or product in SKIP_LABELS:
             continue
         if "Subtotal" in product or "CATEGORY" in product or "no Flipkart" in product:
             continue
-        rev = safe_float(row[FK_COL["revenue"]])
-        orders = safe_int(row[FK_COL["orders"]])
+        rev = safe_float(row[col_map["revenue"]]) if len(row) > col_map["revenue"] else 0
+        orders = safe_int(row[col_map["orders"]]) if len(row) > col_map["orders"] else 0
         if orders == 0 and rev == 0:
             continue
-        ad = safe_float(row[FK_COL["ad_spend"]])
+        ad = safe_float(row[col_map["ad_spend"]]) if len(row) > col_map["ad_spend"] else 0
         total_ad_spend += ad
-        delivered = safe_int(row[FK_COL["delivered"]])
-        returned = safe_int(row[FK_COL["returned"]])
+        delivered = safe_int(row[col_map["delivered"]]) if len(row) > col_map["delivered"] else 0
+        returned = safe_int(row[col_map["returned"]]) if len(row) > col_map["returned"] else 0
         data[product] = {
             "total_orders": orders,
-            "shipped": delivered + returned,  # shipped = delivered + returned
+            "shipped": delivered + returned,
             "delivered": delivered,
             "rto": returned,
             "in_transit": 0,
             "cancelled": max(orders - delivered - returned, 0),
             "lost": 0,
             "revenue": round(rev, 2),
-            "freight": 0,  # Flipkart fees are in commission/fixed/shipping, not freight
+            "freight": 0,
             "ad_spend": round(ad, 2),
-            "commission": round(safe_float(row[FK_COL["commission"]]) if len(row) > FK_COL["commission"] else 0, 2),
-            "fixed_fee": round(safe_float(row[FK_COL["fixed_fee"]]) if len(row) > FK_COL["fixed_fee"] else 0, 2),
-            "shipping_fee": round(safe_float(row[FK_COL["shipping_fee"]]) if len(row) > FK_COL["shipping_fee"] else 0, 2),
-            "reverse_shipping": round(safe_float(row[FK_COL["reverse_shipping"]]) if len(row) > FK_COL["reverse_shipping"] else 0, 2),
-            "refund_amt": round(safe_float(row[FK_COL["refund_amt"]]) if len(row) > FK_COL["refund_amt"] else 0, 2),
+            "commission": round(safe_float(row[col_map["commission"]]) if len(row) > col_map["commission"] else 0, 2),
+            "fixed_fee": round(safe_float(row[col_map["fixed_fee"]]) if len(row) > col_map["fixed_fee"] else 0, 2),
+            "shipping_fee": round(safe_float(row[col_map["shipping_fee"]]) if len(row) > col_map["shipping_fee"] else 0, 2),
+            "reverse_shipping": round(safe_float(row[col_map["reverse_shipping"]]) if len(row) > col_map["reverse_shipping"] else 0, 2),
+            "refund_amt": round(safe_float(row[col_map["refund_amt"]]) if len(row) > col_map["refund_amt"] else 0, 2),
         }
     return data, round(total_ad_spend)
 
 
-def read_firstcry_section(rows):
+def read_firstcry_section(rows, col_map=None):
     """Parse FirstCry rows into dashboard FC_DATA format."""
+    if col_map is None:
+        col_map = FC_COL
     data = {}
     for row in rows:
-        if len(row) < 8:
+        if len(row) < 4:
             continue
-        product = str(row[FC_COL["product"]]).strip()
+        product = str(row[col_map["product"]]).strip()
         if not product or product in SKIP_LABELS:
             continue
         if "Subtotal" in product or "CATEGORY" in product or "no FirstCry" in product:
             continue
-        rev = safe_float(row[FC_COL["revenue"]])
-        orders = safe_int(row[FC_COL["orders"]])
+        rev = safe_float(row[col_map["revenue"]]) if len(row) > col_map["revenue"] else 0
+        orders = safe_int(row[col_map["orders"]]) if len(row) > col_map["orders"] else 0
         if orders == 0 and rev == 0:
             continue
-        delivered = safe_int(row[FC_COL["delivered"]])
-        returned = safe_int(row[FC_COL["returned"]]) if len(row) > FC_COL["returned"] else 0
-        ad = safe_float(row[FC_COL["ad_spend"]]) if len(row) > FC_COL["ad_spend"] else 0
+        delivered = safe_int(row[col_map["delivered"]]) if len(row) > col_map["delivered"] else 0
+        returned = safe_int(row[col_map["returned"]]) if len(row) > col_map.get("returned", 999) else 0
+        ad = safe_float(row[col_map["ad_spend"]]) if len(row) > col_map.get("ad_spend", 999) else 0
         data[product] = {
             "total_orders": orders,
-            "shipped": delivered,  # FirstCry: delivered = shipped (they handle logistics)
+            "shipped": delivered,
             "delivered": delivered,
             "rto": returned,
             "in_transit": 0,
             "cancelled": 0,
             "lost": 0,
             "revenue": round(rev, 2),
-            "freight": 0,  # No freight for FirstCry (they handle shipping)
+            "freight": 0,
             "ad_spend": round(ad, 2),
         }
     return data
 
 
-def read_blinkit_section(rows):
+def read_blinkit_section(rows, col_map=None):
     """Parse Blinkit rows into dashboard BK_DATA format."""
+    if col_map is None:
+        col_map = BK_COL
     data = {}
     total_ad_spend = 0.0
     for row in rows:
-        if len(row) < 7:
+        if len(row) < 4:
             continue
-        product = str(row[BK_COL["product"]]).strip()
+        product = str(row[col_map["product"]]).strip()
         if not product or product in SKIP_LABELS:
             continue
         if "Subtotal" in product or "CATEGORY" in product or "Blinkit Total" in product:
             continue
-        rev = safe_float(row[BK_COL["revenue"]])
-        orders = safe_int(row[BK_COL["orders"]])
+        rev = safe_float(row[col_map["revenue"]]) if len(row) > col_map["revenue"] else 0
+        orders = safe_int(row[col_map["orders"]]) if len(row) > col_map["orders"] else 0
         if orders == 0 and rev == 0:
             continue
-        ads = safe_float(row[BK_COL["ads"]])
-        logistics = safe_float(row[BK_COL["logistics"]])
+        ads = safe_float(row[col_map["ads"]]) if len(row) > col_map.get("ads", 999) else 0
+        logistics = safe_float(row[col_map["logistics"]]) if len(row) > col_map.get("logistics", 999) else 0
         total_ad_spend += ads
         data[product] = {
             "total_orders": orders,
-            "shipped": orders,      # PO model: all orders are shipped/delivered
+            "shipped": orders,
             "delivered": orders,
             "rto": 0,
             "in_transit": 0,
@@ -309,38 +421,27 @@ def read_blinkit_section(rows):
     return data, round(total_ad_spend)
 
 
-def read_instamart_section(rows):
+def read_instamart_section(rows, col_map=None):
     """Parse Instamart rows into dashboard IM_DATA format."""
+    if col_map is None:
+        col_map = IM_COL
     data = {}
     total_ad_spend = 0.0
-
-    # Detect if column E is "Returned" or "COGS" by checking the header row
-    has_returned_col = False
     for row in rows:
-        h = str(row[0]).strip()
-        if h == "Products":
-            col_e = str(row[4]).strip() if len(row) > 4 else ""
-            has_returned_col = (col_e == "Returned")
-            break
-
-    for row in rows:
-        if len(row) < 8:
+        if len(row) < 4:
             continue
-        product = str(row[IM_COL["product"]]).strip()
+        product = str(row[col_map["product"]]).strip()
         if not product or product in SKIP_LABELS:
             continue
         if "Subtotal" in product or "CATEGORY" in product or "no Instamart" in product:
             continue
-        rev = safe_float(row[IM_COL["revenue"]])
-        orders = safe_int(row[IM_COL["orders"]])
+        rev = safe_float(row[col_map["revenue"]]) if len(row) > col_map["revenue"] else 0
+        orders = safe_int(row[col_map["orders"]]) if len(row) > col_map["orders"] else 0
         if orders == 0 and rev == 0:
             continue
-        delivered = safe_int(row[IM_COL["delivered"]])
-        returned = safe_int(row[IM_COL["returned"]]) if has_returned_col and len(row) > IM_COL["returned"] else 0
-        ad = safe_float(row[IM_COL["ad_spend"]]) if has_returned_col and len(row) > IM_COL["ad_spend"] else 0
-        # When no Returned column, ad_spend is at index 8 (shifted left by 1)
-        if not has_returned_col and len(row) > 8:
-            ad = safe_float(row[8])  # Ad Spend is col I when no Returned column
+        delivered = safe_int(row[col_map["delivered"]]) if len(row) > col_map["delivered"] else 0
+        returned = safe_int(row[col_map["returned"]]) if len(row) > col_map.get("returned", 999) else 0
+        ad = safe_float(row[col_map["ad_spend"]]) if len(row) > col_map.get("ad_spend", 999) else 0
         total_ad_spend += ad
         data[product] = {
             "total_orders": orders,
@@ -357,22 +458,23 @@ def read_instamart_section(rows):
     return data, round(total_ad_spend)
 
 
-def read_cred_section(rows):
+def read_cred_section(rows, col_map=None):
     """Parse Cred rows into dashboard CRED_DATA format."""
+    if col_map is None:
+        col_map = CRED_COL
     data = {}
     for row in rows:
-        if len(row) < 8:
+        if len(row) < 3:
             continue
-        product = str(row[CRED_COL["product"]]).strip()
+        product = str(row[col_map["product"]]).strip()
         if not product or product in SKIP_LABELS:
             continue
         if "Subtotal" in product or "CATEGORY" in product or "no Cred" in product:
             continue
-        rev = safe_float(row[CRED_COL["revenue"]])
-        delivered = safe_int(row[CRED_COL["delivered"]])
+        rev = safe_float(row[col_map["revenue"]]) if len(row) > col_map["revenue"] else 0
+        delivered = safe_int(row[col_map["delivered"]]) if len(row) > col_map.get("delivered", 999) else 0
         if delivered == 0 and rev == 0:
             continue
-        expense = safe_float(row[CRED_COL["expense"]])
         data[product] = {
             "total_orders": delivered,
             "shipped": delivered,
@@ -467,10 +569,26 @@ def fetch_all_months(sh):
             if cell == "GRAND TOTAL" and cred_start is not None and i > cred_start and cred_grand_total is None:
                 cred_grand_total = i
 
+        # Build column maps from each section's header row (row immediately after the section title)
+        # Falls back to hardcoded *_COL dicts if header names don't match aliases
+        sr_header = all_values[1] if len(all_values) > 1 else []
+        sr_col_map = find_cols(sr_header, SR_HEADER_MAP, SR_COL)
+
+        def _header(start):
+            idx = start + 1 if start is not None else None
+            return all_values[idx] if idx is not None and idx < len(all_values) else []
+
+        amz_col_map  = find_cols(_header(amz_start),  AMZ_HEADER_MAP,  AMZ_COL)
+        fk_col_map   = find_cols(_header(fk_start),   FK_HEADER_MAP,   FK_COL)
+        fc_col_map   = find_cols(_header(fc_start),   FC_HEADER_MAP,   FC_COL)
+        bk_col_map   = find_cols(_header(bk_start),   BK_HEADER_MAP,   BK_COL)
+        im_col_map   = find_cols(_header(im_start),   IM_HEADER_MAP,   IM_COL)
+        cred_col_map = find_cols(_header(cred_start), CRED_HEADER_MAP, CRED_COL)
+
         # Parse Shiprocket section (rows 2 to GRAND TOTAL, skip header row 1)
         if sr_grand_total:
             sr_rows = all_values[2:sr_grand_total]
-            d2c_data[month_key] = read_shiprocket_section(sr_rows)
+            d2c_data[month_key] = read_shiprocket_section(sr_rows, sr_col_map)
             print(f"    D2C: {len(d2c_data[month_key])} products")
         else:
             d2c_data[month_key] = {}
@@ -480,7 +598,7 @@ def fetch_all_months(sh):
         if amz_start is not None:
             end = amz_grand_total if amz_grand_total else len(all_values)
             amz_rows = all_values[amz_start + 2 : end]
-            amz_data[month_key], amz_ad_map[month_key] = read_amazon_section(amz_rows)
+            amz_data[month_key], amz_ad_map[month_key] = read_amazon_section(amz_rows, amz_col_map)
             print(f"    Amazon: {len(amz_data[month_key])} products, ad spend: ₹{amz_ad_map[month_key]:,}")
         else:
             amz_data[month_key] = {}
@@ -491,7 +609,7 @@ def fetch_all_months(sh):
         if fk_start is not None:
             end = fk_grand_total if fk_grand_total else len(all_values)
             fk_rows = all_values[fk_start + 2 : end]
-            fk_data[month_key], fk_ad_map[month_key] = read_flipkart_section(fk_rows)
+            fk_data[month_key], fk_ad_map[month_key] = read_flipkart_section(fk_rows, fk_col_map)
             print(f"    Flipkart: {len(fk_data[month_key])} products, ad spend: ₹{fk_ad_map[month_key]:,}")
         else:
             fk_data[month_key] = {}
@@ -502,7 +620,7 @@ def fetch_all_months(sh):
         if fc_start is not None:
             end = fc_grand_total if fc_grand_total else len(all_values)
             fc_rows = all_values[fc_start + 2 : end]
-            fc_data[month_key] = read_firstcry_section(fc_rows)
+            fc_data[month_key] = read_firstcry_section(fc_rows, fc_col_map)
             print(f"    FirstCry: {len(fc_data[month_key])} products")
         else:
             fc_data[month_key] = {}
@@ -512,7 +630,7 @@ def fetch_all_months(sh):
         if bk_start is not None:
             end = bk_total if bk_total else len(all_values)
             bk_rows = all_values[bk_start + 2 : end]
-            bk_data[month_key], bk_ad_map[month_key] = read_blinkit_section(bk_rows)
+            bk_data[month_key], bk_ad_map[month_key] = read_blinkit_section(bk_rows, bk_col_map)
             print(f"    Blinkit: {len(bk_data[month_key])} products, ad spend: ₹{bk_ad_map[month_key]:,}")
         else:
             bk_data[month_key] = {}
@@ -523,7 +641,7 @@ def fetch_all_months(sh):
         if im_start is not None:
             end = im_grand_total if im_grand_total else len(all_values)
             im_rows = all_values[im_start + 2 : end]
-            im_data[month_key], im_ad_map[month_key] = read_instamart_section(im_rows)
+            im_data[month_key], im_ad_map[month_key] = read_instamart_section(im_rows, im_col_map)
             print(f"    Instamart: {len(im_data[month_key])} products, ad spend: ₹{im_ad_map[month_key]:,}")
         else:
             im_data[month_key] = {}
@@ -534,7 +652,7 @@ def fetch_all_months(sh):
         if cred_start is not None:
             end = cred_grand_total if cred_grand_total else len(all_values)
             cred_rows = all_values[cred_start + 2 : end]
-            cred_data[month_key] = read_cred_section(cred_rows)
+            cred_data[month_key] = read_cred_section(cred_rows, cred_col_map)
             print(f"    Cred: {len(cred_data[month_key])} products")
         else:
             cred_data[month_key] = {}
