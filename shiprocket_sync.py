@@ -595,12 +595,29 @@ def main():
         # Merge into all_daily_data (overwrite days in this month)
         all_daily_data.update(month_data)
 
-    # Write to Google Sheet (single source of truth)
+    # Write to Google Sheet
     write_to_fulfillment_sheet(all_daily_data)
 
     total_days = len(all_daily_data)
     months_covered = sorted(set(k[:7] for k in all_daily_data.keys()))
     print(f"\n  {total_days} days ({len(months_covered)} months) written to Google Sheet")
+
+    # Write directly to mtd_daily_data.json (bypasses Google Sheets round-trip in sync_mtd.py)
+    if all_daily_data and os.path.exists(OUTPUT_FILE):
+        try:
+            with open(OUTPUT_FILE, "r") as f:
+                output = json.load(f)
+            existing_sr = output.get("shiprocket", {})
+            sr_before = len(existing_sr)
+            existing_sr.update(all_daily_data)
+            output["shiprocket"] = dict(sorted(existing_sr.items()))
+            output["shiprocket_synced"] = datetime.now().strftime("%Y-%m-%dT%H:%M")
+            with open(OUTPUT_FILE, "w") as f:
+                json.dump(output, f, indent=2)
+            print(f"  mtd_daily_data.json: shiprocket {sr_before} → {len(output['shiprocket'])} dates")
+            inject_into_dashboard(output["shiprocket"])
+        except Exception as e:
+            print(f"  Warning: could not write to mtd_daily_data.json: {e}")
 
     print("\nDone.\n")
 
