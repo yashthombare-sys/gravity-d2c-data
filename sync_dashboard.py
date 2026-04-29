@@ -17,8 +17,20 @@ SHEET_URL = "https://docs.google.com/spreadsheets/d/1-aln640f4OxRmoS9R5EBvnQACp6
 CREDS_FILE = os.path.join(BASE, "shiproket-mis-70c28ae6e7fb.json")
 DASHBOARD = os.path.join(BASE, "dashboard.html")
 
-# FY 2025-26 months — actively synced from Google Sheet
+# All months (FY 2024-25 + FY 2025-26) — actively synced from Google Sheet
 MONTHS = {
+    "Apr 2024": "April 2024 MIS",
+    "May 2024": "May 2024 MIS",
+    "Jun 2024": "June 2024 MIS",
+    "Jul 2024": "July 2024 MIS",
+    "Aug 2024": "August 2024 MIS",
+    "Sep 2024": "September 2024 MIS",
+    "Oct 2024": "October 2024 MIS",
+    "Nov 2024": "November 2024 MIS",
+    "Dec 2024": "December 2024 MIS",
+    "Jan 2025": "January 2025 MIS",
+    "Feb 2025": "February 2025 MIS",
+    "Mar 2025": "March 2025 MIS",
     "Apr 2025": "April 2025 MIS",
     "May 2025": "May 2025 MIS",
     "Jun 2025": "June 2025 MIS",
@@ -34,15 +46,11 @@ MONTHS = {
     "Apr 2026": "April 2026 MIS",
 }
 
-# FY 2024-25 months — frozen in dashboard, no longer fetched
-FY24_25_MONTHS = [
-    "Apr 2024", "May 2024", "Jun 2024", "Jul 2024",
-    "Aug 2024", "Sep 2024", "Oct 2024", "Nov 2024",
-    "Dec 2024", "Jan 2025", "Feb 2025", "Mar 2025",
-]
+# FY 2024-25 months — now fetched fresh (no longer frozen)
+FY24_25_MONTHS = []
 
 # Full list for dashboard output (both FYs)
-ALL_MONTHS = FY24_25_MONTHS + list(MONTHS.keys())
+ALL_MONTHS = list(MONTHS.keys())
 
 # ── Column indices for Shiprocket section (0-based) ──
 # A=Products, B=Revenue, C=TotalExpense, D=P/L, E=Profit%, F=P/pcs,
