@@ -1961,24 +1961,37 @@ function renderKPIs() {
   html += '<div class="kpi-per">' + fmt(t.totalAds) + ' spent <span style="font-size:6px;color:var(--muted)">(inc GST)</span></div>';
   html += '</div>';
 
-  // 9. RTO% (hide for Amazon — FBA has no RTO)
+  // 9. RTO% — always D2C (Shiprocket) only; marketplace channels have no RTO in same sense
   if (globalChannel !== 'amazon' && globalChannel !== 'firstcry') {
-    const rtoPct = t.shipped > 0 ? (t.rto / t.shipped) * 100 : 0;
+    let d2cShipped = 0, d2cRto = 0, d2cDelivered = 0, d2cCancelled = 0;
+    if (DATA) {
+      months.forEach(m => {
+        if (!DATA[m]) return;
+        for (const p in DATA[m]) {
+          if (globalCat !== 'all' && CATS[p] !== globalCat) continue;
+          d2cShipped += DATA[m][p].shipped || 0;
+          d2cRto += DATA[m][p].rto || 0;
+          d2cDelivered += DATA[m][p].delivered || 0;
+          d2cCancelled += DATA[m][p].cancelled || 0;
+        }
+      });
+    }
+    const rtoPct = d2cShipped > 0 ? (d2cRto / d2cShipped) * 100 : 0;
     if (rtoExpanded) {
       html += '<div class="kpi clickable" onclick="toggleRto()">';
       html += '<div class="kpi-label">RTO Breakdown</div>';
       html += '<div class="kpi-value negative">' + pct(rtoPct) + '</div>';
       html += '<div class="kpi-sub">';
-      html += '<span><span class="sub-label">Shipped</span><span class="sub-val">' + t.shipped.toLocaleString() + '</span></span>';
-      html += '<span><span class="sub-label">RTO</span><span class="sub-val">' + t.rto.toLocaleString() + '</span></span>';
-      html += '<span><span class="sub-label">Delivered</span><span class="sub-val">' + t.delivered.toLocaleString() + '</span></span>';
-      html += '<span><span class="sub-label">Cancelled</span><span class="sub-val">' + t.cancelled.toLocaleString() + '</span></span>';
+      html += '<span><span class="sub-label">Shipped</span><span class="sub-val">' + d2cShipped.toLocaleString() + '</span></span>';
+      html += '<span><span class="sub-label">RTO</span><span class="sub-val">' + d2cRto.toLocaleString() + '</span></span>';
+      html += '<span><span class="sub-label">Delivered</span><span class="sub-val">' + d2cDelivered.toLocaleString() + '</span></span>';
+      html += '<span><span class="sub-label">Cancelled</span><span class="sub-val">' + d2cCancelled.toLocaleString() + '</span></span>';
       html += '</div></div>';
     } else {
       html += '<div class="kpi clickable" onclick="toggleRto()">';
       html += '<div class="kpi-label">RTO%</div>';
       html += '<div class="kpi-value ' + (rtoPct > 10 ? 'negative' : rtoPct > 5 ? 'neutral' : 'positive') + '">' + pct(rtoPct) + '</div>';
-      html += '<div class="kpi-per">' + t.rto.toLocaleString() + ' returns</div>';
+      html += '<div class="kpi-per">' + d2cRto.toLocaleString() + ' returns</div>';
       html += '</div>';
     }
   }
