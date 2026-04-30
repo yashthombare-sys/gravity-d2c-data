@@ -14,6 +14,7 @@ from google.oauth2.service_account import Credentials
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 SHEET_URL = "https://docs.google.com/spreadsheets/d/1-aln640f4OxRmoS9R5EBvnQACp6edzxrMQDU6sgd3Lc/"
+FY24_25_SHEET_KEY = "1-ICA_vT55I_Mu9ZVcWxKKFui3F7gil7sPNeCiZ-21s0"
 CREDS_FILE = os.path.join(BASE, "shiproket-mis-70c28ae6e7fb.json")
 DASHBOARD = os.path.join(BASE, "dashboard.html")
 
@@ -655,6 +656,30 @@ def fetch_dashboard_metrics(sh):
     return overall, cm2, rev_ex
 
 
+def fetch_fy24_25_cm2(gc):
+    """Read CM2 row from each FY24-25 monthly tab in the old sheet."""
+    try:
+        old_sh = gc.open_by_key(FY24_25_SHEET_KEY)
+    except Exception as e:
+        print(f"  FY24-25 old sheet not accessible: {e}")
+        return {}
+    result = {}
+    for month_key, tab_name in FY24_25_MONTHS_MAP.items():
+        try:
+            ws = old_sh.worksheet(tab_name)
+            rows = ws.get_all_values()
+            for row in rows:
+                if row and str(row[0]).strip() == 'CM2':
+                    val = safe_float(re.sub(r'[₹,\s]', '', str(row[1]))) if len(row) > 1 else None
+                    if val is not None:
+                        result[month_key] = val
+                    break
+        except Exception as e:
+            print(f"  FY24-25 {tab_name}: {e}")
+    print(f"  FY24-25 CM2: {len(result)} months read from old sheet")
+    return result
+
+
 def fetch_all_months(sh):
     """Read all months from Google Sheets, return D2C, Amazon, Flipkart, FirstCry, Blinkit, Instamart, Cred data and ad maps."""
     d2c_data = {}
@@ -1192,6 +1217,11 @@ def main():
 
     print("\nFetching Dashboard tab metrics...")
     overall_ad_spend, cm2_data, rev_ex_data = fetch_dashboard_metrics(sh)
+
+    print("\nFetching FY24-25 CM2 from old sheet...")
+    fy24_25_cm2 = fetch_fy24_25_cm2(gc)
+    cm2_data.update(fy24_25_cm2)  # FY25-26 from Dashboard tab, FY24-25 from old sheet
+
     d2c_ad_spend = {}
     for m in MONTHS:
         if m in overall_ad_spend:
