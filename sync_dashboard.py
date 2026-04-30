@@ -622,6 +622,37 @@ def fetch_fy24_25_from_json():
     return d2c_data, amz_data, amz_ad_map, fk_data, fk_ad_map, fc_data, bk_data, bk_ad_map, im_data, im_ad_map, cred_data
 
 
+def fetch_overall_ad_spend(sh):
+    """Read Overall Ad Spend (Inc Tax) per month from the Dashboard tab."""
+    try:
+        ws = sh.worksheet('Dashboard')
+        rows = ws.get_all_values()
+    except gspread.exceptions.WorksheetNotFound:
+        print("  Dashboard tab not found — adSpent will not be updated")
+        return {}
+
+    # Row 0: ['FY 2025-2026', 'Apr-25', 'May-25', ..., 'Mar-26', 'Total']
+    header = rows[0] if rows else []
+    col_to_month = {}
+    for i, cell in enumerate(header):
+        cell = str(cell).strip()
+        if '-' in cell and len(cell) == 6:          # e.g. 'Apr-25'
+            mon, yr = cell.split('-')
+            month_key = f"{mon} 20{yr}"             # 'Apr 2025'
+            col_to_month[i] = month_key
+
+    overall = {}
+    for row in rows:
+        if str(row[0]).strip() == 'Overall Ad Spend (Inc Tax)':
+            for col_idx, month_key in col_to_month.items():
+                if col_idx < len(row):
+                    overall[month_key] = safe_float(row[col_idx])
+            break
+
+    print(f"  Dashboard tab: found Overall Ad Spend for {len(overall)} months")
+    return overall
+
+
 def fetch_all_months(sh):
     """Read all months from Google Sheets, return D2C, Amazon, Flipkart, FirstCry, Blinkit, Instamart, Cred data and ad maps."""
     d2c_data = {}
@@ -819,7 +850,7 @@ def to_js_obj(data, include_ad_spend=False):
     return "{" + ",".join(parts) + "}"
 
 
-def update_dashboard(d2c_data, amz_data, amz_ad_map, fk_data, fk_ad_map, fc_data, bk_data, bk_ad_map, im_data, im_ad_map, cred_data):
+def update_dashboard(d2c_data, amz_data, amz_ad_map, fk_data, fk_ad_map, fc_data, bk_data, bk_ad_map, im_data, im_ad_map, cred_data, d2c_ad_spend=None):
     """Rewrite the inline data section in dashboard.html."""
     with open(DASHBOARD, "r") as f:
         html = f.read()
@@ -1082,6 +1113,24 @@ def update_dashboard(d2c_data, amz_data, amz_ad_map, fk_data, fk_ad_map, fc_data
         print("   This likely means data was lost. Skipping write.")
         return False
 
+    # ── Inject fresh adSpent (D2C-only ad spend from Dashboard tab) ──
+    if d2c_ad_spend:
+        ad_match = re.search(r'adSpent=\{[^}]*\}', new_html)
+        if ad_match:
+            existing_ad = {}
+            for item in re.finditer(r"'([^']+)':(\d+)", ad_match.group(0)):
+                existing_ad[item.group(1)] = int(item.group(2))
+            merged = {}
+            for m in ALL_MONTHS:
+                val = d2c_ad_spend.get(m)
+                if val is not None and val >= 0:
+                    merged[m] = round(val)
+                elif m in existing_ad:
+                    merged[m] = existing_ad[m]
+            items = ','.join(f"'{m}':{merged[m]}" for m in ALL_MONTHS if m in merged)
+            new_html = re.sub(r'adSpent=\{[^}]*\}', f'adSpent={{{items}}}', new_html)
+            print(f"  adSpent updated for {len(merged)} months")
+
     # ── Create backup before overwriting ──
     if os.path.exists(DASHBOARD):
         shutil.copy2(DASHBOARD, DASHBOARD + ".bak")
@@ -1137,8 +1186,17 @@ def main():
     im_ad_map.update(fy24_im_ad)
     cred_data.update(fy24_cred)
 
+    print("\nFetching Overall Ad Spend from Dashboard tab...")
+    overall_ad_spend = fetch_overall_ad_spend(sh)
+    d2c_ad_spend = {}
+    for m in MONTHS:
+        if m in overall_ad_spend:
+            marketplace = (amz_ad_map.get(m, 0) + fk_ad_map.get(m, 0)
+                           + bk_ad_map.get(m, 0) + im_ad_map.get(m, 0))
+            d2c_ad_spend[m] = max(0, overall_ad_spend[m] - marketplace)
+
     print("\nUpdating dashboard.html...")
-    if update_dashboard(d2c_data, amz_data, amz_ad_map, fk_data, fk_ad_map, fc_data, bk_data, bk_ad_map, im_data, im_ad_map, cred_data):
+    if update_dashboard(d2c_data, amz_data, amz_ad_map, fk_data, fk_ad_map, fc_data, bk_data, bk_ad_map, im_data, im_ad_map, cred_data, d2c_ad_spend):
         total_d2c = sum(len(v) for v in d2c_data.values())
         total_amz = sum(len(v) for v in amz_data.values())
         total_fk = sum(len(v) for v in fk_data.values())
