@@ -622,35 +622,37 @@ def fetch_fy24_25_from_json():
     return d2c_data, amz_data, amz_ad_map, fk_data, fk_ad_map, fc_data, bk_data, bk_ad_map, im_data, im_ad_map, cred_data
 
 
-def fetch_overall_ad_spend(sh):
-    """Read Overall Ad Spend (Inc Tax) per month from the Dashboard tab."""
+def fetch_dashboard_metrics(sh):
+    """Read Overall Ad Spend, CM2, and Ex Tax Revenue per month from the Dashboard tab.
+    Returns (overall_ad_spend, cm2_by_month, rev_ex_by_month).
+    """
     try:
         ws = sh.worksheet('Dashboard')
         rows = ws.get_all_values()
     except gspread.exceptions.WorksheetNotFound:
-        print("  Dashboard tab not found — adSpent will not be updated")
-        return {}
+        print("  Dashboard tab not found — adSpent/CM2 will not be updated")
+        return {}, {}, {}
 
-    # Row 0: ['FY 2025-2026', 'Apr-25', 'May-25', ..., 'Mar-26', 'Total']
     header = rows[0] if rows else []
     col_to_month = {}
     for i, cell in enumerate(header):
         cell = str(cell).strip()
-        if '-' in cell and len(cell) == 6:          # e.g. 'Apr-25'
+        if '-' in cell and len(cell) == 6:
             mon, yr = cell.split('-')
-            month_key = f"{mon} 20{yr}"             # 'Apr 2025'
-            col_to_month[i] = month_key
+            col_to_month[i] = f"{mon} 20{yr}"
 
-    overall = {}
-    for row in rows:
-        if str(row[0]).strip() == 'Overall Ad Spend (Inc Tax)':
-            for col_idx, month_key in col_to_month.items():
-                if col_idx < len(row):
-                    overall[month_key] = safe_float(row[col_idx])
-            break
+    def _extract_row(label):
+        for row in rows:
+            if str(row[0]).strip() == label:
+                return {mk: safe_float(row[ci]) for ci, mk in col_to_month.items() if ci < len(row)}
+        return {}
 
-    print(f"  Dashboard tab: found Overall Ad Spend for {len(overall)} months")
-    return overall
+    overall  = _extract_row('Overall Ad Spend (Inc Tax)')
+    cm2      = _extract_row('CM2 (Contribution Margin 2)')
+    rev_ex   = _extract_row('Total Net Revenue (Ex Tax)')
+
+    print(f"  Dashboard tab: Ad Spend {len(overall)}m, CM2 {len(cm2)}m, Rev(Ex) {len(rev_ex)}m")
+    return overall, cm2, rev_ex
 
 
 def fetch_all_months(sh):
@@ -850,7 +852,7 @@ def to_js_obj(data, include_ad_spend=False):
     return "{" + ",".join(parts) + "}"
 
 
-def update_dashboard(d2c_data, amz_data, amz_ad_map, fk_data, fk_ad_map, fc_data, bk_data, bk_ad_map, im_data, im_ad_map, cred_data, d2c_ad_spend=None):
+def update_dashboard(d2c_data, amz_data, amz_ad_map, fk_data, fk_ad_map, fc_data, bk_data, bk_ad_map, im_data, im_ad_map, cred_data, d2c_ad_spend=None, cm2_data=None, rev_ex_data=None):
     """Rewrite the inline data section in dashboard.html."""
     with open(DASHBOARD, "r") as f:
         html = f.read()
@@ -1050,6 +1052,8 @@ def update_dashboard(d2c_data, amz_data, amz_ad_map, fk_data, fk_ad_map, fc_data
         + "\n".join(im_lines) + "\n"
         "// ── Build Cred DATA in same format as D2C ──────────────\n"
         + "\n".join(cred_lines) + "\n"
+        + f"const SHEET_CM2={json.dumps(cm2_data or {})};\n"
+        + f"const SHEET_REV_EX={json.dumps(rev_ex_data or {})};\n"
         "// ── SYNC_DATA_END ──"
     )
 
@@ -1186,8 +1190,8 @@ def main():
     im_ad_map.update(fy24_im_ad)
     cred_data.update(fy24_cred)
 
-    print("\nFetching Overall Ad Spend from Dashboard tab...")
-    overall_ad_spend = fetch_overall_ad_spend(sh)
+    print("\nFetching Dashboard tab metrics...")
+    overall_ad_spend, cm2_data, rev_ex_data = fetch_dashboard_metrics(sh)
     d2c_ad_spend = {}
     for m in MONTHS:
         if m in overall_ad_spend:
@@ -1196,7 +1200,7 @@ def main():
             d2c_ad_spend[m] = max(0, overall_ad_spend[m] - marketplace)
 
     print("\nUpdating dashboard.html...")
-    if update_dashboard(d2c_data, amz_data, amz_ad_map, fk_data, fk_ad_map, fc_data, bk_data, bk_ad_map, im_data, im_ad_map, cred_data, d2c_ad_spend):
+    if update_dashboard(d2c_data, amz_data, amz_ad_map, fk_data, fk_ad_map, fc_data, bk_data, bk_ad_map, im_data, im_ad_map, cred_data, d2c_ad_spend, cm2_data, rev_ex_data):
         total_d2c = sum(len(v) for v in d2c_data.values())
         total_amz = sum(len(v) for v in amz_data.values())
         total_fk = sum(len(v) for v in fk_data.values())

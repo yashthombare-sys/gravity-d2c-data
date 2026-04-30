@@ -1941,16 +1941,24 @@ function renderKPIs() {
   html += '<div class="kpi-per">\u20B9' + Math.round(t.totalAds / deliveredOrders) + '/order</div>';
   html += '</div>';
 
-  // 7. CM2%
-  const profitPct = t.revenue > 0 ? (t.profit / t.revenue) * 100 : 0;
+  // 7. CM2% — all-channels: use pre-computed Ex Tax values from Google Sheet Dashboard tab
+  let displayProfit = t.profit;
+  let displayRevenue = t.revenue;
+  if (globalChannel === 'all' && typeof SHEET_CM2 !== 'undefined') {
+    const sheetProfit = months.reduce((s, m) => s + (SHEET_CM2[m] || 0), 0);
+    const sheetRevEx  = typeof SHEET_REV_EX !== 'undefined'
+                        ? months.reduce((s, m) => s + (SHEET_REV_EX[m] || 0), 0) : 0;
+    if (sheetProfit !== 0) { displayProfit = sheetProfit; displayRevenue = sheetRevEx || t.revenue; }
+  }
+  const profitPct = displayRevenue > 0 ? (displayProfit / displayRevenue) * 100 : 0;
   html += '<div class="kpi clickable" onclick="toggleKpi(\'profit\')">';
   html += '<div class="kpi-label">' + (globalChannel === 'all' ? 'CM2%' : 'Profit %') + '</div>';
   if (kpiMode.profit === 'pct') {
     html += '<div class="kpi-value ' + (profitPct >= 0 ? 'positive' : 'negative') + '">' + pct(profitPct) + '</div>';
   } else {
-    html += '<div class="kpi-value ' + (t.profit >= 0 ? 'positive' : 'negative') + '">' + fmt(t.profit) + '</div>';
+    html += '<div class="kpi-value ' + (displayProfit >= 0 ? 'positive' : 'negative') + '">' + fmt(displayProfit) + '</div>';
   }
-  html += '<div class="kpi-per">\u20B9' + Math.round(t.profit / deliveredOrders) + '/order</div>';
+  html += '<div class="kpi-per">\u20B9' + Math.round(displayProfit / deliveredOrders) + '/order</div>';
   html += '</div>';
 
   // 8. ROAS
