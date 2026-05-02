@@ -1,0 +1,15 @@
+[
+  {
+    "date": "2026-05-01",
+    "revenue": 42185.75,
+    "orders": 56,
+    "cogs": 15186.87,
+    "fees_commission": 4606.06,
+    "fees_fba": 5799.7,
+    "fees_closing": 3024.34,
+    "fees_total": 13430.1,
+    "ad_spend": 0,
+    "sessions": 0,
+    "conversion_pct": 0
+  }
+]
