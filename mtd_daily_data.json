@@ -4235,7 +4235,7 @@
       "sessions": 0
     }
   },
-  "last_synced": "2026-05-02T01:53:33",
+  "last_synced": "2026-05-02T02:06:02",
   "shiprocket": {
     "2025-04-01": {
       "new_orders": 263,
@@ -99239,9 +99239,9 @@
       "in_transit": 152,
       "rto": 0,
       "cancelled": 2,
-      "avg_tat_days": 0,
-      "avg_ship_days": 0,
-      "avg_deliver_days": 0,
+      "avg_tat_days": 0.0,
+      "avg_ship_days": 0.0,
+      "avg_deliver_days": 0.0,
       "products": {
         "V6": {
           "new_orders": 53,
@@ -99534,10 +99534,10 @@
       }
     },
     "2026-05-02": {
-      "new_orders": 26,
-      "new_value": 25753.4,
-      "pending": 26,
-      "pending_value": 25753.4,
+      "new_orders": 28,
+      "new_value": 28251.4,
+      "pending": 28,
+      "pending_value": 28251.4,
       "shipped": 0,
       "shipped_value": 0.0,
       "delivered": 0,
@@ -99545,15 +99545,15 @@
       "in_transit": 0,
       "rto": 0,
       "cancelled": 0,
-      "avg_tat_days": 0,
-      "avg_ship_days": 0,
-      "avg_deliver_days": 0,
+      "avg_tat_days": 0.0,
+      "avg_ship_days": 0.0,
+      "avg_deliver_days": 0.0,
       "products": {
         "Car": {
-          "new_orders": 2,
-          "new_value": 2598.0,
-          "pending": 2,
-          "pending_value": 2598.0,
+          "new_orders": 4,
+          "new_value": 5096.0,
+          "pending": 4,
+          "pending_value": 5096.0,
           "shipped": 0,
           "shipped_value": 0.0,
           "delivered": 0,
@@ -99696,5 +99696,5 @@
       }
     }
   },
-  "shiprocket_synced": "2026-05-02T01:52"
+  "shiprocket_synced": "2026-05-02T02:06"
 }
