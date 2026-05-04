@@ -18,22 +18,8 @@ FY24_25_SHEET_KEY = "1-ICA_vT55I_Mu9ZVcWxKKFui3F7gil7sPNeCiZ-21s0"
 CREDS_FILE = os.path.join(BASE, "shiproket-mis-70c28ae6e7fb.json")
 DASHBOARD = os.path.join(BASE, "dashboard.html")
 
-# FY 2025-26 months — actively synced from Google Sheet
-MONTHS = {
-    "Apr 2025": "April 2025 MIS",
-    "May 2025": "May 2025 MIS",
-    "Jun 2025": "June 2025 MIS",
-    "Jul 2025": "July 2025 MIS",
-    "Aug 2025": "August 2025 MIS",
-    "Sep 2025": "September 2025 MIS",
-    "Oct 2025": "October 2025 MIS",
-    "Nov 2025": "November 2025 MIS",
-    "Dec 2025": "December 2025 MIS",
-    "Jan 2026": "January 2026 MIS",
-    "Feb 2026": "February 2026 MIS",
-    "Mar 2026": "March 2026 MIS",
-    "Apr 2026": "April 2026 MIS",
-}
+# FY 2025-26 months — auto-detected at runtime from Google Sheet tabs (see detect_months())
+MONTHS = {}  # populated in main() — no manual update needed when a new month tab is created
 
 # FY 2024-25 months — Google Sheet tabs no longer exist; data read from local backup JSON
 FY24_25_MONTHS_MAP = {
@@ -53,8 +39,8 @@ FY24_25_MONTHS_MAP = {
 FY24_25_MONTHS = []  # empty — FY24-25 data injected from JSON, not from frozen HTML
 FY24_25_JSON = os.path.join(BASE, "fy2024_25_data.json")
 
-# Full list for dashboard output (both FYs)
-ALL_MONTHS = list(FY24_25_MONTHS_MAP.keys()) + list(MONTHS.keys())
+# Full list for dashboard output (both FYs) — populated in main() after detect_months()
+ALL_MONTHS = []
 
 # ── Column indices for Shiprocket section (0-based) ──
 # A=Products, B=Revenue, C=TotalExpense, D=P/L, E=Profit%, F=P/pcs,
@@ -680,6 +666,23 @@ def fetch_fy24_25_cm2(gc):
     return result
 
 
+def detect_months(sh):
+    """List all 'Month YYYY MIS' tabs in the sheet and return {abbr_key: tab_title}.
+    FY24-25 months are excluded — those come from the local JSON backup."""
+    from datetime import datetime as _dt
+    month_to_abbr = {_dt(2000, m, 1).strftime("%B"): _dt(2000, m, 1).strftime("%b") for m in range(1, 13)}
+    months = {}
+    for ws in sh.worksheets():
+        parts = ws.title.split()
+        if len(parts) == 3 and parts[2] == "MIS" and parts[1].isdigit() and parts[0] in month_to_abbr:
+            key = f"{month_to_abbr[parts[0]]} {parts[1]}"
+            if key not in FY24_25_MONTHS_MAP:
+                months[key] = ws.title
+    months = dict(sorted(months.items(), key=lambda x: _dt.strptime(x[0], "%b %Y")))
+    print(f"  Auto-detected {len(months)} month tabs: {', '.join(months.keys())}")
+    return months
+
+
 def fetch_all_months(sh):
     """Read all months from Google Sheets, return D2C, Amazon, Flipkart, FirstCry, Blinkit, Instamart, Cred data and ad maps."""
     d2c_data = {}
@@ -1198,6 +1201,11 @@ def main():
     sh = gc.open_by_url(SHEET_URL)
 
     print("\n🔄 Syncing dashboard from Google Sheets\n")
+
+    print("Detecting month tabs...")
+    global MONTHS, ALL_MONTHS
+    MONTHS = detect_months(sh)
+    ALL_MONTHS = list(FY24_25_MONTHS_MAP.keys()) + list(MONTHS.keys())
 
     d2c_data, amz_data, amz_ad_map, fk_data, fk_ad_map, fc_data, bk_data, bk_ad_map, im_data, im_ad_map, cred_data = fetch_all_months(sh)
 
