@@ -44,7 +44,7 @@ D2C_HEADER_MAP = {
     "profit":         ["profit"],
     "profit_pct":     ["profit %", "profit%"],
     "mkt_pct":        ["marketing spends %", "marketing spend %", "mkt %", "marketing %"],
-    "cogs_logistics": ["cogs+logistics", "cogs + logistics", "cogs logistics"],
+    "cogs_logistics": ["cogs+logistics", "cogs + logistics", "cogs logistics", "cogs+logitics", "cogs+logistic"],
 }
 
 # Fallback hardcoded column indices (used only if header detection fails)
