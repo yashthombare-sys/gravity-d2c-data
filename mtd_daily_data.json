@@ -4437,7 +4437,7 @@
       "sessions": 0
     }
   },
-  "last_synced": "2026-05-05T03:57:47",
+  "last_synced": "2026-05-05T06:33:53",
   "shiprocket": {
     "2025-04-01": {
       "new_orders": 263,
@@ -100768,5 +100768,5 @@
       }
     }
   },
-  "shiprocket_synced": "2026-05-05T03:57"
+  "shiprocket_synced": "2026-05-05T06:33"
 }
