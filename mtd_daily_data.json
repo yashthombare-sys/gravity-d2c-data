@@ -4485,65 +4485,65 @@
     "2026-05-01": {
       "revenue": 56743.8,
       "orders": 53,
-      "ad_spend": 0.0,
+      "ad_spend": 18714.8,
       "commissions": 13430.1,
       "product_expense": 24449.85,
-      "total_expense": 37879.95,
-      "profit": 18863.85,
+      "total_expense": 56594.75,
+      "profit": 149.05,
       "sessions": 1552
     },
     "2026-05-02": {
       "revenue": 65735.47,
       "orders": 68,
-      "ad_spend": 0.0,
+      "ad_spend": 21782.8,
       "commissions": 11263.77,
       "product_expense": 29306.29,
-      "total_expense": 40570.06,
-      "profit": 25165.41,
+      "total_expense": 62352.86,
+      "profit": 3382.61,
       "sessions": 1627
     },
     "2026-05-03": {
       "revenue": 85283.25,
       "orders": 91,
-      "ad_spend": 0.0,
+      "ad_spend": 30986.8,
       "commissions": 11084.5,
       "product_expense": 43718.42,
-      "total_expense": 54802.92,
-      "profit": 30480.33,
+      "total_expense": 85789.72,
+      "profit": -506.47,
       "sessions": 1598
     },
     "2026-05-04": {
       "revenue": 69431.39,
       "orders": 75,
-      "ad_spend": 0.0,
+      "ad_spend": 17528.9,
       "commissions": 17178.56,
       "product_expense": 35256.79,
-      "total_expense": 52435.35,
-      "profit": 16996.04,
+      "total_expense": 69964.25,
+      "profit": -532.86,
       "sessions": 1307
     },
     "2026-05-05": {
       "revenue": 73378.35,
       "orders": 75,
-      "ad_spend": 0.0,
+      "ad_spend": 20723.16,
       "commissions": 16480.03,
       "product_expense": 35256.79,
-      "total_expense": 51736.82,
-      "profit": 21641.53,
+      "total_expense": 72459.98,
+      "profit": 918.37,
       "sessions": 1554
     },
     "2026-05-06": {
       "revenue": 89104.3,
       "orders": 113,
-      "ad_spend": 0.0,
+      "ad_spend": 27702.86,
       "commissions": 16679.84,
       "product_expense": 32077.55,
-      "total_expense": 48757.39,
-      "profit": 40346.91,
+      "total_expense": 76460.25,
+      "profit": 12644.05,
       "sessions": 0
     }
   },
-  "last_synced": "2026-05-07T04:13:36",
+  "last_synced": "2026-05-07T07:26:39",
   "shiprocket": {
     "2025-04-01": {
       "new_orders": 263,
@@ -101244,5 +101244,5 @@
       }
     }
   },
-  "shiprocket_synced": "2026-05-07T04:13"
+  "shiprocket_synced": "2026-05-07T07:26"
 }
